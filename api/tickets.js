@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     const limit = req.query.limit || 100;
 
     const response = await fetch(
-      `https://outtax.digisac.me/api/v1/tickets?isOpen=true&limit=${limit}&sort=startedAt&order=desc`,
+      `https://outtax.digisac.me/api/v1/tickets?limit=${limit}&sort=startedAt&order=desc`,
       {
         headers: {
           'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}`,
@@ -21,8 +21,8 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-
-    const abertos = (data.data || []).filter(t => t.isOpen === true);
+    const todos = data.data || [];
+    const abertos = todos.filter(t => t.isOpen === true || t.endedAt === null);
 
     return res.status(200).json({
       ...data,
