@@ -4,426 +4,672 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OUTTAX — Central de Atendimento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f4f5f7; color: #1a1a2e; min-height: 100vh; }
+:root{
+  --sidebar-w:240px;
+  --topbar-h:56px;
+  --navy:#0b1d3a;
+  --navy-2:#0f2548;
+  --navy-3:#1a3460;
+  --orange:#f97316;
+  --surface:#ffffff;
+  --surface-2:#f7f8fc;
+  --surface-3:#eef0f7;
+  --border:#e2e6f0;
+  --border-2:#c8d0e4;
+  --text-1:#0b1d3a;
+  --text-2:#3a4d6e;
+  --text-3:#6e809e;
+  --text-4:#a8b4c8;
+  --red:#dc3545;--red-s:#fff2f3;--red-b:#ffc9cd;
+  --amber:#e8920a;--amber-s:#fff8ed;--amber-b:#fddfa0;
+  --green:#0e9e6e;--green-s:#f0fdf8;--green-b:#9fe8d2;
+  --blue:#2563eb;--blue-s:#eff4ff;--blue-b:#bdd0fd;
+  --purple:#7c3aed;--purple-s:#f5f2ff;
+  --r:8px;--r-lg:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--text-1);background:var(--surface-2);-webkit-font-smoothing:antialiased;}
 
-  /* HEADER */
-  .header { background: #0d1b3e; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; }
-  .header-logo { display: flex; align-items: center; gap: 10px; }
-  .logo-text { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
-  .logo-text span { color: #f97316; }
-  .logo-sub { font-size: 11px; color: #94a3b8; margin-top: 1px; }
-  .header-info { display: flex; align-items: center; gap: 16px; }
-  .header-clock { font-size: 13px; color: #94a3b8; }
-  .header-badge { background: #f97316; color: #fff; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+/* ── LAYOUT SHELL ── */
+.shell{display:flex;height:100vh;overflow:hidden;}
 
-  /* LAYOUT */
-  .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px; }
+/* ── SIDEBAR ── */
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--navy);
+  display:flex;flex-direction:column;
+  height:100vh;
+  overflow:hidden;
+  border-right:1px solid rgba(255,255,255,0.04);
+}
+.sb-logo{
+  display:flex;align-items:center;gap:10px;
+  padding:0 18px;height:var(--topbar-h);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;
+}
+.sb-logo-mark{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff;
+  flex-shrink:0;
+}
+.sb-logo-text{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
+.sb-logo-text em{color:var(--orange);font-style:normal;}
+.sb-logo-sub{font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px;}
 
-  /* METRICS */
-  .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .metric-card { background: #fff; border-radius: 10px; padding: 16px; border: 1px solid #e8eaed; }
-  .metric-label { font-size: 12px; color: #6b7280; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-  .metric-value { font-size: 28px; font-weight: 600; }
-  .metric-sub { font-size: 11px; color: #9ca3af; margin-top: 4px; }
-  .m-danger { color: #dc2626; }
-  .m-warning { color: #d97706; }
-  .m-success { color: #16a34a; }
-  .m-info { color: #2563eb; }
+.sb-section{padding:20px 12px 6px;flex-shrink:0;}
+.sb-section-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.25);padding:0 8px;margin-bottom:4px;}
 
-  /* MAIN GRID */
-  .main-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; }
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:var(--r);
+  color:rgba(255,255,255,0.5);
+  font-size:12px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;
+  margin-bottom:2px;
+  text-decoration:none;
+}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);}
+.sb-item.on{background:rgba(249,115,22,0.15);color:#fff;}
+.sb-item.on .sb-icon{color:var(--orange);}
+.sb-icon{font-size:15px;flex-shrink:0;width:18px;text-align:center;}
+.sb-badge{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'JetBrains Mono',monospace;}
+.sb-item.on .sb-badge{background:rgba(249,115,22,0.25);color:var(--orange);}
+.sb-badge.alert{background:rgba(220,53,69,0.25);color:#ff8a8a;}
 
-  /* PANEL */
-  .panel { background: #fff; border-radius: 10px; border: 1px solid #e8eaed; overflow: hidden; }
-  .panel-header { padding: 14px 18px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
-  .panel-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
-  .panel-body { padding: 12px; }
+.sb-setores{padding:0 12px;flex-shrink:0;}
+.sb-setor{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;border-radius:var(--r);
+  color:rgba(255,255,255,0.45);font-size:12px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;margin-bottom:1px;
+}
+.sb-setor:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.75);}
+.sb-setor.on{background:rgba(255,255,255,0.07);color:#fff;}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sb-setor-count{margin-left:auto;font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace;}
+.sb-setor.on .sb-setor-count{color:rgba(255,255,255,0.5);}
 
-  /* FILTROS */
-  .filtros { display: flex; gap: 6px; flex-wrap: wrap; }
-  .filtro-btn { font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 1px solid #e8eaed; background: transparent; color: #6b7280; cursor: pointer; transition: all 0.15s; }
-  .filtro-btn.active { background: #0d1b3e; color: #fff; border-color: #0d1b3e; }
-  .filtro-btn:hover:not(.active) { background: #f4f5f7; }
+.sb-divider{height:1px;background:rgba(255,255,255,0.06);margin:12px 18px;}
 
-  /* SEARCH */
-  .search-box { padding: 6px 12px; border: 1px solid #e8eaed; border-radius: 20px; font-size: 12px; width: 200px; outline: none; }
-  .search-box:focus { border-color: #0d1b3e; }
+.sb-bottom{margin-top:auto;padding:14px 12px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
+.sb-user{display:flex;align-items:center;gap:9px;}
+.sb-avatar{width:30px;height:30px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-user-name{font-size:12px;font-weight:500;color:rgba(255,255,255,0.7);}
+.sb-user-role{font-size:10px;color:rgba(255,255,255,0.3);}
 
-  /* CHAMADO */
-  .chamado { border: 1px solid #e8eaed; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s; border-left-width: 3px; }
-  .chamado:hover { border-color: #0d1b3e; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-  .chamado.nivel-0 { border-left-color: #2563eb; }
-  .chamado.nivel-1 { border-left-color: #d97706; }
-  .chamado.nivel-2 { border-left-color: #dc2626; }
-  .chamado.selecionado { background: #f0f4ff; border-color: #0d1b3e; }
-  .chamado-top { display: flex; align-items: center; gap: 10px; }
-  .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-  .chamado-info { flex: 1; min-width: 0; }
-  .chamado-nome { font-size: 13px; font-weight: 600; color: #1a1a2e; }
-  .chamado-assunto { font-size: 12px; color: #6b7280; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .chamado-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; align-items: center; }
-  .tag { font-size: 11px; padding: 1px 7px; border-radius: 4px; font-weight: 500; }
-  .tag-setor { background: #eff6ff; color: #1d4ed8; }
-  .tag-nivel0 { background: #eff6ff; color: #1d4ed8; }
-  .tag-nivel1 { background: #fffbeb; color: #b45309; }
-  .tag-nivel2 { background: #fef2f2; color: #b91c1c; }
-  .tempo-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; flex-shrink: 0; }
-  .tempo-ok { background: #f0fdf4; color: #16a34a; }
-  .tempo-alerta { background: #fffbeb; color: #b45309; }
-  .tempo-critico { background: #fef2f2; color: #b91c1c; }
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
 
-  /* BARRA TEMPO */
-  .barra-wrap { height: 3px; background: #f0f0f0; border-radius: 2px; margin-top: 7px; overflow: hidden; }
-  .barra-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+/* ── TOPBAR ── */
+.topbar{
+  height:var(--topbar-h);flex-shrink:0;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;
+  padding:0 24px;gap:16px;
+}
+.topbar-title{font-size:14px;font-weight:600;color:var(--text-1);}
+.topbar-sub{font-size:12px;color:var(--text-4);margin-left:4px;}
+.topbar-spacer{flex:1;}
+.live-wrap{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:var(--text-4);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:glow 2.5s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 2px rgba(14,158,110,0.2);}50%{box-shadow:0 0 0 5px rgba(14,158,110,0);}}
+.topbar-clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-4);}
+.urg-tag{
+  display:flex;align-items:center;gap:5px;
+  background:var(--red-s);border:1px solid var(--red-b);
+  color:var(--red);font-size:11px;font-weight:600;
+  padding:4px 11px;border-radius:6px;
+}
+.urg-tag.ok{background:var(--green-s);border-color:var(--green-b);color:var(--green);}
+.urg-udot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:glow 2s infinite;}
 
-  /* PERFIL */
-  .perfil-vazio { padding: 40px 20px; text-align: center; color: #9ca3af; font-size: 13px; }
-  .perfil-vazio-icon { font-size: 36px; margin-bottom: 10px; }
-  .perfil-nome { font-size: 16px; font-weight: 600; color: #1a1a2e; }
-  .perfil-sub { font-size: 12px; color: #6b7280; margin-top: 2px; }
-  .perfil-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #f4f5f7; font-size: 13px; }
-  .perfil-row:last-child { border-bottom: none; }
-  .perfil-key { color: #6b7280; }
-  .perfil-val { font-weight: 500; color: #1a1a2e; }
-  .nivel-indicator { display: flex; align-items: center; gap: 6px; }
-  .nivel-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .hist-item { font-size: 12px; padding: 5px 8px; background: #f9fafb; border-radius: 6px; margin-bottom: 4px; color: #6b7280; display: flex; align-items: center; gap: 6px; }
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:22px 24px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 
-  /* NIVEL PIPELINE */
-  .pipeline { display: flex; gap: 4px; margin-top: 10px; }
-  .pipe-step { flex: 1; padding: 6px; border-radius: 6px; text-align: center; font-size: 11px; font-weight: 500; border: 1px solid transparent; }
-  .pipe-done { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
-  .pipe-active { background: #fffbeb; color: #b45309; border-color: #fcd34d; }
-  .pipe-wait { background: #f9fafb; color: #9ca3af; border-color: #e8eaed; }
-  .pipe-escalado { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+/* ── METRICS ROW ── */
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px;}
+.mc{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:18px 20px;
+  transition:box-shadow 0.2s,transform 0.2s;
+  cursor:default;
+}
+.mc:hover{box-shadow:0 4px 16px rgba(11,29,58,0.07);transform:translateY(-1px);}
+.mc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.mc-icon{width:38px;height:38px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:17px;}
+.mc-delta{font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;}
+.mc-val{font-size:34px;font-weight:700;letter-spacing:-1.5px;line-height:1;margin-bottom:4px;}
+.mc-label{font-size:11px;font-weight:500;color:var(--text-3);text-transform:uppercase;letter-spacing:0.06em;}
+.mc-sub{font-size:11px;color:var(--text-4);margin-top:3px;}
+.mc-bar{height:3px;background:var(--surface-3);border-radius:2px;margin-top:12px;overflow:hidden;}
+.mc-bar-f{height:100%;border-radius:2px;transition:width 0.5s;}
 
-  /* SETOR DIST */
-  .setor-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-top: 4px; }
-  .setor-card { background: #f9fafb; border-radius: 8px; padding: 10px 12px; border: 1px solid #e8eaed; }
-  .setor-n { font-size: 20px; font-weight: 600; }
-  .setor-nome { font-size: 11px; color: #6b7280; margin-top: 1px; }
-  .setor-resp { font-size: 11px; color: #9ca3af; margin-top: 3px; }
+/* ── GRID ── */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start;}
 
-  /* REFRESH */
-  .refresh-info { font-size: 11px; color: #9ca3af; display: flex; align-items: center; gap: 4px; }
-  .dot-live { width: 6px; height: 6px; border-radius: 50%; background: #16a34a; display: inline-block; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+/* ── PANEL ── */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.ph{
+  padding:14px 18px;border-bottom:1px solid var(--surface-3);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.ph-left{display:flex;align-items:center;gap:10px;}
+.ph-title{font-size:13px;font-weight:600;color:var(--text-1);}
+.ph-count{font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--surface-3);color:var(--text-3);font-family:'JetBrains Mono',monospace;}
+.ph-right{display:flex;align-items:center;gap:8px;}
 
-  /* BOTAO */
-  .btn { font-size: 12px; padding: 6px 14px; border-radius: 6px; border: 1px solid #e8eaed; background: #fff; color: #374151; cursor: pointer; transition: all 0.15s; }
-  .btn:hover { background: #f4f5f7; }
-  .btn-primary { background: #0d1b3e; color: #fff; border-color: #0d1b3e; }
-  .btn-primary:hover { background: #1a2f5e; }
+/* ── SEARCH ── */
+.search{position:relative;}
+.search input{
+  font-family:'Inter',sans-serif;font-size:12px;
+  padding:6px 12px 6px 32px;
+  border:1px solid var(--border);border-radius:7px;
+  background:var(--surface-2);color:var(--text-1);
+  width:210px;outline:none;transition:all 0.15s;
+}
+.search input:focus{border-color:var(--navy-3);background:var(--surface);box-shadow:0 0 0 3px rgba(26,52,96,0.07);}
+.search input::placeholder{color:var(--text-4);}
+.search-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-4);pointer-events:none;}
+.ib{
+  width:30px;height:30px;border:1px solid var(--border);border-radius:7px;
+  background:var(--surface);color:var(--text-3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;cursor:pointer;transition:all 0.15s;
+}
+.ib:hover{background:var(--surface-3);color:var(--text-1);}
 
-  @media (max-width: 900px) {
-    .main-grid { grid-template-columns: 1fr; }
-    .metrics { grid-template-columns: repeat(2, 1fr); }
-  }
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead tr{border-bottom:1px solid var(--surface-3);}
+thead th{
+  padding:10px 14px;
+  font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;
+  color:var(--text-4);text-align:left;white-space:nowrap;
+}
+tbody tr{
+  border-bottom:1px solid var(--surface-3);
+  cursor:pointer;transition:background 0.12s;
+}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface-2);}
+tbody tr.sel{background:#f3f6ff;}
+tbody td{padding:11px 14px;vertical-align:middle;}
+
+.td-client{display:flex;align-items:center;gap:10px;}
+.td-av{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;
+}
+.td-name{font-size:13px;font-weight:600;color:var(--text-1);}
+.td-subj{font-size:11px;color:var(--text-3);margin-top:1px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.td-id{font-size:11px;color:var(--text-4);font-family:'JetBrains Mono',monospace;}
+
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:5px;border:1px solid transparent;white-space:nowrap;}
+.b-gray{background:var(--surface-3);color:var(--text-2);border-color:var(--border);}
+.b-blue{background:var(--blue-s);color:#1d4ed8;border-color:var(--blue-b);}
+.b-amber{background:var(--amber-s);color:#b45309;border-color:var(--amber-b);}
+.b-red{background:var(--red-s);color:#b91c1c;border-color:var(--red-b);}
+.b-green{background:var(--green-s);color:#065f46;border-color:var(--green-b);}
+.b-purple{background:var(--purple-s);color:#5b21b6;}
+
+.tbar{height:4px;background:var(--surface-3);border-radius:2px;overflow:hidden;width:80px;}
+.tbar-f{height:100%;border-radius:2px;transition:width 0.4s;}
+
+.tbadge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;
+  padding:3px 9px;border-radius:5px;
+  border:1px solid transparent;
+  font-family:'JetBrains Mono',monospace;
+  white-space:nowrap;
+}
+.t-ok{background:var(--green-s);color:#065f46;border-color:var(--green-b);}
+.t-mid{background:var(--amber-s);color:#92400e;border-color:var(--amber-b);}
+.t-hot{background:var(--red-s);color:#991b1b;border-color:var(--red-b);}
+.t-cli{background:var(--purple-s);color:#5b21b6;border-color:#ddd6fe;}
+
+.nivel-wrap{display:flex;align-items:center;gap:4px;}
+.nivel-pip{width:10px;height:10px;border-radius:3px;background:var(--surface-3);border:1px solid var(--border);}
+.nivel-pip.done{background:var(--green);border-color:var(--green);}
+.nivel-pip.active{background:var(--amber);border-color:var(--amber);}
+.nivel-pip.hot{background:var(--red);border-color:var(--red);}
+
+/* ── PERFIL ── */
+.p-empty{padding:56px 20px;text-align:center;}
+.p-empty-ico{width:56px;height:56px;background:var(--surface-3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px;}
+.p-empty p{font-size:12px;color:var(--text-4);line-height:1.7;max-width:180px;margin:0 auto;}
+
+.p-inner{padding:0;}
+.p-hero{padding:18px;border-bottom:1px solid var(--surface-3);}
+.p-av-lg{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:12px;}
+.p-name{font-size:15px;font-weight:700;color:var(--text-1);letter-spacing:-0.2px;}
+.p-assunto{font-size:12px;color:var(--text-2);margin-top:3px;}
+.p-id-row{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
+
+.p-section{padding:14px 18px;border-bottom:1px solid var(--surface-3);}
+.p-section:last-child{border-bottom:none;}
+.p-section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--text-4);margin-bottom:10px;}
+.p-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--surface-3);font-size:12px;}
+.p-row:last-child{border-bottom:none;}
+.p-k{color:var(--text-3);}
+.p-v{font-weight:500;color:var(--text-1);}
+
+.pipe-steps{display:flex;gap:4px;margin-top:6px;}
+.pipe-s{
+  flex:1;padding:7px 6px;border-radius:7px;text-align:center;
+  font-size:11px;font-weight:500;line-height:1.3;
+  border:1px solid var(--border);color:var(--text-4);background:var(--surface-3);
+}
+.ps-done{background:var(--green-s);color:#065f46;border-color:var(--green-b);}
+.ps-active{background:var(--amber-s);color:#92400e;border-color:var(--amber-b);}
+.ps-hot{background:var(--red-s);color:#991b1b;border-color:var(--red-b);}
+
+.tempo-bar-wrap{margin-top:8px;}
+.tempo-bar-head{display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;}
+.tempo-bar-track{height:6px;background:var(--surface-3);border-radius:3px;overflow:hidden;}
+.tempo-bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease;}
+.tempo-val{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-top:5px;}
+
+.hist-row{display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--surface-2);border-radius:6px;margin-bottom:4px;border:1px solid var(--border);font-size:12px;color:var(--text-2);}
+.hist-ck{color:var(--green);font-weight:700;font-size:11px;flex-shrink:0;}
+
+/* ── SETOR ROW ABAIXO ── */
+.setores-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:16px;}
+.sc{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:14px 16px;
+  border-top:3px solid transparent;
+  cursor:pointer;transition:all 0.15s;
+}
+.sc:hover{box-shadow:0 4px 12px rgba(11,29,58,0.07);transform:translateY(-1px);}
+.sc-val{font-size:26px;font-weight:700;letter-spacing:-0.8px;line-height:1;}
+.sc-name{font-size:11px;font-weight:500;color:var(--text-2);margin-top:4px;}
+.sc-resp{font-size:11px;color:var(--text-4);margin-top:2px;}
+.sc-urg{font-size:11px;font-weight:600;margin-top:6px;display:flex;align-items:center;gap:5px;}
+.sc-urg-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:glow 2s infinite;}
 </style>
 </head>
 <body>
+<div class="shell">
 
-<div class="header">
-  <div class="header-logo">
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">O</div>
     <div>
-      <div class="logo-text">OUT<span>TAX</span></div>
-      <div class="logo-sub">Central de Atendimento</div>
+      <div class="sb-logo-text">OUT<em>TAX</em></div>
+      <div class="sb-logo-sub">Gestão Contábil</div>
     </div>
   </div>
-  <div class="header-info">
-    <div class="refresh-info"><span class="dot-live"></span> Ao vivo</div>
-    <div class="header-clock" id="clock">--:--</div>
-    <div class="header-badge" id="badge-urgente">0 urgentes</div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Principal</div>
+    <div class="sb-item on" onclick="setNav(this)">
+      <span class="sb-icon">📊</span> Atendimento
+      <span class="sb-badge alert" id="sb-urg">0</span>
+    </div>
+    <div class="sb-item" onclick="setNav(this)">
+      <span class="sb-icon">📋</span> Chamados
+      <span class="sb-badge" id="sb-total">0</span>
+    </div>
+    <div class="sb-item" onclick="setNav(this)">
+      <span class="sb-icon">👥</span> Clientes
+      <span class="sb-badge">330</span>
+    </div>
+    <div class="sb-item" onclick="setNav(this)">
+      <span class="sb-icon">📈</span> Relatórios
+    </div>
+  </div>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Setores</div>
+  </div>
+  <div class="sb-setores" id="sb-setores"></div>
+
+  <div class="sb-divider"></div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Sistema</div>
+    <div class="sb-item" onclick="setNav(this)">
+      <span class="sb-icon">⚙️</span> Configurações
+    </div>
+    <div class="sb-item" onclick="setNav(this)">
+      <span class="sb-icon">🔗</span> DIGISAC API
+    </div>
+  </div>
+
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar">MX</div>
+      <div>
+        <div class="sb-user-name">Marcos Xavier</div>
+        <div class="sb-user-role">Sócio · Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <div class="topbar">
+    <div>
+      <span class="topbar-title">Central de Atendimento</span>
+      <span class="topbar-sub" id="tb-date"></span>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="live-wrap"><span class="live-dot"></span>Ao vivo</div>
+    <div class="topbar-clock" id="clock"></div>
+    <div class="urg-tag" id="urg-tag">
+      <span class="urg-udot"></span>
+      <span id="urg-txt">—</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- MÉTRICAS -->
+    <div class="metrics">
+      <div class="mc">
+        <div class="mc-head">
+          <div class="mc-icon" style="background:var(--red-s);">⏳</div>
+          <div class="mc-delta" style="background:var(--red-s);color:var(--red);" id="md1"></div>
+        </div>
+        <div class="mc-val" style="color:var(--red);" id="m1">0</div>
+        <div class="mc-label">Aguardando time</div>
+        <div class="mc-sub">chamados sem resposta</div>
+        <div class="mc-bar"><div class="mc-bar-f" style="background:var(--red);" id="mb1"></div></div>
+      </div>
+      <div class="mc">
+        <div class="mc-head">
+          <div class="mc-icon" style="background:var(--amber-s);">👤</div>
+          <div class="mc-delta" style="background:var(--amber-s);color:var(--amber);" id="md2"></div>
+        </div>
+        <div class="mc-val" style="color:var(--amber);" id="m2">0</div>
+        <div class="mc-label">Aguardando cliente</div>
+        <div class="mc-sub">bola no cliente</div>
+        <div class="mc-bar"><div class="mc-bar-f" style="background:var(--amber);" id="mb2"></div></div>
+      </div>
+      <div class="mc">
+        <div class="mc-head">
+          <div class="mc-icon" style="background:var(--blue-s);">⬆️</div>
+          <div class="mc-delta" style="background:var(--blue-s);color:var(--blue);" id="md3"></div>
+        </div>
+        <div class="mc-val" style="color:var(--blue);" id="m3">0</div>
+        <div class="mc-label">Escalados ao gestor</div>
+        <div class="mc-sub">nível 1 ou 2</div>
+        <div class="mc-bar"><div class="mc-bar-f" style="background:var(--blue);" id="mb3"></div></div>
+      </div>
+      <div class="mc">
+        <div class="mc-head">
+          <div class="mc-icon" style="background:var(--green-s);">✅</div>
+          <div class="mc-delta" style="background:var(--green-s);color:var(--green);">+18 hoje</div>
+        </div>
+        <div class="mc-val" style="color:var(--green);">18</div>
+        <div class="mc-label">Resolvidos hoje</div>
+        <div class="mc-sub">TMA: 1h 42min</div>
+        <div class="mc-bar"><div class="mc-bar-f" style="background:var(--green);width:60%;"></div></div>
+      </div>
+    </div>
+
+    <!-- GRID PRINCIPAL -->
+    <div class="grid">
+
+      <!-- TABELA -->
+      <div>
+        <div class="panel">
+          <div class="ph">
+            <div class="ph-left">
+              <div class="ph-title">Chamados ativos</div>
+              <div class="ph-count" id="ph-count">0</div>
+            </div>
+            <div class="ph-right">
+              <div class="search">
+                <span class="search-ic">🔍</span>
+                <input type="text" placeholder="Buscar cliente ou assunto…" oninput="buscar(this.value)" id="srch">
+              </div>
+              <button class="ib" onclick="reset()" title="Limpar">↻</button>
+            </div>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="padding-left:18px;">Cliente</th>
+                  <th>Protocolo</th>
+                  <th>Setor</th>
+                  <th>Nível</th>
+                  <th>Status</th>
+                  <th>Tempo</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SETORES -->
+        <div class="setores-row" id="setores-row"></div>
+      </div>
+
+      <!-- PERFIL -->
+      <div class="panel" style="position:sticky;top:0;">
+        <div class="ph">
+          <div class="ph-left">
+            <div class="ph-title">Perfil do chamado</div>
+          </div>
+          <span id="p-id" style="font-size:11px;color:var(--text-4);font-family:'JetBrains Mono',monospace;"></span>
+        </div>
+        <div id="perfil">
+          <div class="p-empty">
+            <div class="p-empty-ico">📋</div>
+            <p>Selecione um chamado na tabela para ver o perfil completo e histórico do cliente.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
-
-<div class="container">
-
-  <!-- METRICS -->
-  <div class="metrics">
-    <div class="metric-card">
-      <div class="metric-label">⏳ Aguardando nosso time</div>
-      <div class="metric-value m-danger" id="m1">0</div>
-      <div class="metric-sub">chamados sem resposta</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">👤 Aguardando cliente</div>
-      <div class="metric-value m-warning" id="m2">0</div>
-      <div class="metric-sub">bola no cliente</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">⬆️ Escalados ao gestor</div>
-      <div class="metric-value m-info" id="m3">0</div>
-      <div class="metric-sub">nível 1 ou 2</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">✅ Resolvidos hoje</div>
-      <div class="metric-value m-success" id="m4">0</div>
-      <div class="metric-sub">tempo médio: <span id="tma">--</span></div>
-    </div>
-  </div>
-
-  <div class="main-grid">
-
-    <!-- LISTA CHAMADOS -->
-    <div>
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title">Chamados ativos</div>
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input type="text" class="search-box" placeholder="Buscar cliente..." oninput="buscar(this.value)" id="search">
-            <button class="btn" onclick="recarregar()" title="Atualizar">↻</button>
-          </div>
-        </div>
-        <div style="padding:10px 12px 4px;border-bottom:1px solid #f0f0f0;">
-          <div class="filtros" id="filtros">
-            <button class="filtro-btn active" onclick="setFiltro('todos',this)">Todos</button>
-            <button class="filtro-btn" onclick="setFiltro('time',this)">Aguard. time</button>
-            <button class="filtro-btn" onclick="setFiltro('cliente',this)">Aguard. cliente</button>
-            <button class="filtro-btn" onclick="setFiltro('escalado',this)">Escalados</button>
-            <button class="filtro-btn" onclick="setFiltro('Fiscal',this)">Fiscal</button>
-            <button class="filtro-btn" onclick="setFiltro('Dep. Pessoal',this)">Dep. Pessoal</button>
-            <button class="filtro-btn" onclick="setFiltro('Contabilidade',this)">Contabilidade</button>
-            <button class="filtro-btn" onclick="setFiltro('Legalização',this)">Legalização</button>
-            <button class="filtro-btn" onclick="setFiltro('BPO Financeiro',this)">BPO</button>
-          </div>
-        </div>
-        <div class="panel-body" id="lista" style="max-height:560px;overflow-y:auto;"></div>
-      </div>
-
-      <!-- SETOR DIST -->
-      <div class="panel" style="margin-top:14px;">
-        <div class="panel-header">
-          <div class="panel-title">Chamados por setor hoje</div>
-        </div>
-        <div class="panel-body">
-          <div class="setor-grid" id="setor-grid"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PERFIL -->
-    <div>
-      <div class="panel" style="position:sticky;top:20px;">
-        <div class="panel-header">
-          <div class="panel-title">Perfil do chamado</div>
-          <div id="perfil-id" style="font-size:11px;color:#9ca3af;"></div>
-        </div>
-        <div id="perfil-content">
-          <div class="perfil-vazio">
-            <div class="perfil-vazio-icon">👆</div>
-            Clique em um chamado para ver o perfil completo
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
 </div>
 
 <script>
-const SETORES = {
-  'Fiscal':        { gestor:'André Rocha',    ini:'AR', cor:'#eff6ff', txt:'#1d4ed8' },
-  'Dep. Pessoal':  { gestor:'Edgar de Paula', ini:'EP', cor:'#f0fdf4', txt:'#15803d' },
-  'Contabilidade': { gestor:'Carla Rosa',     ini:'CR', cor:'#fdf4ff', txt:'#7e22ce' },
-  'Legalização':   { gestor:'Michelle Costa', ini:'MC', cor:'#fff7ed', txt:'#c2410c' },
-  'BPO Financeiro':{ gestor:'Nivea Carvalho', ini:'NC', cor:'#fef2f2', txt:'#b91c1c' },
+const S={
+  'Fiscal':        {g:'André Rocha',   i:'AR',bg:'#eff6ff',fg:'#1d4ed8',dot:'#3b82f6',top:'#3b82f6'},
+  'Dep. Pessoal':  {g:'Edgar de Paula',i:'EP',bg:'#f0fdf4',fg:'#15803d',dot:'#10b981',top:'#10b981'},
+  'Contabilidade': {g:'Carla Rosa',    i:'CR',bg:'#f5f3ff',fg:'#6d28d9',dot:'#8b5cf6',top:'#8b5cf6'},
+  'Legalização':   {g:'Michelle Costa',i:'MC',bg:'#fff7ed',fg:'#c2410c',dot:'#f97316',top:'#f97316'},
+  'BPO Financeiro':{g:'Nivea Carvalho',i:'NC',bg:'#fef2f2',fg:'#b91c1c',dot:'#dc3545',top:'#dc3545'},
 };
-
-const SOCIOS = ['Marcos Xavier','Maiccon Dornelles'];
-
-const CHAMADOS = [
-  { id:'#1042', cliente:'Mercado São João', ini:'MS', setor:'Fiscal', assunto:'DARF em atraso', nivel:2, responsavel:'André Rocha', minutos:320, status:'time', hist:['Certidão negativa — resolvido','DAS vencido — resolvido'] },
-  { id:'#1041', cliente:'Auto Peças Norte', ini:'AP', setor:'Fiscal', assunto:'Nota fiscal rejeitada', nivel:1, responsavel:'André Rocha', minutos:180, status:'time', hist:['NF rejeitada dez — resolvido'] },
-  { id:'#1040', cliente:'Clínica Bem Estar', ini:'CB', setor:'Dep. Pessoal', assunto:'Rescisão contratual', nivel:2, responsavel:'Edgar de Paula', minutos:410, status:'time', hist:['Admissão funcionário — resolvido','Férias coletivas — resolvido'] },
-  { id:'#1039', cliente:'Tech Imports Ltda', ini:'TI', setor:'Contabilidade', assunto:'Balanço anual', nivel:0, responsavel:'Carla Rosa', minutos:95, status:'time', hist:['DRE trimestral — resolvido'] },
-  { id:'#1038', cliente:'Padaria Central', ini:'PC', setor:'Fiscal', assunto:'Consulta Simples Nacional', nivel:0, responsavel:'André Rocha', minutos:50, status:'time', hist:['Opção Simples — resolvido'] },
-  { id:'#1037', cliente:'Matos Advogados', ini:'MA', setor:'Contabilidade', assunto:'Demonstrativos contábeis', nivel:0, responsavel:'Carla Rosa', minutos:200, status:'cliente', hist:['Balanço 2023 — resolvido'] },
-  { id:'#1036', cliente:'Loja das Flores', ini:'LF', setor:'Dep. Pessoal', assunto:'Holerite divergente', nivel:0, responsavel:'Edgar de Paula', minutos:140, status:'cliente', hist:['Admissão — resolvido'] },
-  { id:'#1035', cliente:'Distribuidora Alfa', ini:'DA', setor:'BPO Financeiro', assunto:'Conciliação bancária', nivel:1, responsavel:'Nivea Carvalho', minutos:260, status:'time', hist:['Relatório financeiro — resolvido'] },
-  { id:'#1034', cliente:'Construtora Horizonte', ini:'CH', setor:'Legalização', assunto:'Alteração contratual', nivel:0, responsavel:'Michelle Costa', minutos:75, status:'cliente', hist:['Abertura empresa — resolvido'] },
-  { id:'#1033', cliente:'Pet Shop Amigos', ini:'PA', setor:'Dep. Pessoal', assunto:'Férias vencidas', nivel:0, responsavel:'Edgar de Paula', minutos:30, status:'time', hist:['Holerite — resolvido'] },
-  { id:'#1032', cliente:'Farmácia Saúde+', ini:'FS', setor:'Fiscal', assunto:'SPED Fiscal pendente', nivel:1, responsavel:'André Rocha', minutos:300, status:'time', hist:['SPED 2023 — resolvido'] },
-  { id:'#1031', cliente:'Academia Fitness', ini:'AF', setor:'Legalização', assunto:'Abertura de filial', nivel:0, responsavel:'Michelle Costa', minutos:120, status:'cliente', hist:['Abertura matriz — resolvido'] },
+const SOCIOS=['Marcos Xavier','Maiccon Dornelles'];
+const D=[
+  {id:'#1042',c:'Mercado São João',    i:'MS',s:'Fiscal',        a:'DARF em atraso',           n:2,m:320,st:'time',   h:['Certidão negativa — resolvido','DAS vencido — resolvido','Dúvida regime — resolvido']},
+  {id:'#1041',c:'Auto Peças Norte',    i:'AP',s:'Fiscal',        a:'Nota fiscal rejeitada',     n:1,m:180,st:'time',   h:['NF rejeitada dez — resolvido','Consulta ICMS — resolvido']},
+  {id:'#1040',c:'Clínica Bem Estar',   i:'CB',s:'Dep. Pessoal',  a:'Rescisão contratual',       n:2,m:410,st:'time',   h:['Admissão funcionário — resolvido','Férias coletivas — resolvido']},
+  {id:'#1039',c:'Tech Imports Ltda',   i:'TI',s:'Contabilidade', a:'Balanço anual',             n:0,m:95, st:'time',   h:['DRE trimestral — resolvido']},
+  {id:'#1038',c:'Padaria Central',     i:'PC',s:'Fiscal',        a:'Consulta Simples Nacional', n:0,m:50, st:'time',   h:['Opção Simples — resolvido']},
+  {id:'#1037',c:'Matos Advogados',     i:'MA',s:'Contabilidade', a:'Demonstrativos contábeis',  n:0,m:200,st:'cliente',h:['Balanço 2023 — resolvido','DRE anual — resolvido']},
+  {id:'#1036',c:'Loja das Flores',     i:'LF',s:'Dep. Pessoal',  a:'Holerite divergente',       n:0,m:140,st:'cliente',h:['Admissão — resolvido']},
+  {id:'#1035',c:'Distribuidora Alfa',  i:'DA',s:'BPO Financeiro',a:'Conciliação bancária',      n:1,m:260,st:'time',   h:['Relatório financeiro — resolvido','Fluxo de caixa — resolvido']},
+  {id:'#1034',c:'Construtora Horizonte',i:'CH',s:'Legalização',  a:'Alteração contratual',      n:0,m:75, st:'cliente',h:['Abertura empresa — resolvido']},
+  {id:'#1033',c:'Pet Shop Amigos',     i:'PA',s:'Dep. Pessoal',  a:'Férias vencidas',           n:0,m:30, st:'time',   h:['Holerite — resolvido','Admissão — resolvido']},
+  {id:'#1032',c:'Farmácia Saúde+',     i:'FS',s:'Fiscal',        a:'SPED Fiscal pendente',      n:1,m:300,st:'time',   h:['SPED 2023 — resolvido','EFD contribuições — resolvido']},
+  {id:'#1031',c:'Academia Fitness',    i:'AF',s:'Legalização',   a:'Abertura de filial',        n:0,m:120,st:'cliente',h:['Abertura matriz — resolvido']},
 ];
 
-let filtroAtual = 'todos';
-let buscaAtual = '';
-let chamadoSelecionado = null;
+let filtroSetor='todos', busca='', sel=null;
 
-function fmt(min) {
-  if (min < 60) return min + 'min';
-  const h = Math.floor(min/60), m = min%60;
-  return h + 'h' + (m > 0 ? ' ' + m + 'min' : '');
-}
+const fmt=m=>m<60?m+'min':Math.floor(m/60)+'h'+(m%60?' '+m%60+'min':'');
+const pct=m=>Math.min(100,Math.round(m/240*100));
+const cor=m=>m>=240?'var(--red)':m>=120?'var(--amber)':'var(--green)';
+const corHex=m=>m>=240?'#dc3545':m>=120?'#e8920a':'#0e9e6e';
 
-function barCor(min) {
-  if (min >= 240) return '#dc2626';
-  if (min >= 120) return '#d97706';
-  return '#16a34a';
-}
-
-function barPct(min) { return Math.min(100, Math.round(min/240*100)); }
-
-function tempoBadge(c) {
-  const cls = c.minutos >= 240 ? 'tempo-critico' : c.minutos >= 120 ? 'tempo-alerta' : 'tempo-ok';
-  const label = c.status === 'time'
-    ? (c.minutos >= 240 ? '🔴 ' : c.minutos >= 120 ? '🟡 ' : '🟢 ') + fmt(c.minutos) + ' sem resp.'
-    : '👤 Aguard. cliente ' + fmt(c.minutos);
-  return `<span class="tempo-badge ${cls}">${label}</span>`;
-}
-
-function nivelTag(c) {
-  if (c.nivel === 0) return `<span class="tag tag-nivel0">Com responsável</span>`;
-  if (c.nivel === 1) return `<span class="tag tag-nivel1">⬆ Gestor: ${SETORES[c.setor].gestor}</span>`;
-  return `<span class="tag tag-nivel2" style="background:#fef2f2;color:#b91c1c;">🚨 Sócio: ${SOCIOS[0]}</span>`;
-}
-
-function render() {
-  const lista = CHAMADOS.filter(c => {
-    if (filtroAtual === 'time' && c.status !== 'time') return false;
-    if (filtroAtual === 'cliente' && c.status !== 'cliente') return false;
-    if (filtroAtual === 'escalado' && c.nivel === 0) return false;
-    if (['Fiscal','Dep. Pessoal','Contabilidade','Legalização','BPO Financeiro'].includes(filtroAtual) && c.setor !== filtroAtual) return false;
-    if (buscaAtual && !c.cliente.toLowerCase().includes(buscaAtual) && !c.assunto.toLowerCase().includes(buscaAtual)) return false;
+function render(){
+  const list=D.filter(d=>{
+    if(filtroSetor!=='todos'&&d.s!==filtroSetor)return false;
+    if(busca&&!d.c.toLowerCase().includes(busca)&&!d.a.toLowerCase().includes(busca))return false;
     return true;
-  }).sort((a,b) => b.minutos - a.minutos);
+  }).sort((a,b)=>b.m-a.m);
 
-  // métricas
-  const timeCount = CHAMADOS.filter(c => c.status === 'time').length;
-  const clienteCount = CHAMADOS.filter(c => c.status === 'cliente').length;
-  const escaladoCount = CHAMADOS.filter(c => c.nivel > 0).length;
-  const urgentes = CHAMADOS.filter(c => c.minutos >= 240 && c.status === 'time').length;
-  document.getElementById('m1').textContent = timeCount;
-  document.getElementById('m2').textContent = clienteCount;
-  document.getElementById('m3').textContent = escaladoCount;
-  document.getElementById('m4').textContent = 18;
-  document.getElementById('tma').textContent = '1h 42min';
-  document.getElementById('badge-urgente').textContent = urgentes + (urgentes === 1 ? ' urgente' : ' urgentes');
+  const urg=D.filter(d=>d.m>=240&&d.st==='time').length;
+  const timeC=D.filter(d=>d.st==='time').length;
+  const cliC=D.filter(d=>d.st==='cliente').length;
+  const escC=D.filter(d=>d.n>0).length;
 
-  // lista
-  document.getElementById('lista').innerHTML = lista.map(c => `
-    <div class="chamado nivel-${c.nivel} ${chamadoSelecionado===c.id?'selecionado':''}" onclick="selecionar('${c.id}')">
-      <div class="chamado-top">
-        <div class="avatar" style="background:${SETORES[c.setor].cor};color:${SETORES[c.setor].txt};">${c.ini}</div>
-        <div class="chamado-info">
-          <div class="chamado-nome">${c.cliente}</div>
-          <div class="chamado-assunto">${c.assunto}</div>
-        </div>
-        ${tempoBadge(c)}
-      </div>
-      <div class="chamado-tags">
-        <span class="tag tag-setor">${c.setor}</span>
-        ${nivelTag(c)}
-      </div>
-      <div class="barra-wrap"><div class="barra-fill" style="width:${barPct(c.minutos)}%;background:${barCor(c.minutos)};"></div></div>
-    </div>
-  `).join('') || '<div style="text-align:center;padding:2rem;color:#9ca3af;font-size:13px;">Nenhum chamado para este filtro</div>';
+  document.getElementById('m1').textContent=timeC;
+  document.getElementById('m2').textContent=cliC;
+  document.getElementById('m3').textContent=escC;
+  document.getElementById('md1').textContent=urg+' acima do SLA';
+  document.getElementById('md2').textContent=cliC+' aguardando';
+  document.getElementById('md3').textContent=D.filter(d=>d.n===2).length+' críticos';
+  document.getElementById('mb1').style.width=Math.round(timeC/D.length*100)+'%';
+  document.getElementById('mb2').style.width=Math.round(cliC/D.length*100)+'%';
+  document.getElementById('mb3').style.width=Math.round(escC/D.length*100)+'%';
+  document.getElementById('sb-urg').textContent=urg;
+  document.getElementById('sb-total').textContent=D.length;
+  document.getElementById('ph-count').textContent=list.length;
 
-  // setores
-  const setorData = Object.entries(SETORES).map(([nome, info]) => ({
-    nome, info,
-    total: CHAMADOS.filter(c => c.setor === nome).length,
-    urgente: CHAMADOS.filter(c => c.setor === nome && c.minutos >= 240 && c.status === 'time').length,
-  }));
-  document.getElementById('setor-grid').innerHTML = setorData.map(s => `
-    <div class="setor-card">
-      <div class="setor-n" style="color:${s.info.txt};">${s.total}</div>
-      <div class="setor-nome">${s.nome}</div>
-      <div class="setor-resp">${s.info.gestor}</div>
-      ${s.urgente > 0 ? `<div style="font-size:11px;color:#dc2626;margin-top:3px;">🔴 ${s.urgente} urgente${s.urgente>1?'s':''}</div>` : ''}
-    </div>
-  `).join('');
-}
+  const utag=document.getElementById('urg-tag');
+  const utxt=document.getElementById('urg-txt');
+  utxt.textContent=urg?urg+' urgente'+(urg>1?'s':''):'Tudo no prazo';
+  utag.className='urg-tag'+(urg?'':' ok');
 
-function selecionar(id) {
-  chamadoSelecionado = id;
-  const c = CHAMADOS.find(x => x.id === id);
-  if (!c) return;
-  document.getElementById('perfil-id').textContent = c.id;
-
-  const nivelLabel = c.nivel === 0
-    ? '<span style="background:#eff6ff;color:#1d4ed8;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500;">Com responsável</span>'
-    : c.nivel === 1
-    ? `<span style="background:#fffbeb;color:#b45309;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500;">⬆ Nível 1 — Gestor</span>`
-    : `<span style="background:#fef2f2;color:#b91c1c;padding:2px 8px;border-radius:20px;font-size:12px;font-weight:500;">🚨 Nível 2 — Sócio</span>`;
-
-  const pipeSteps = ['Responsável', 'Gestor da área', 'Sócio'];
-  const pipeline = pipeSteps.map((s,i) => {
-    let cls = 'pipe-wait';
-    if (i < c.nivel) cls = 'pipe-done';
-    else if (i === c.nivel) cls = c.nivel === 2 ? 'pipe-escalado' : c.nivel === 1 ? 'pipe-active' : 'pipe-done';
-    return `<div class="pipe-step ${cls}">${s}</div>`;
-  }).join('');
-
-  const corTempo = barCor(c.minutos);
-
-  document.getElementById('perfil-content').innerHTML = `
-    <div style="padding:16px;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div class="avatar" style="width:44px;height:44px;font-size:14px;background:${SETORES[c.setor].cor};color:${SETORES[c.setor].txt};">${c.ini}</div>
-        <div>
-          <div class="perfil-nome">${c.cliente}</div>
-          <div class="perfil-sub">${c.assunto}</div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:14px;">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;color:#9ca3af;margin-bottom:6px;">Nível de escalonamento</div>
-        <div class="pipeline">${pipeline}</div>
-      </div>
-
-      <div style="border-top:1px solid #f4f5f7;padding-top:12px;">
-        <div class="perfil-row"><span class="perfil-key">Setor</span><span class="perfil-val">${c.setor}</span></div>
-        <div class="perfil-row"><span class="perfil-key">Responsável</span><span class="perfil-val">${c.responsavel}</span></div>
-        ${c.nivel >= 1 ? `<div class="perfil-row"><span class="perfil-key">Gestor da área</span><span class="perfil-val" style="color:#b45309;">${SETORES[c.setor].gestor}</span></div>` : ''}
-        ${c.nivel >= 2 ? `<div class="perfil-row"><span class="perfil-key">Sócio acionado</span><span class="perfil-val" style="color:#b91c1c;">${SOCIOS[0]}</span></div>` : ''}
-        <div class="perfil-row"><span class="perfil-key">Status</span><span>${nivelLabel}</span></div>
-        <div class="perfil-row"><span class="perfil-key">Aberto há</span><span class="perfil-val" style="color:${corTempo};">${fmt(c.minutos)}</span></div>
-        <div style="padding:8px 0;">
-          <div style="font-size:12px;color:#6b7280;margin-bottom:5px;">Tempo sem resposta</div>
-          <div class="barra-wrap" style="height:6px;"><div class="barra-fill" style="width:${barPct(c.minutos)}%;background:${corTempo};"></div></div>
-          <div style="display:flex;justify-content:space-between;margin-top:3px;">
-            <span style="font-size:11px;font-weight:600;color:${corTempo};">${fmt(c.minutos)}</span>
-            <span style="font-size:11px;color:#9ca3af;">SLA: 4h</span>
+  document.getElementById('tbody').innerHTML=list.map(d=>{
+    const s=S[d.s];
+    const np=Array.from({length:3},(_,i)=>{
+      let cls='nivel-pip';
+      if(i<d.n)cls+=' done';
+      else if(i===d.n)cls+=d.n===2?' hot':d.n===1?' active':' done';
+      return`<div class="${cls}"></div>`;
+    }).join('');
+    const tbcls=d.st==='cliente'?'t-cli':d.m>=240?'t-hot':d.m>=120?'t-mid':'t-ok';
+    const tblbl=d.st==='cliente'?'Aguard. cliente':(d.m>=240?'⚠ ':'')+fmt(d.m);
+    const nbadge=d.n===0?`<span class="badge b-blue">Responsável</span>`:d.n===1?`<span class="badge b-amber">Gestor</span>`:`<span class="badge b-red">Sócio</span>`;
+    return`<tr class="${sel===d.id?'sel':''}" onclick="pick('${d.id}')">
+      <td style="padding-left:18px;">
+        <div class="td-client">
+          <div class="td-av" style="background:${s.bg};color:${s.fg};">${d.i}</div>
+          <div>
+            <div class="td-name">${d.c}</div>
+            <div class="td-subj">${d.a}</div>
           </div>
         </div>
-      </div>
+      </td>
+      <td><span class="td-id">${d.id}</span></td>
+      <td><span class="badge b-gray"><span style="width:6px;height:6px;border-radius:50%;background:${s.dot};display:inline-block;margin-right:3px;flex-shrink:0;"></span>${d.s}</span></td>
+      <td><div class="nivel-wrap">${np}</div>${nbadge}</td>
+      <td>
+        <div class="tbar"><div class="tbar-f" style="width:${pct(d.m)}%;background:${corHex(d.m)};"></div></div>
+      </td>
+      <td><span class="tbadge ${tbcls}">${tblbl}</span></td>
+    </tr>`;
+  }).join('');
 
-      <div style="border-top:1px solid #f4f5f7;padding-top:12px;margin-top:4px;">
-        <div style="font-size:11px;font-weight:600;text-transform:uppercase;color:#9ca3af;margin-bottom:8px;">Histórico de chamados</div>
-        ${c.hist.map(h => `<div class="hist-item"><span style="color:#16a34a;">✓</span>${h}</div>`).join('')}
+  document.getElementById('sb-setores').innerHTML=Object.entries(S).map(([nome,info])=>{
+    const tot=D.filter(d=>d.s===nome).length;
+    return`<div class="sb-setor${filtroSetor===nome?' on':''}" onclick="setSetor('${nome}')">
+      <span class="sb-dot" style="background:${info.dot};"></span>${nome}
+      <span class="sb-setor-count">${tot}</span>
+    </div>`;
+  }).join('')+`<div class="sb-setor${filtroSetor==='todos'?' on':''}" style="margin-top:6px;" onclick="setSetor('todos')">
+    <span class="sb-dot" style="background:rgba(255,255,255,0.2);"></span>Todos os setores
+    <span class="sb-setor-count">${D.length}</span>
+  </div>`;
+
+  document.getElementById('setores-row').innerHTML=Object.entries(S).map(([nome,info])=>{
+    const tot=D.filter(d=>d.s===nome).length;
+    const ug=D.filter(d=>d.s===nome&&d.m>=240&&d.st==='time').length;
+    return`<div class="sc" style="border-top-color:${info.top};" onclick="setSetor('${nome}')">
+      <div class="sc-val" style="color:${info.fg};">${tot}</div>
+      <div class="sc-name">${nome}</div>
+      <div class="sc-resp">${info.g}</div>
+      ${ug?`<div class="sc-urg" style="color:var(--red);"><span class="sc-urg-dot"></span>${ug} urgente${ug>1?'s':''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function pick(id){
+  sel=id;
+  const d=D.find(x=>x.id===id);
+  if(!d)return;
+  const s=S[d.s];
+  const c=corHex(d.m);
+  document.getElementById('p-id').textContent=d.id;
+  const steps=['Responsável','Gestor da área','Sócio'];
+  const pipe=steps.map((lbl,i)=>{
+    let cls='pipe-s';
+    if(i<d.n)cls+=' ps-done';
+    else if(i===d.n)cls+=d.n===2?' ps-hot':d.n===1?' ps-active':' ps-done';
+    return`<div class="${cls}">${lbl}</div>`;
+  }).join('');
+  document.getElementById('perfil').innerHTML=`
+  <div class="p-inner">
+    <div class="p-hero">
+      <div class="p-av-lg" style="background:${s.bg};color:${s.fg};">${d.i}</div>
+      <div class="p-name">${d.c}</div>
+      <div class="p-assunto">${d.a}</div>
+      <div class="p-id-row">
+        <span class="badge b-gray">${d.id}</span>
+        <span class="badge b-gray"><span style="width:5px;height:5px;border-radius:50%;background:${s.dot};display:inline-block;margin-right:3px;"></span>${d.s}</span>
+        ${d.n===0?'<span class="badge b-blue">Responsável</span>':d.n===1?'<span class="badge b-amber">Gestor</span>':'<span class="badge b-red">Sócio acionado</span>'}
       </div>
     </div>
-  `;
+    <div class="p-section">
+      <div class="p-section-title">Escalonamento</div>
+      <div class="pipe-steps">${pipe}</div>
+    </div>
+    <div class="p-section">
+      <div class="p-section-title">Detalhes</div>
+      <div class="p-row"><span class="p-k">Responsável</span><span class="p-v">${s.g}</span></div>
+      ${d.n>=1?`<div class="p-row"><span class="p-k">Gestor da área</span><span class="p-v" style="color:#92400e;">${s.g}</span></div>`:''}
+      ${d.n>=2?`<div class="p-row"><span class="p-k">Sócio</span><span class="p-v" style="color:#991b1b;">${SOCIOS[0]}</span></div>`:''}
+      <div class="p-row"><span class="p-k">Status</span><span class="p-v">${d.st==='time'?'Aguardando time':'Aguardando cliente'}</span></div>
+      <div class="p-row"><span class="p-k">Setor</span><span class="p-v">${d.s}</span></div>
+    </div>
+    <div class="p-section">
+      <div class="p-section-title">Tempo sem resposta</div>
+      <div class="tempo-bar-wrap">
+        <div class="tempo-bar-head">
+          <span style="color:var(--text-3);font-size:11px;">Decorrido</span>
+          <span style="color:var(--text-4);font-size:11px;">SLA: 4h</span>
+        </div>
+        <div class="tempo-bar-track"><div class="tempo-bar-fill" style="width:${pct(d.m)}%;background:${c};"></div></div>
+        <div class="tempo-val" style="color:${c};">${fmt(d.m)}</div>
+      </div>
+    </div>
+    <div class="p-section">
+      <div class="p-section-title">Histórico (${d.h.length} chamados)</div>
+      ${d.h.map(h=>`<div class="hist-row"><span class="hist-ck">✓</span>${h}</div>`).join('')}
+    </div>
+  </div>`;
   render();
 }
 
-function setFiltro(f, btn) {
-  filtroAtual = f;
-  document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
+function setSetor(s){
+  filtroSetor=s;render();
 }
+function buscar(v){busca=v.toLowerCase();render();}
+function reset(){document.getElementById('srch').value='';busca='';filtroSetor='todos';render();}
+function setNav(el){document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 
-function buscar(v) { buscaAtual = v.toLowerCase(); render(); }
-
-function recarregar() {
-  document.getElementById('search').value = '';
-  buscaAtual = '';
-  render();
+function tick(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('tb-date').textContent=n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
 }
-
-function atualizarClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) + ' — ' + now.toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' });
-}
-
-render();
-atualizarClock();
-setInterval(atualizarClock, 30000);
+render();tick();setInterval(tick,30000);
 </script>
 </body>
 </html>
