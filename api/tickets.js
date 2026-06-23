@@ -3,15 +3,21 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
   try {
-    const response = await fetch('https://outtax.digisac.me/api/v1/tickets?limit=100&status=open', {
-      headers: {
-        'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}`,
-        'Content-Type': 'application/json',
+    const status = req.query.status || 'open';
+    const limit  = req.query.limit  || 100;
+
+    const response = await fetch(
+      `https://outtax.digisac.me/api/v1/tickets?isOpen=true&limit=${limit}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}`,
+          'Content-Type': 'application/json',
+        }
       }
-    });
+    );
 
     if (!response.ok) {
-      return res.status(response.status).json({ error: 'Erro ao buscar tickets do DIGISAC' });
+      return res.status(response.status).json({ error: 'Erro ao buscar tickets' });
     }
 
     const data = await response.json();
