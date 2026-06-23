@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     const limit = req.query.limit || 100;
 
     const response = await fetch(
-      `https://outtax.digisac.me/api/v1/tickets?limit=${limit}&sort=startedAt&order=desc`,
+      `https://outtax.digisac.me/api/v1/tickets?limit=${limit}`,
       {
         headers: {
           'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}`,
