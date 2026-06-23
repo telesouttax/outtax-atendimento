@@ -3,17 +3,17 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
   try {
-    const limit = req.query.limit || 100;
+    const page = req.query.page || 1;
+    const limit = 100;
 
-    const response = await fetch(
-      `https://outtax.digisac.me/api/v1/tickets?limit=${limit}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}`,
-          'Content-Type': 'application/json',
-        }
+    const url = `https://outtax.digisac.me/api/v1/tickets?isOpen=1&limit=${limit}&page=${page}`;
+
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}`,
+        'Content-Type': 'application/json',
       }
-    );
+    });
 
     if (!response.ok) {
       const err = await response.text();
@@ -21,14 +21,7 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    const todos = data.data || [];
-    const abertos = todos.filter(t => t.isOpen === true || t.endedAt === null);
-
-    return res.status(200).json({
-      ...data,
-      data: abertos,
-      total: abertos.length
-    });
+    return res.status(200).json(data);
 
   } catch (error) {
     return res.status(500).json({ error: 'Erro interno', detail: error.message });
