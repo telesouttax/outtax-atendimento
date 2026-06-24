@@ -323,6 +323,13 @@ tbody td{padding:11px 14px;vertical-align:middle;}
             <div class="ph">
               <div class="ph-l"><div class="ph-title">Chamados abertos</div><div class="ph-cnt" id="ph-cnt">—</div></div>
               <div class="ph-r">
+                <select id="filtro-hora" onchange="filtrarHora(this.value)" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;border:1px solid var(--bor);border-radius:7px;background:var(--sur2);color:var(--t2);outline:none;cursor:pointer;height:30px;">
+                  <option value="todos">🕐 Todos os horários</option>
+                  <option value="comercial">💼 Comercial (10h–17h)</option>
+                  <option value="manha">🌅 Manhã (08h–12h)</option>
+                  <option value="tarde">☀️ Tarde (12h–18h)</option>
+                  <option value="noite">🌙 Noite (18h–22h)</option>
+                </select>
                 <div class="srch"><span class="srch-ic">🔍</span><input type="text" placeholder="Buscar protocolo…" oninput="filtrarAtend(this.value)" id="srch-atend"></div>
                 <button class="ib" onclick="carregarAtendimento()" title="Atualizar">↻</button>
               </div>
