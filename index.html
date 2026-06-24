@@ -880,31 +880,14 @@ function renderAlertList(isNew) {
         <div class="alert-name">${a.contactName}</div>
         <div class="alert-desc">${a.departmentName} · Protocolo ${a.protocol}</div>
         <div class="alert-time">${a.minutesOpen}min em aberto · ${a.hora}</div>
-        ${a.whatsappSent ? '<span class="alert-whats">✓ WhatsApp enviado</span>' : ''}
+        ${a.whatsappSent ? '<span class="alert-whats">✓ Google Chat notificado</span>' : ''}
       </div>
     </div>`).join('');
 }
 
-async function dispararAlertaWhatsApp(ticket, dept, contactName) {
+async function dispararAlertaGoogleChat(ticket, dept, contactName) {
   try {
-    // Pega IDs dos usuários do setor + sócios
-    const recipientIds = Object.values(USUARIOS)
-      .filter(u => {
-        const nome = (u.name || u.username || '').toLowerCase();
-        const deptNome = dept.name.toLowerCase();
-        const eSocio = nome.includes('marcos') || nome.includes('maiccon');
-        const eGestor = deptNome.includes('fiscal') && nome.includes('andré') ||
-                        deptNome.includes('pessoal') && nome.includes('edgar') ||
-                        deptNome.includes('contabilidade') && nome.includes('carla') ||
-                        deptNome.includes('legaliz') && nome.includes('michelle') ||
-                        deptNome.includes('financeiro') && nome.includes('nivea') ||
-                        deptNome.includes('bpo') && nome.includes('nivea');
-        return eSocio || eGestor;
-      })
-      .map(u => u.id);
-
-    if (recipientIds.length === 0) return false;
-
+    const minutesOpen = Math.floor((Date.now() - new Date(ticket.startedAt).getTime()) / 60000);
     const r = await fetch('/api/alerts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -913,12 +896,11 @@ async function dispararAlertaWhatsApp(ticket, dept, contactName) {
         protocol: ticket.protocol,
         departmentName: dept.name,
         contactName,
-        minutesOpen: Math.floor((Date.now() - new Date(ticket.startedAt).getTime()) / 60000),
-        recipientIds
+        minutesOpen
       })
     });
     const d = await r.json();
-    return d.sent > 0;
+    return d.ok === true;
   } catch(e) { return false; }
 }
 
@@ -935,7 +917,7 @@ async function verificarAlertas() {
     const contactName = t.contact ? (t.contact.name || t.contact.pushname || t.contact.number || 'Sem nome') : 'Sem nome';
     const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-    const whatsappSent = await dispararAlertaWhatsApp(t, dept, contactName);
+    const whatsappSent = await dispararAlertaGoogleChat(t, dept, contactName);
 
     ALERTAS.push({
       id: t.id,
