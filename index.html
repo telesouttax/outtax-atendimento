@@ -303,7 +303,7 @@ tbody td{padding:11px 14px;vertical-align:middle;}
               </div>
             </div>
             <div class="tbl-wrap"><table>
-              <thead><tr><th style="padding-left:18px;">Departamento</th><th>Protocolo</th><th>Responsável</th><th>Origem</th><th>Tempo aberto</th></tr></thead>
+              <thead><tr><th style="padding-left:18px;">Cliente</th><th>Departamento</th><th>Protocolo</th><th>Agente</th><th>Origem</th><th>Tempo aberto</th></tr></thead>
               <tbody id="tbody-atend"></tbody>
             </table></div>
           </div>
@@ -512,10 +512,16 @@ function renderAtendimento(){
     const cor=dept.cor;
     const min=tempoMin(t.startedAt);
     const tcls=min>=240?'t-hot':min>=120?'t-mid':t.userId?'t-ok':'t-cli';
+    const cli=t.contact;
+    const cliNome=cli?(cli.name||cli.pushname||cli.number||'Sem nome'):'Sem nome';
+    const cliTel=cli?(cli.number||cli.phone||''):'';
+    const cliIni=cli?(cliNome.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'?'):ini(dept.name);
+    const agenteNome=t.agent?(t.agent.name||t.agent.username||'Atribuído'):null;
     return`<tr class="${selAtend===t.id?'sel':''}" onclick="pickAtend('${t.id}')">
-      <td style="padding-left:18px;"><div class="td-cl"><div class="td-av" style="background:${cor.bg};color:${cor.fg};">${ini(dept.name)}</div><div><div class="td-name">${dept.name}</div><div class="td-sub">Protocolo ${t.protocol||'—'}</div></div></div></td>
+      <td style="padding-left:18px;"><div class="td-cl"><div class="td-av" style="background:${cor.bg};color:${cor.fg};">${cliIni}</div><div><div class="td-name">${cliNome}</div><div class="td-sub">${cliTel||dept.name}</div></div></div></td>
+      <td><span class="bdg b-gray" style="font-size:11px;">${dept.name}</span></td>
       <td><span class="td-id">${t.protocol||'—'}</span></td>
-      <td>${t.userId?'<span class="bdg b-grn">Atribuído</span>':'<span class="bdg b-amb">Sem agente</span>'}</td>
+      <td>${agenteNome?`<span class="bdg b-grn">${agenteNome}</span>`:'<span class="bdg b-amb">Sem agente</span>'}</td>
       <td>${t.origin==='manual'?'<span class="bdg b-blue">Manual</span>':'<span class="bdg b-gray">Auto</span>'}</td>
       <td>
         <div class="tbar"><div class="tbar-f" style="width:${pct(min)}%;background:${corHex(min)};"></div></div>
@@ -569,18 +575,26 @@ function pickAtend(id){
   document.getElementById('perfil').innerHTML=`
   <div>
     <div class="p-hero">
-      <div class="p-avlg" style="background:${cor.bg};color:${cor.fg};">${ini(dept.name)}</div>
-      <div class="p-name">${dept.name}</div>
-      <div class="p-assunto">Protocolo ${t.protocol||'—'}</div>
+      <div class="p-avlg" style="background:${cor.bg};color:${cor.fg};">${(()=>{const c=t.contact;const n=c?(c.name||c.pushname||c.number||'?'):dept.name;return n.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'?';})()}</div>
+      <div class="p-name">${t.contact?(t.contact.name||t.contact.pushname||t.contact.number||'Sem nome'):'Sem nome'}</div>
+      <div class="p-assunto">${t.contact&&t.contact.number?t.contact.number+' · ':''} ${dept.name}</div>
       <div class="p-idrow">
+        <span class="bdg b-gray">Protocolo ${t.protocol||'—'}</span>
         <span class="bdg b-gray">${t.origin==='manual'?'Manual':'Automático'}</span>
-        ${t.userId?'<span class="bdg b-grn">Agente atribuído</span>':'<span class="bdg b-amb">Sem agente</span>'}
+        ${t.agent?`<span class="bdg b-grn">${t.agent.name||t.agent.username||'Atribuído'}</span>`:'<span class="bdg b-amb">Sem agente</span>'}
       </div>
     </div>
     <div class="p-sec">
-      <div class="p-seclbl">Detalhes</div>
+      <div class="p-seclbl">Cliente</div>
+      ${t.contact?`<div class="p-row"><span class="p-k">Nome</span><span class="p-v">${t.contact.name||t.contact.pushname||'—'}</span></div>`:''}
+      ${t.contact&&t.contact.number?`<div class="p-row"><span class="p-k">Telefone</span><span class="p-v" style="font-family:monospace;">${t.contact.number}</span></div>`:''}
+      ${t.contact&&t.contact.email?`<div class="p-row"><span class="p-k">E-mail</span><span class="p-v">${t.contact.email}</span></div>`:''}
+    </div>
+    <div class="p-sec">
+      <div class="p-seclbl">Chamado</div>
       <div class="p-row"><span class="p-k">Protocolo</span><span class="p-v" style="font-family:monospace;">${t.protocol||'—'}</span></div>
       <div class="p-row"><span class="p-k">Departamento</span><span class="p-v">${dept.name}</span></div>
+      ${t.agent?`<div class="p-row"><span class="p-k">Agente</span><span class="p-v">${t.agent.name||t.agent.username||'—'}</span></div>`:''}
       <div class="p-row"><span class="p-k">Origem</span><span class="p-v">${t.origin==='manual'?'Manual':'Automático'}</span></div>
       <div class="p-row"><span class="p-k">Aberto em</span><span class="p-v">${fmtDate(t.startedAt)}</span></div>
       ${t.comments?`<div class="p-row"><span class="p-k">Comentário</span><span class="p-v" style="max-width:180px;text-align:right;font-size:11px;">${t.comments}</span></div>`:''}
