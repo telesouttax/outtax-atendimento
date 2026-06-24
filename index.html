@@ -447,7 +447,7 @@ tbody td{padding:11px 14px;vertical-align:middle;}
 </div>
 
 <script>
-let TICKETS=[], DEPTS={}, DEPTS_LIST=[], filtroSetor='todos', buscaAtend='', selAtend=null;
+let TICKETS=[], DEPTS={}, DEPTS_LIST=[], filtroSetor='todos', buscaAtend='', selAtend=null, filtroHoraAtend='todos';
 let HIST=[], histPage=1, histTotal=0, buscaHist='';
 let CLIENTES=[], cliPage=1, cliTotal=0;
 
@@ -506,6 +506,7 @@ function renderAtendimento(){
   const list=TICKETS.filter(t=>{
     if(filtroSetor!=='todos'&&t.departmentId!==filtroSetor)return false;
     if(buscaAtend&&!(t.protocol||'').toLowerCase().includes(buscaAtend))return false;
+    if(!dentroFaixaHora(t))return false;
     return true;
   });
 
@@ -586,6 +587,17 @@ function renderSidebar(){
 }
 
 function filtrarSetor(s){filtroSetor=s;renderAtendimento();}
+function filtrarHora(v){filtroHoraAtend=v;renderAtendimento();}
+
+function dentroFaixaHora(ticket) {
+  if (filtroHoraAtend === 'todos') return true;
+  const h = new Date(ticket.startedAt).getHours();
+  if (filtroHoraAtend === 'manha')    return h >= 8  && h < 12;
+  if (filtroHoraAtend === 'tarde')    return h >= 12 && h < 18;
+  if (filtroHoraAtend === 'noite')    return h >= 18 && h < 22;
+  if (filtroHoraAtend === 'comercial')return h >= 10 && h < 17;
+  return true;
+}
 function filtrarAtend(v){buscaAtend=v.toLowerCase();renderAtendimento();}
 
 function pickAtend(id){
@@ -885,13 +897,36 @@ function renderAlertList(isNew) {
     </div>`).join('');
 }
 
-async function dispararAlertaGoogleChat(ticket, dept, contactName) {
+// Marcos de alertas já disparados: chave = ticketId + tipo + faixa
+const MARCOS_ALERTAS = new Set();
+
+function faixaMinutos(min) {
+  if (min >= 120) return 120;
+  if (min >= 90)  return 90;
+  if (min >= 60)  return 60;
+  if (min >= 30)  return 30;
+  return 0;
+}
+
+function emHorarioComercial() {
+  const now = new Date();
+  const h = now.getHours();
+  return h >= 10 && h < 17;
+}
+
+async function dispararAlerta(tipo, ticket, dept, contactName, minutesOpen) {
+  const faixa = faixaMinutos(minutesOpen);
+  if (faixa === 0) return false;
+  const chave = `${ticket.id}_${tipo}_${faixa}`;
+  if (MARCOS_ALERTAS.has(chave)) return false;
+  MARCOS_ALERTAS.add(chave);
+
   try {
-    const minutesOpen = Math.floor((Date.now() - new Date(ticket.startedAt).getTime()) / 60000);
     const r = await fetch('/api/alerts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        tipo,
         ticketId: ticket.id,
         protocol: ticket.protocol,
         departmentName: dept.name,
@@ -902,6 +937,70 @@ async function dispararAlertaGoogleChat(ticket, dept, contactName) {
     const d = await r.json();
     return d.ok === true;
   } catch(e) { return false; }
+}
+
+async function verificarMensagensTicket(ticket) {
+  try {
+    const r = await fetch(`/api/messages?ticketId=${ticket.id}`);
+    const d = await r.json();
+    return d.data || [];
+  } catch(e) { return []; }
+}
+
+async function dispararAlertaGoogleChat(ticket, dept, contactName) {
+  const minutesOpen = Math.floor((Date.now() - new Date(ticket.startedAt).getTime()) / 60000);
+  if (minutesOpen < 30) return false;
+
+  // Busca últimas mensagens para saber quem foi o último a falar
+  const msgs = await verificarMensagensTicket(ticket);
+  const ultimaMsg = msgs[msgs.length - 1] || msgs[0];
+
+  let sent = false;
+
+  if (ultimaMsg) {
+    const ultimaAt = new Date(ultimaMsg.createdAt || ultimaMsg.timestamp);
+    const minSemResp = Math.floor((Date.now() - ultimaAt.getTime()) / 60000);
+    const foiCliente = ultimaMsg.fromMe === false || ultimaMsg.direction === 'inbound';
+    const foiTime   = ultimaMsg.fromMe === true  || ultimaMsg.direction === 'outbound';
+
+    // Alerta: cliente mandou, time não respondeu
+    if (foiCliente && minSemResp >= 30) {
+      sent = await dispararAlerta('time_sem_resposta', ticket, dept, contactName, minSemResp);
+    }
+
+    // Alerta: time mandou, cliente não respondeu
+    if (foiTime && minSemResp >= 30) {
+      sent = await dispararAlerta('cliente_sem_resposta', ticket, dept, contactName, minSemResp);
+    }
+
+    // Alerta: horário comercial sem resposta do time
+    if (foiCliente && emHorarioComercial() && minSemResp >= 30) {
+      const chaveHC = `${ticket.id}_horario_comercial`;
+      if (!MARCOS_ALERTAS.has(chaveHC)) {
+        MARCOS_ALERTAS.add(chaveHC);
+        await dispararAlerta('horario_comercial', ticket, dept, contactName, minSemResp);
+      }
+    }
+  } else {
+    // Sem mensagens — usa tempo de abertura
+    if (minutesOpen >= 30) {
+      sent = await dispararAlerta('time_sem_resposta', ticket, dept, contactName, minutesOpen);
+    }
+  }
+
+  // Alerta: transferência sem atendimento (30min sem userId)
+  if (!ticket.userId && ticket.currentTicketTransferId) {
+    const chaveTransf = `${ticket.id}_transferencia`;
+    if (!MARCOS_ALERTAS.has(chaveTransf)) {
+      const minTransf = minutesOpen;
+      if (minTransf >= 30) {
+        MARCOS_ALERTAS.add(chaveTransf);
+        await dispararAlerta('transferencia_sem_atendimento', ticket, dept, contactName, minTransf);
+      }
+    }
+  }
+
+  return sent;
 }
 
 async function verificarAlertas() {
@@ -956,7 +1055,7 @@ carregarAtendimento();
 tick();
 setInterval(tick,30000);
 setInterval(carregarAtendimento,60000);
-setInterval(verificarAlertas,60000);
+setInterval(verificarAlertas,300000);
 </script>
 </body>
 </html>
