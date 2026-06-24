@@ -25,6 +25,30 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--t1);background:var(--sur2);-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;}
 input,textarea{user-select:text;-webkit-user-select:text;}
+/* ALERTAS */
+.alert-btn{position:relative;width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.15s;flex-shrink:0;}
+.alert-btn:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.alert-btn.has-alert{border-color:rgba(220,53,69,0.5);background:rgba(220,53,69,0.15);color:#ff6b6b;animation:ring 2s ease-in-out infinite;}
+@keyframes ring{0%,100%{transform:rotate(0);}10%{transform:rotate(-15deg);}20%{transform:rotate(15deg);}30%{transform:rotate(-10deg);}40%{transform:rotate(10deg);}50%{transform:rotate(0);}}
+.alert-count{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
+.alert-panel{position:absolute;top:calc(var(--th) + 8px);right:24px;width:360px;background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);box-shadow:0 8px 32px rgba(11,29,58,0.15);z-index:500;display:none;}
+.alert-panel.open{display:block;}
+.alert-ph{padding:12px 16px;border-bottom:1px solid var(--sur3);display:flex;align-items:center;justify-content:space-between;}
+.alert-title{font-size:13px;font-weight:600;color:var(--t1);}
+.alert-clear{font-size:11px;color:var(--t3);cursor:pointer;padding:3px 8px;border-radius:5px;border:1px solid var(--bor);background:transparent;transition:all 0.15s;}
+.alert-clear:hover{background:var(--sur3);}
+.alert-list{max-height:320px;overflow-y:auto;}
+.alert-item{padding:12px 16px;border-bottom:1px solid var(--sur3);display:flex;gap:10px;align-items:flex-start;}
+.alert-item:last-child{border-bottom:none;}
+.alert-item.new{background:#fff8f3;}
+.alert-ico{width:32px;height:32px;border-radius:8px;background:var(--reds);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.alert-info{flex:1;min-width:0;}
+.alert-name{font-size:12px;font-weight:600;color:var(--t1);}
+.alert-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.alert-time{font-size:10px;color:var(--t4);margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.alert-whats{font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;background:var(--grns);color:#065f46;margin-top:4px;display:inline-block;}
+.alert-empty{padding:2rem;text-align:center;color:var(--t4);font-size:12px;}
+
 .shell{display:flex;height:100vh;overflow:hidden;}
 
 /* SIDEBAR */
@@ -259,6 +283,7 @@ tbody td{padding:11px 14px;vertical-align:middle;}
     <div class="tb-sp"></div>
     <div class="live"><span class="live-dot"></span>Ao vivo</div>
     <div class="tb-clock" id="clock"></div>
+    <div style="position:relative;"><button class="alert-btn" id="alert-btn" onclick="toggleAlertPanel()" title="Alertas">🔔<span class="alert-count" id="alert-count" style="display:none;">0</span></button><div class="alert-panel" id="alert-panel"><div class="alert-ph"><span class="alert-title">🔔 Alertas de SLA</span><button class="alert-clear" onclick="limparAlertas()">Limpar tudo</button></div><div class="alert-list" id="alert-list"><div class="alert-empty">Nenhum alerta no momento.</div></div></div></div>
     <div class="urg-tag ok" id="urg-tag"><span class="urg-udot"></span><span id="urg-txt">Carregando…</span></div>
   </div>
 
@@ -471,6 +496,7 @@ async function carregarAtendimento(){
     TICKETS=tickData.data||[];
     renderAtendimento();
     renderSidebar();
+    verificarAlertas();
   }catch(e){
     document.getElementById('tbody-atend').innerHTML=`<tr><td colspan="5"><div class="err-msg">Erro ao carregar. Tente novamente.</div></td></tr>`;
   }
@@ -797,10 +823,158 @@ function tick(){
   document.getElementById('tb-date').textContent=n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
 }
 
+
+/* ── SISTEMA DE ALERTAS ── */
+let ALERTAS = [];
+let ALERTAS_DISPARADOS = new Set();
+let USUARIOS = {};
+
+async function carregarUsuarios() {
+  try {
+    const r = await fetch('/api/users');
+    const d = await r.json();
+    (d.data || []).forEach(u => { USUARIOS[u.id] = u; });
+  } catch(e) {}
+}
+
+function toggleAlertPanel() {
+  const panel = document.getElementById('alert-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById('alert-btn').classList.remove('has-alert');
+    renderAlertList(false);
+  }
+}
+
+document.addEventListener('click', e => {
+  const panel = document.getElementById('alert-panel');
+  const btn = document.getElementById('alert-btn');
+  if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
+    panel.classList.remove('open');
+  }
+});
+
+function limparAlertas() {
+  ALERTAS = [];
+  renderAlertList(false);
+  document.getElementById('alert-count').style.display = 'none';
+  document.getElementById('alert-btn').classList.remove('has-alert');
+}
+
+function renderAlertList(isNew) {
+  const list = document.getElementById('alert-list');
+  const cnt = document.getElementById('alert-count');
+  if (ALERTAS.length === 0) {
+    list.innerHTML = '<div class="alert-empty">Nenhum alerta no momento.</div>';
+    cnt.style.display = 'none';
+    document.getElementById('alert-btn').classList.remove('has-alert');
+    return;
+  }
+  cnt.textContent = ALERTAS.length;
+  cnt.style.display = 'flex';
+  if (isNew) document.getElementById('alert-btn').classList.add('has-alert');
+  list.innerHTML = ALERTAS.slice().reverse().map(a => `
+    <div class="alert-item ${a.isNew?'new':''}">
+      <div class="alert-ico">⚠️</div>
+      <div class="alert-info">
+        <div class="alert-name">${a.contactName}</div>
+        <div class="alert-desc">${a.departmentName} · Protocolo ${a.protocol}</div>
+        <div class="alert-time">${a.minutesOpen}min em aberto · ${a.hora}</div>
+        ${a.whatsappSent ? '<span class="alert-whats">✓ WhatsApp enviado</span>' : ''}
+      </div>
+    </div>`).join('');
+}
+
+async function dispararAlertaWhatsApp(ticket, dept, contactName) {
+  try {
+    // Pega IDs dos usuários do setor + sócios
+    const recipientIds = Object.values(USUARIOS)
+      .filter(u => {
+        const nome = (u.name || u.username || '').toLowerCase();
+        const deptNome = dept.name.toLowerCase();
+        const eSocio = nome.includes('marcos') || nome.includes('maiccon');
+        const eGestor = deptNome.includes('fiscal') && nome.includes('andré') ||
+                        deptNome.includes('pessoal') && nome.includes('edgar') ||
+                        deptNome.includes('contabilidade') && nome.includes('carla') ||
+                        deptNome.includes('legaliz') && nome.includes('michelle') ||
+                        deptNome.includes('financeiro') && nome.includes('nivea') ||
+                        deptNome.includes('bpo') && nome.includes('nivea');
+        return eSocio || eGestor;
+      })
+      .map(u => u.id);
+
+    if (recipientIds.length === 0) return false;
+
+    const r = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ticketId: ticket.id,
+        protocol: ticket.protocol,
+        departmentName: dept.name,
+        contactName,
+        minutesOpen: Math.floor((Date.now() - new Date(ticket.startedAt).getTime()) / 60000),
+        recipientIds
+      })
+    });
+    const d = await r.json();
+    return d.sent > 0;
+  } catch(e) { return false; }
+}
+
+async function verificarAlertas() {
+  if (TICKETS.length === 0) return;
+
+  for (const t of TICKETS) {
+    const min = tempoMin(t.startedAt);
+    if (min < 60) continue;
+    if (ALERTAS_DISPARADOS.has(t.id)) continue;
+
+    ALERTAS_DISPARADOS.add(t.id);
+    const dept = DEPTS[t.departmentId] || { name: 'Sem setor', cor: CORES[0] };
+    const contactName = t.contact ? (t.contact.name || t.contact.pushname || t.contact.number || 'Sem nome') : 'Sem nome';
+    const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    const whatsappSent = await dispararAlertaWhatsApp(t, dept, contactName);
+
+    ALERTAS.push({
+      id: t.id,
+      protocol: t.protocol || '—',
+      departmentName: dept.name,
+      contactName,
+      minutesOpen: min,
+      hora,
+      whatsappSent,
+      isNew: true
+    });
+
+    // Som de notificação
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+  }
+
+  if (ALERTAS.some(a => a.isNew)) {
+    renderAlertList(true);
+    ALERTAS.forEach(a => a.isNew = false);
+  }
+}
+
+carregarUsuarios();
 carregarAtendimento();
 tick();
 setInterval(tick,30000);
 setInterval(carregarAtendimento,60000);
+setInterval(verificarAlertas,60000);
 </script>
 </body>
 </html>
