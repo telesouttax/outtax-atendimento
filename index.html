@@ -6,239 +6,514 @@
 <title>OUTTAX — Central de Atendimento</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --sw:240px;--th:56px;
-  --navy:#0b1d3a;--navy2:#0f2548;--navy3:#1a3460;
-  --orange:#f97316;--orange2:#ea6a08;
-  --sur:#fff;--sur2:#f7f8fc;--sur3:#eef0f7;
-  --bor:#e2e6f0;--bor2:#c8d0e4;
-  --t1:#0b1d3a;--t2:#3a4d6e;--t3:#6e809e;--t4:#a8b4c8;
-  --red:#dc3545;--reds:#fff2f3;--redb:#ffc9cd;
-  --amb:#e8920a;--ambs:#fff8ed;--ambb:#fddfa0;
-  --grn:#0e9e6e;--grns:#f0fdf8;--grnb:#9fe8d2;
-  --blu:#2563eb;--blus:#eff4ff;--blub:#bdd0fd;
-  --pur:#7c3aed;--purs:#f5f2ff;
-  --r:8px;--rl:12px;
+:root {
+  --navy:    #0b1d3a;
+  --navy2:   #112347;
+  --navy3:   #1a3460;
+  --orange:  #f97316;
+  --orange2: #ea6a08;
+  --bg:      #eef2fb;
+  --bg2:     #e4eaf8;
+  --sur:     #ffffff;
+  --sur2:    #f7f9ff;
+  --bor:     #dde3f5;
+  --bor2:    #c8d2ee;
+  --t1:      #0b1d3a;
+  --t2:      #2d3f6b;
+  --t3:      #6272a4;
+  --t4:      #9aa5c8;
+  --red:     #e53935; --reds: #fff1f1; --redb: #ffc5c5;
+  --amb:     #e8920a; --ambs: #fff7ed; --ambb: #fde68a;
+  --grn:     #0d9e6e; --grns: #f0fdf8; --grnb: #9fe8d2;
+  --blu:     #2563eb; --blus: #eff4ff; --blub: #bdd0fd;
+  --pur:     #7c3aed; --purs: #f5f2ff;
+  --r:       10px;
+  --rl:      14px;
+  --rxl:     20px;
+  --sh:      0 2px 12px rgba(11,29,58,0.08);
+  --sh2:     0 4px 24px rgba(11,29,58,0.12);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--t1);background:var(--sur2);-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;}
-input,textarea{user-select:text;-webkit-user-select:text;}
-/* ALERTAS */
-.alert-btn{position:relative;width:34px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all 0.15s;flex-shrink:0;}
-.alert-btn:hover{background:rgba(255,255,255,0.1);color:#fff;}
-.alert-btn.has-alert{border-color:rgba(220,53,69,0.5);background:rgba(220,53,69,0.15);color:#ff6b6b;animation:ring 2s ease-in-out infinite;}
-@keyframes ring{0%,100%{transform:rotate(0);}10%{transform:rotate(-15deg);}20%{transform:rotate(15deg);}30%{transform:rotate(-10deg);}40%{transform:rotate(10deg);}50%{transform:rotate(0);}}
-.alert-count{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy);}
-.alert-panel{position:absolute;top:calc(var(--th) + 8px);right:24px;width:360px;background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);box-shadow:0 8px 32px rgba(11,29,58,0.15);z-index:500;display:none;}
-.alert-panel.open{display:block;}
-.alert-ph{padding:12px 16px;border-bottom:1px solid var(--sur3);display:flex;align-items:center;justify-content:space-between;}
-.alert-title{font-size:13px;font-weight:600;color:var(--t1);}
-.alert-clear{font-size:11px;color:var(--t3);cursor:pointer;padding:3px 8px;border-radius:5px;border:1px solid var(--bor);background:transparent;transition:all 0.15s;}
-.alert-clear:hover{background:var(--sur3);}
-.alert-list{max-height:320px;overflow-y:auto;}
-.alert-item{padding:12px 16px;border-bottom:1px solid var(--sur3);display:flex;gap:10px;align-items:flex-start;}
-.alert-item:last-child{border-bottom:none;}
-.alert-item.new{background:#fff8f3;}
-.alert-ico{width:32px;height:32px;border-radius:8px;background:var(--reds);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.alert-info{flex:1;min-width:0;}
-.alert-name{font-size:12px;font-weight:600;color:var(--t1);}
-.alert-desc{font-size:11px;color:var(--t3);margin-top:2px;}
-.alert-time{font-size:10px;color:var(--t4);margin-top:3px;font-family:'JetBrains Mono',monospace;}
-.alert-whats{font-size:10px;font-weight:500;padding:2px 6px;border-radius:4px;background:var(--grns);color:#065f46;margin-top:4px;display:inline-block;}
-.alert-empty{padding:2rem;text-align:center;color:var(--t4);font-size:12px;}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--t1);background:var(--bg);-webkit-font-smoothing:antialiased;user-select:none;-webkit-user-select:none;}
+input,textarea,select{user-select:text;-webkit-user-select:text;}
 
+/* ── SHELL ── */
 .shell{display:flex;height:100vh;overflow:hidden;}
 
-/* SIDEBAR */
-.sb{width:var(--sw);flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
-.sb-logo{display:flex;align-items:center;gap:10px;padding:0 18px;height:var(--th);border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
-.sb-mark{width:30px;height:30px;border-radius:8px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
-.sb-name{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.3px;}
-.sb-name em{color:var(--orange);font-style:normal;}
-.sb-sub{font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px;}
-.sb-sec{padding:20px 12px 6px;flex-shrink:0;}
-.sb-sec-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.25);padding:0 8px;margin-bottom:4px;}
-.sb-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);color:rgba(255,255,255,0.5);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;margin-bottom:2px;outline:none;}
-.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);}
-.sb-item.on{background:rgba(249,115,22,0.15);color:#fff;}
+/* ── SIDEBAR ── */
+.sb{
+  width:250px;flex-shrink:0;
+  background:var(--navy);
+  display:flex;flex-direction:column;
+  height:100vh;overflow:hidden;
+  box-shadow:4px 0 20px rgba(11,29,58,0.15);
+}
+.sb-logo{
+  display:flex;align-items:center;gap:12px;
+  padding:20px 20px 18px;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+}
+.sb-mark{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:800;color:#fff;
+  flex-shrink:0;
+  box-shadow:0 4px 12px rgba(249,115,22,0.4);
+}
+.sb-brand{font-size:17px;font-weight:800;color:#fff;letter-spacing:-0.5px;}
+.sb-brand em{color:var(--orange);font-style:normal;}
+.sb-sub{font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px;font-weight:400;}
+
+.sb-sec{padding:22px 14px 6px;flex-shrink:0;}
+.sb-sec-lbl{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.1em;color:rgba(255,255,255,0.28);
+  padding:0 8px;margin-bottom:6px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:var(--r);
+  color:rgba(255,255,255,0.5);
+  font-size:12px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;
+  margin-bottom:2px;outline:none;
+}
+.sb-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.85);}
+.sb-item.on{
+  background:rgba(249,115,22,0.18);
+  color:#fff;
+  box-shadow:inset 3px 0 0 var(--orange);
+}
 .sb-item.on .sb-ico{color:var(--orange);}
-.sb-ico{font-size:15px;flex-shrink:0;width:18px;text-align:center;}
-.sb-bdg{margin-left:auto;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);font-family:'JetBrains Mono',monospace;}
-.sb-item.on .sb-bdg{background:rgba(249,115,22,0.25);color:var(--orange);}
-.sb-bdg.alert{background:rgba(220,53,69,0.25);color:#ff8a8a;}
-.sb-setores{padding:0 12px;flex-shrink:0;overflow-y:auto;}
-.sb-setor{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);color:rgba(255,255,255,0.45);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.15s;margin-bottom:1px;}
-.sb-setor:hover{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.75);}
-.sb-setor.on{background:rgba(255,255,255,0.07);color:#fff;}
+.sb-ico{font-size:16px;flex-shrink:0;width:20px;text-align:center;}
+.sb-bdg{
+  margin-left:auto;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.4);
+  font-family:'JetBrains Mono',monospace;
+  min-width:24px;text-align:center;
+}
+.sb-item.on .sb-bdg{background:rgba(249,115,22,0.3);color:var(--orange);}
+.sb-bdg.alert{background:rgba(229,57,53,0.3);color:#ff7070;}
+
+.sb-div{height:1px;background:rgba(255,255,255,0.07);margin:10px 16px;}
+
+.sb-setores{padding:0 14px;flex:1;overflow-y:auto;scrollbar-width:none;}
+.sb-setores::-webkit-scrollbar{display:none;}
+.sb-setor{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:var(--r);
+  color:rgba(255,255,255,0.42);font-size:12px;font-weight:500;
+  cursor:pointer;transition:all 0.15s;margin-bottom:1px;
+}
+.sb-setor:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);}
+.sb-setor.on{background:rgba(255,255,255,0.08);color:#fff;}
 .sb-sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.sb-scount{margin-left:auto;font-size:10px;font-weight:600;color:rgba(255,255,255,0.25);font-family:'JetBrains Mono',monospace;}
-.sb-div{height:1px;background:rgba(255,255,255,0.06);margin:12px 18px;}
-.sb-bot{margin-top:auto;padding:14px 12px;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
-.sb-user{display:flex;align-items:center;gap:9px;}
-.sb-av{width:30px;height:30px;border-radius:50%;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
-.sb-uname{font-size:12px;font-weight:500;color:rgba(255,255,255,0.7);}
-.sb-urole{font-size:10px;color:rgba(255,255,255,0.3);}
+.sb-scount{margin-left:auto;font-size:10px;font-weight:600;color:rgba(255,255,255,0.22);font-family:'JetBrains Mono',monospace;}
+.sb-setor.on .sb-scount{color:rgba(255,255,255,0.5);}
 
-/* MAIN */
+.sb-bot{
+  padding:16px 14px;
+  border-top:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;
+}
+.sb-user{display:flex;align-items:center;gap:10px;}
+.sb-uav{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--orange),var(--orange2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(249,115,22,0.3);
+}
+.sb-uname{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);}
+.sb-urole{font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px;}
+
+/* ── MAIN ── */
 .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
-.topbar{height:var(--th);flex-shrink:0;background:var(--sur);border-bottom:1px solid var(--bor);display:flex;align-items:center;padding:0 24px;gap:16px;}
-.tb-title{font-size:14px;font-weight:600;color:var(--t1);}
-.tb-sub{font-size:12px;color:var(--t4);margin-left:4px;}
-.tb-sp{flex:1;}
-.live{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t4);}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);animation:glow 2.5s ease-in-out infinite;}
-@keyframes glow{0%,100%{box-shadow:0 0 0 2px rgba(14,158,110,0.2);}50%{box-shadow:0 0 0 5px rgba(14,158,110,0);}}
-.tb-clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--t4);}
-.urg-tag{display:flex;align-items:center;gap:5px;background:var(--reds);border:1px solid var(--redb);color:var(--red);font-size:11px;font-weight:600;padding:4px 11px;border-radius:6px;}
-.urg-tag.ok{background:var(--grns);border-color:var(--grnb);color:var(--grn);}
-.urg-udot{width:5px;height:5px;border-radius:50%;background:currentColor;}
 
-/* PAGES */
-.content{flex:1;overflow-y:auto;padding:22px 24px;scrollbar-width:thin;scrollbar-color:var(--bor) transparent;}
+/* ── TOPBAR ── */
+.topbar{
+  height:58px;flex-shrink:0;
+  background:var(--navy);
+  display:flex;align-items:center;
+  padding:0 28px;gap:16px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.tb-title{font-size:15px;font-weight:700;color:#fff;letter-spacing:-0.2px;}
+.tb-sub{font-size:12px;color:rgba(255,255,255,0.35);margin-left:6px;}
+.tb-sp{flex:1;}
+.live{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:500;color:rgba(255,255,255,0.4);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#0d9e6e;box-shadow:0 0 0 2px rgba(13,158,110,0.3);animation:glow 2.5s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 2px rgba(13,158,110,0.3);}50%{box-shadow:0 0 0 5px rgba(13,158,110,0);}}
+.tb-clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(255,255,255,0.35);}
+
+/* ALERTA SINO */
+.alert-wrap{position:relative;}
+.alert-btn{
+  width:36px;height:36px;border-radius:var(--r);
+  border:1px solid rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.5);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:17px;transition:all 0.15s;
+}
+.alert-btn:hover{background:rgba(255,255,255,0.1);color:#fff;}
+.alert-btn.has-alert{border-color:rgba(229,57,53,0.5);background:rgba(229,57,53,0.15);color:#ff7070;animation:ring 2s ease-in-out infinite;}
+@keyframes ring{0%,100%{transform:rotate(0);}10%{transform:rotate(-12deg);}20%{transform:rotate(12deg);}30%{transform:rotate(-8deg);}40%{transform:rotate(8deg);}50%{transform:rotate(0);}}
+.alert-cnt{
+  position:absolute;top:-5px;right:-5px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--red);color:#fff;
+  font-size:9px;font-weight:700;
+  display:none;align-items:center;justify-content:center;
+  border:2px solid var(--navy);
+}
+.alert-panel{
+  position:absolute;top:calc(100% + 10px);right:0;
+  width:380px;
+  background:var(--sur);border-radius:var(--rl);
+  box-shadow:var(--sh2);
+  border:1px solid var(--bor);
+  z-index:500;display:none;
+  overflow:hidden;
+}
+.alert-panel.open{display:block;}
+.alert-ph{
+  padding:14px 18px;
+  border-bottom:1px solid var(--bor);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--sur2);
+}
+.alert-title{font-size:13px;font-weight:700;color:var(--t1);}
+.alert-clear{font-size:11px;color:var(--t3);cursor:pointer;padding:4px 10px;border-radius:6px;border:1px solid var(--bor);background:transparent;transition:all 0.15s;}
+.alert-clear:hover{background:var(--bg2);color:var(--t1);}
+.alert-list{max-height:340px;overflow-y:auto;}
+.alert-item{
+  padding:13px 18px;border-bottom:1px solid var(--bor);
+  display:flex;gap:12px;align-items:flex-start;
+  transition:background 0.12s;
+}
+.alert-item:hover{background:var(--sur2);}
+.alert-item:last-child{border-bottom:none;}
+.alert-item.new{background:#fff8f3;}
+.alert-ico{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--reds);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+}
+.alert-info{flex:1;min-width:0;}
+.alert-name{font-size:13px;font-weight:600;color:var(--t1);}
+.alert-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.alert-time{font-size:10px;color:var(--t4);margin-top:3px;font-family:'JetBrains Mono',monospace;}
+.alert-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--grns);color:#065f46;margin-top:5px;display:inline-block;}
+.alert-empty{padding:2.5rem;text-align:center;color:var(--t4);font-size:12px;}
+
+/* URGENTE TAG */
+.urg-tag{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 13px;border-radius:8px;
+  font-size:11px;font-weight:600;
+  border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.06);
+  color:rgba(255,255,255,0.4);
+  white-space:nowrap;
+}
+.urg-tag.danger{background:rgba(229,57,53,0.2);border-color:rgba(229,57,53,0.3);color:#ff7070;}
+.urg-tag.ok{background:rgba(13,158,110,0.15);border-color:rgba(13,158,110,0.25);color:#4ade9e;}
+.urg-udot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow-y:auto;padding:24px 28px 40px;scrollbar-width:thin;scrollbar-color:var(--bor) transparent;}
 .page{display:none;}
 .page.on{display:block;}
 
-/* METRICS */
-.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px;}
-.mc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:18px 20px;transition:box-shadow 0.2s,transform 0.2s;}
-.mc:hover{box-shadow:0 4px 16px rgba(11,29,58,0.07);transform:translateY(-1px);}
-.mc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.mc-ico{width:38px;height:38px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:17px;}
-.mc-delta{font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;}
-.mc-val{font-size:34px;font-weight:700;letter-spacing:-1.5px;line-height:1;margin-bottom:4px;}
-.mc-lbl{font-size:11px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:0.06em;}
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:22px;}
+.page-header h1{font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-0.5px;}
+.page-header p{font-size:13px;color:var(--t3);margin-top:4px;}
+
+/* ── METRICS ── */
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:24px;}
+.mc{
+  background:var(--sur);border-radius:var(--rl);
+  padding:20px 22px;
+  box-shadow:var(--sh);
+  border:1px solid var(--bor);
+  transition:all 0.2s;
+  position:relative;overflow:hidden;
+}
+.mc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  border-radius:var(--rl) var(--rl) 0 0;
+}
+.mc.red::before{background:linear-gradient(90deg,var(--red),#ff6b6b);}
+.mc.amb::before{background:linear-gradient(90deg,var(--amb),#fbbf24);}
+.mc.blu::before{background:linear-gradient(90deg,var(--blu),#60a5fa);}
+.mc.grn::before{background:linear-gradient(90deg,var(--grn),#34d399);}
+.mc:hover{box-shadow:var(--sh2);transform:translateY(-2px);}
+.mc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.mc-ico{
+  width:42px;height:42px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+}
+.mc-delta{font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;}
+.mc-val{font-size:38px;font-weight:800;letter-spacing:-2px;line-height:1;margin-bottom:5px;}
+.mc-lbl{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.07em;}
 .mc-sub{font-size:11px;color:var(--t4);margin-top:3px;}
-.mc-bar{height:3px;background:var(--sur3);border-radius:2px;margin-top:12px;overflow:hidden;}
-.mc-barf{height:100%;border-radius:2px;transition:width 0.5s;}
+.mc-bar{height:4px;background:var(--bg2);border-radius:2px;margin-top:14px;overflow:hidden;}
+.mc-barf{height:100%;border-radius:2px;transition:width 0.6s ease;}
 
-/* GRID */
-.grid2{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start;}
+/* ── GRID ── */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px;align-items:start;}
 
-/* PANEL */
-.panel{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);overflow:hidden;margin-bottom:16px;}
-.ph{padding:14px 18px;border-bottom:1px solid var(--sur3);display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.ph-l{display:flex;align-items:center;gap:10px;}
-.ph-title{font-size:13px;font-weight:600;color:var(--t1);}
-.ph-cnt{font-size:11px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--sur3);color:var(--t3);font-family:'JetBrains Mono',monospace;}
-.ph-r{display:flex;align-items:center;gap:8px;}
+/* ── CARD ── */
+.card{
+  background:var(--sur);border-radius:var(--rl);
+  box-shadow:var(--sh);border:1px solid var(--bor);
+  overflow:hidden;
+  margin-bottom:18px;
+}
+.card:last-child{margin-bottom:0;}
+.card-head{
+  padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--bg2);
+}
+.card-title{font-size:14px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:8px;}
+.card-cnt{
+  font-size:11px;font-weight:700;
+  padding:3px 9px;border-radius:20px;
+  background:var(--bg);color:var(--t3);
+  font-family:'JetBrains Mono',monospace;
+  border:1px solid var(--bor);
+}
+.card-r{display:flex;align-items:center;gap:8px;}
+
+/* ── SEARCH + FILTER ── */
 .srch{position:relative;}
-.srch input{font-family:'Inter',sans-serif;font-size:12px;padding:6px 12px 6px 32px;border:1px solid var(--bor);border-radius:7px;background:var(--sur2);color:var(--t1);width:210px;outline:none;transition:all 0.15s;}
-.srch input:focus{border-color:var(--navy3);background:var(--sur);box-shadow:0 0 0 3px rgba(26,52,96,0.07);}
+.srch input{
+  font-family:'Inter',sans-serif;font-size:12px;
+  padding:7px 12px 7px 34px;
+  border:1.5px solid var(--bor);border-radius:9px;
+  background:var(--bg);color:var(--t1);
+  width:210px;outline:none;transition:all 0.15s;
+}
+.srch input:focus{border-color:var(--navy3);background:var(--sur);box-shadow:0 0 0 3px rgba(26,52,96,0.08);}
 .srch input::placeholder{color:var(--t4);}
-.srch-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--t4);pointer-events:none;}
-.ib{width:30px;height:30px;border:1px solid var(--bor);border-radius:7px;background:var(--sur);color:var(--t3);display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;transition:all 0.15s;}
-.ib:hover{background:var(--sur3);color:var(--t1);}
+.srch-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--t4);pointer-events:none;}
 
-/* TABLE */
+.sel-filter{
+  font-family:'Inter',sans-serif;font-size:12px;
+  padding:7px 12px;border:1.5px solid var(--bor);
+  border-radius:9px;background:var(--bg);
+  color:var(--t2);outline:none;cursor:pointer;
+  transition:all 0.15s;height:34px;
+}
+.sel-filter:focus{border-color:var(--navy3);}
+
+.ib{
+  width:34px;height:34px;
+  border:1.5px solid var(--bor);border-radius:9px;
+  background:var(--bg);color:var(--t3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;cursor:pointer;transition:all 0.15s;
+  flex-shrink:0;
+}
+.ib:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── TABLE ── */
 .tbl-wrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-thead tr{border-bottom:1px solid var(--sur3);}
-thead th{padding:10px 14px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--t4);text-align:left;white-space:nowrap;}
-tbody tr{border-bottom:1px solid var(--sur3);cursor:pointer;transition:background 0.12s;}
+thead tr{border-bottom:2px solid var(--bg2);}
+thead th{
+  padding:11px 16px;
+  font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:0.09em;
+  color:var(--t4);text-align:left;white-space:nowrap;
+  background:var(--sur2);
+}
+thead th:first-child{border-radius:0;}
+tbody tr{border-bottom:1px solid var(--bg2);cursor:pointer;transition:all 0.12s;}
 tbody tr:last-child{border-bottom:none;}
-tbody tr:hover{background:var(--sur2);}
-tbody tr.sel{background:#f3f6ff;}
-tbody td{padding:11px 14px;vertical-align:middle;}
-.td-av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-.td-cl{display:flex;align-items:center;gap:10px;}
+tbody tr:hover{background:var(--bg);}
+tbody tr.sel{background:#eef3ff;border-left:3px solid var(--orange);}
+tbody td{padding:12px 16px;vertical-align:middle;}
+
+.td-cl{display:flex;align-items:center;gap:11px;}
+.td-av{
+  width:36px;height:36px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+  box-shadow:0 2px 6px rgba(11,29,58,0.1);
+}
 .td-name{font-size:13px;font-weight:600;color:var(--t1);}
 .td-sub{font-size:11px;color:var(--t3);margin-top:1px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.td-id{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;}
+.td-id{font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;font-weight:500;}
 
-/* BADGES */
-.bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:5px;border:1px solid transparent;white-space:nowrap;}
-.b-gray{background:var(--sur3);color:var(--t2);border-color:var(--bor);}
+/* ── BADGES ── */
+.bdg{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:600;
+  padding:3px 9px;border-radius:6px;
+  border:1px solid transparent;white-space:nowrap;
+}
+.b-gray{background:var(--bg);color:var(--t2);border-color:var(--bor);}
 .b-blue{background:var(--blus);color:#1d4ed8;border-color:var(--blub);}
 .b-amb{background:var(--ambs);color:#b45309;border-color:var(--ambb);}
 .b-red{background:var(--reds);color:#b91c1c;border-color:var(--redb);}
 .b-grn{background:var(--grns);color:#065f46;border-color:var(--grnb);}
 .b-pur{background:var(--purs);color:#5b21b6;border-color:#ddd6fe;}
 .b-org{background:#fff8f3;color:#c2410c;border-color:#fed7aa;}
-.tbar{height:4px;background:var(--sur3);border-radius:2px;overflow:hidden;width:80px;}
-.tbar-f{height:100%;border-radius:2px;}
-.tbdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:5px;border:1px solid transparent;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
-.t-ok{background:var(--grns);color:#065f46;border-color:var(--grnb);}
+.b-navy{background:var(--navy);color:#fff;}
+
+.tbdg{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:11px;font-weight:700;
+  padding:4px 10px;border-radius:7px;
+  border:1.5px solid transparent;
+  font-family:'JetBrains Mono',monospace;
+  white-space:nowrap;
+}
+.t-ok {background:var(--grns);color:#065f46;border-color:var(--grnb);}
 .t-mid{background:var(--ambs);color:#92400e;border-color:var(--ambb);}
 .t-hot{background:var(--reds);color:#991b1b;border-color:var(--redb);}
 .t-cli{background:var(--purs);color:#5b21b6;border-color:#ddd6fe;}
 
-/* PERFIL */
-.p-empty{padding:56px 20px;text-align:center;}
-.p-eico{width:56px;height:56px;background:var(--sur3);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 12px;}
-.p-empty p{font-size:12px;color:var(--t4);line-height:1.7;max-width:180px;margin:0 auto;}
-.p-hero{padding:18px;border-bottom:1px solid var(--sur3);}
-.p-avlg{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;margin-bottom:12px;}
-.p-name{font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-0.2px;}
-.p-assunto{font-size:12px;color:var(--t2);margin-top:3px;}
-.p-idrow{display:flex;align-items:center;gap:6px;margin-top:8px;flex-wrap:wrap;}
-.p-sec{padding:14px 18px;border-bottom:1px solid var(--sur3);}
+.tbar-mini{height:4px;background:var(--bg2);border-radius:2px;overflow:hidden;width:80px;margin-bottom:4px;}
+.tbar-mini-f{height:100%;border-radius:2px;}
+
+/* ── PERFIL ── */
+.p-empty{padding:56px 24px;text-align:center;}
+.p-eico{
+  width:64px;height:64px;background:var(--bg2);border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;margin:0 auto 14px;
+}
+.p-empty-title{font-size:14px;font-weight:600;color:var(--t2);margin-bottom:6px;}
+.p-empty p{font-size:12px;color:var(--t4);line-height:1.7;max-width:200px;margin:0 auto;}
+
+.p-hero{
+  padding:20px;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy3) 100%);
+  position:relative;overflow:hidden;
+}
+.p-hero::after{
+  content:'';position:absolute;
+  top:-30px;right:-30px;
+  width:100px;height:100px;
+  background:rgba(249,115,22,0.15);
+  border-radius:50%;
+}
+.p-avlg{
+  width:52px;height:52px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;
+  margin-bottom:12px;
+  box-shadow:0 4px 12px rgba(11,29,58,0.3);
+  position:relative;z-index:1;
+}
+.p-name{font-size:16px;font-weight:800;color:#fff;letter-spacing:-0.3px;position:relative;z-index:1;}
+.p-assunto{font-size:12px;color:rgba(255,255,255,0.6);margin-top:3px;position:relative;z-index:1;}
+.p-idrow{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap;position:relative;z-index:1;}
+.p-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15);}
+.p-tag.orange{background:rgba(249,115,22,0.25);color:#fdba74;border-color:rgba(249,115,22,0.3);}
+
+.p-body{padding:0;}
+.p-sec{padding:14px 20px;border-bottom:1px solid var(--bg2);}
 .p-sec:last-child{border-bottom:none;}
-.p-seclbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.09em;color:var(--t4);margin-bottom:10px;}
-.p-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--sur3);font-size:12px;}
+.p-seclbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--t4);margin-bottom:10px;}
+.p-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bg2);font-size:12px;}
 .p-row:last-child{border-bottom:none;}
-.p-k{color:var(--t3);}
-.p-v{font-weight:500;color:var(--t1);}
-.tbar-wrap{margin-top:8px;}
-.tbar-head{display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;}
-.tbar-track{height:6px;background:var(--sur3);border-radius:3px;overflow:hidden;}
-.tbar-fill{height:100%;border-radius:3px;transition:width 0.5s;}
-.tbar-val{font-size:14px;font-weight:700;margin-top:5px;font-family:'JetBrains Mono',monospace;}
+.p-k{color:var(--t3);font-weight:500;}
+.p-v{font-weight:600;color:var(--t1);text-align:right;}
 
-/* SETOR CARDS */
-.scards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:16px;}
-.sc{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:14px 16px;border-top:3px solid transparent;cursor:pointer;transition:all 0.15s;}
-.sc:hover{box-shadow:0 4px 12px rgba(11,29,58,0.07);transform:translateY(-1px);}
-.sc-val{font-size:26px;font-weight:700;letter-spacing:-0.8px;line-height:1;}
-.sc-name{font-size:11px;font-weight:500;color:var(--t2);margin-top:4px;}
-.sc-resp{font-size:11px;color:var(--t4);margin-top:2px;}
+/* TEMPO BAR */
+.tbar-hero{margin-top:2px;}
+.tbar-hero-head{display:flex;justify-content:space-between;font-size:11px;margin-bottom:6px;}
+.tbar-hero-track{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;}
+.tbar-hero-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.tbar-hero-val{font-size:15px;font-weight:800;margin-top:6px;font-family:'JetBrains Mono',monospace;letter-spacing:-0.5px;}
 
-/* LOADING / ERROR */
-.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--t4);font-size:13px;gap:10px;}
-.spin{width:18px;height:18px;border:2px solid var(--bor);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+/* ── SETOR CARDS ── */
+.scards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;}
+.sc{
+  background:var(--sur);border-radius:var(--rl);
+  padding:16px;border:1px solid var(--bor);
+  box-shadow:var(--sh);
+  cursor:pointer;transition:all 0.18s;
+  border-top:3px solid transparent;
+}
+.sc:hover{box-shadow:var(--sh2);transform:translateY(-2px);}
+.sc-val{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1;}
+.sc-name{font-size:11px;font-weight:600;color:var(--t2);margin-top:5px;}
+.sc-resp{font-size:10px;color:var(--t4);margin-top:2px;}
+.sc-urg{font-size:11px;font-weight:600;margin-top:6px;display:flex;align-items:center;gap:4px;color:var(--red);}
+.sc-urgdot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:glow 2s infinite;}
+
+/* ── LOADING / ERROR ── */
+.loading{display:flex;align-items:center;justify-content:center;padding:48px;color:var(--t4);font-size:13px;gap:10px;}
+.spin{width:20px;height:20px;border:2px solid var(--bor);border-top-color:var(--navy);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
 @keyframes spin{to{transform:rotate(360deg);}}
-.err-msg{padding:14px 18px;color:var(--red);font-size:12px;background:var(--reds);margin:12px;border-radius:var(--r);border:1px solid var(--redb);}
+.err{padding:14px 20px;color:var(--red);font-size:12px;background:var(--reds);margin:14px;border-radius:var(--r);border:1px solid var(--redb);}
 
-/* PAGINATION */
-.pag{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--sur3);font-size:12px;color:var(--t3);}
+/* ── PAGINATION ── */
+.pag{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;border-top:1px solid var(--bg2);font-size:12px;color:var(--t3);}
 .pag-btns{display:flex;gap:6px;}
-.pag-btn{padding:4px 10px;border:1px solid var(--bor);border-radius:6px;background:var(--sur);cursor:pointer;font-size:12px;color:var(--t2);transition:all 0.15s;}
-.pag-btn:hover:not(:disabled){background:var(--sur3);}
+.pag-btn{padding:5px 12px;border:1.5px solid var(--bor);border-radius:7px;background:var(--sur);cursor:pointer;font-size:12px;font-weight:500;color:var(--t2);transition:all 0.15s;}
+.pag-btn:hover:not(:disabled){background:var(--navy);color:#fff;border-color:var(--navy);}
 .pag-btn:disabled{opacity:0.4;cursor:default;}
 .pag-btn.on{background:var(--navy);color:#fff;border-color:var(--navy);}
 
-/* RELATORIO */
-.rel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px;}
-.rel-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:18px 20px;}
-.rel-title{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:6px;}
-.chart-bar-wrap{display:flex;flex-direction:column;gap:8px;}
-.chart-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;}
-.chart-bar-label{width:100px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;}
-.chart-bar-track{flex:1;height:8px;background:var(--sur3);border-radius:4px;overflow:hidden;}
-.chart-bar-fill{height:100%;border-radius:4px;transition:width 0.6s ease;}
-.chart-bar-val{font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--t1);min-width:30px;text-align:right;}
+/* ── RELATÓRIOS ── */
+.rel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:20px;}
+.rel-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:20px;box-shadow:var(--sh);}
+.rel-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:16px;display:flex;align-items:center;gap:7px;}
+.cbar-row{display:flex;align-items:center;gap:10px;font-size:12px;margin-bottom:10px;}
+.cbar-lbl{width:110px;color:var(--t2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;}
+.cbar-track{flex:1;height:9px;background:var(--bg2);border-radius:5px;overflow:hidden;}
+.cbar-fill{height:100%;border-radius:5px;transition:width 0.6s ease;}
+.cbar-val{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--t1);min-width:28px;text-align:right;font-size:12px;}
 
-/* CONFIG */
+/* ── CONFIG ── */
 .cfg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
-.cfg-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:20px;}
-.cfg-title{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--sur3);}
-.cfg-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--sur3);font-size:12px;}
+.cfg-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--rl);padding:22px;box-shadow:var(--sh);}
+.cfg-title{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid var(--bg2);}
+.cfg-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--bg2);font-size:12px;}
 .cfg-row:last-child{border-bottom:none;}
-.cfg-k{color:var(--t3);}
-.cfg-v{font-weight:500;color:var(--t1);font-family:'JetBrains Mono',monospace;font-size:11px;}
-.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
-.status-ok{background:var(--grn);}
-.status-err{background:var(--red);}
+.cfg-k{color:var(--t3);font-weight:500;}
+.cfg-v{font-weight:600;color:var(--t1);}
+.cfg-mono{font-family:'JetBrains Mono',monospace;font-size:11px;}
 
-/* CLIENTES CARD */
-.cli-card{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--sur3);cursor:pointer;transition:background 0.12s;}
-.cli-card:hover{background:var(--sur2);}
-.cli-card:last-child{border-bottom:none;}
-.cli-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;background:var(--blus);color:#1d4ed8;}
+/* ── CLIENTES ── */
+.cli-row{
+  display:flex;align-items:center;gap:13px;
+  padding:12px 20px;border-bottom:1px solid var(--bg2);
+  cursor:pointer;transition:background 0.12s;
+}
+.cli-row:hover{background:var(--bg);}
+.cli-row:last-child{border-bottom:none;}
+.cli-av{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;
+}
 .cli-info{flex:1;min-width:0;}
 .cli-name{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cli-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+
+@media(max-width:1000px){
+  .grid2{grid-template-columns:1fr;}
+  .metrics{grid-template-columns:repeat(2,1fr);}
+  .scards{grid-template-columns:repeat(3,1fr);}
+  .rel-grid{grid-template-columns:1fr;}
+  .cfg-grid{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
@@ -248,7 +523,7 @@ tbody td{padding:11px 14px;vertical-align:middle;}
 <aside class="sb">
   <div class="sb-logo">
     <div class="sb-mark">O</div>
-    <div><div class="sb-name">OUT<em>TAX</em></div><div class="sb-sub">Gestão Contábil</div></div>
+    <div><div class="sb-brand">OUT<em>TAX</em></div><div class="sb-sub">Gestão Contábil</div></div>
   </div>
   <div class="sb-sec">
     <div class="sb-sec-lbl">Principal</div>
@@ -260,7 +535,7 @@ tbody td{padding:11px 14px;vertical-align:middle;}
   <div class="sb-div"></div>
   <div class="sb-sec"><div class="sb-sec-lbl">Setores</div></div>
   <div class="sb-setores" id="sb-setores">
-    <div class="sb-setor" style="color:rgba(255,255,255,0.3);font-size:11px;padding-left:18px;">Carregando…</div>
+    <div class="sb-setor" style="color:rgba(255,255,255,0.25);font-size:11px;padding-left:10px;">Carregando…</div>
   </div>
   <div class="sb-div"></div>
   <div class="sb-sec">
@@ -270,8 +545,8 @@ tbody td{padding:11px 14px;vertical-align:middle;}
   </div>
   <div class="sb-bot">
     <div class="sb-user">
-      <div class="sb-av">MX</div>
-      <div><div class="sb-uname">Marcos Xavier</div><div class="sb-urole">Sócio · Admin</div></div>
+      <div class="sb-uav">LT</div>
+      <div><div class="sb-uname">Lucas Teles</div><div class="sb-urole">Administrador</div></div>
     </div>
   </div>
 </aside>
@@ -283,35 +558,48 @@ tbody td{padding:11px 14px;vertical-align:middle;}
     <div class="tb-sp"></div>
     <div class="live"><span class="live-dot"></span>Ao vivo</div>
     <div class="tb-clock" id="clock"></div>
-    <div style="position:relative;"><button class="alert-btn" id="alert-btn" onclick="toggleAlertPanel()" title="Alertas">🔔<span class="alert-count" id="alert-count" style="display:none;">0</span></button><div class="alert-panel" id="alert-panel"><div class="alert-ph"><span class="alert-title">🔔 Alertas de SLA</span><button class="alert-clear" onclick="limparAlertas()">Limpar tudo</button></div><div class="alert-list" id="alert-list"><div class="alert-empty">Nenhum alerta no momento.</div></div></div></div>
+    <div class="alert-wrap">
+      <button class="alert-btn" id="alert-btn" onclick="toggleAlertPanel()" title="Alertas SLA">🔔<span class="alert-cnt" id="alert-cnt">0</span></button>
+      <div class="alert-panel" id="alert-panel">
+        <div class="alert-ph">
+          <span class="alert-title">🔔 Alertas de SLA</span>
+          <button class="alert-clear" onclick="limparAlertas()">Limpar tudo</button>
+        </div>
+        <div class="alert-list" id="alert-list"><div class="alert-empty">Nenhum alerta no momento.</div></div>
+      </div>
+    </div>
     <div class="urg-tag ok" id="urg-tag"><span class="urg-udot"></span><span id="urg-txt">Carregando…</span></div>
   </div>
 
   <div class="content">
 
-    <!-- PAGE: ATENDIMENTO -->
+    <!-- ATENDIMENTO -->
     <div class="page on" id="page-atendimento">
+      <div class="page-header">
+        <h1>Central de Atendimento</h1>
+        <p>Monitore todos os chamados em tempo real — atualiza a cada 60 segundos.</p>
+      </div>
       <div class="metrics">
-        <div class="mc">
-          <div class="mc-head"><div class="mc-ico" style="background:var(--reds);">⏳</div><div class="mc-delta" style="background:var(--reds);color:var(--red);" id="md1">—</div></div>
+        <div class="mc red">
+          <div class="mc-top"><div class="mc-ico" style="background:var(--reds);">⏳</div><div class="mc-delta" style="background:var(--reds);color:var(--red);" id="md1">—</div></div>
           <div class="mc-val" style="color:var(--red);" id="m1">—</div>
           <div class="mc-lbl">Abertos agora</div><div class="mc-sub">chamados em aberto</div>
           <div class="mc-bar"><div class="mc-barf" style="background:var(--red);" id="mb1"></div></div>
         </div>
-        <div class="mc">
-          <div class="mc-head"><div class="mc-ico" style="background:var(--ambs);">👤</div><div class="mc-delta" style="background:var(--ambs);color:var(--amb);" id="md2">—</div></div>
+        <div class="mc amb">
+          <div class="mc-top"><div class="mc-ico" style="background:var(--ambs);">👤</div><div class="mc-delta" style="background:var(--ambs);color:var(--amb);" id="md2">—</div></div>
           <div class="mc-val" style="color:var(--amb);" id="m2">—</div>
           <div class="mc-lbl">Sem responsável</div><div class="mc-sub">aguardando atribuição</div>
           <div class="mc-bar"><div class="mc-barf" style="background:var(--amb);" id="mb2"></div></div>
         </div>
-        <div class="mc">
-          <div class="mc-head"><div class="mc-ico" style="background:var(--blus);">🏢</div><div class="mc-delta" style="background:var(--blus);color:var(--blu);" id="md3">—</div></div>
+        <div class="mc blu">
+          <div class="mc-top"><div class="mc-ico" style="background:var(--blus);">🏢</div><div class="mc-delta" style="background:var(--blus);color:var(--blu);" id="md3">—</div></div>
           <div class="mc-val" style="color:var(--blu);" id="m3">—</div>
           <div class="mc-lbl">Departamentos</div><div class="mc-sub">setores com chamados</div>
           <div class="mc-bar"><div class="mc-barf" style="background:var(--blu);" id="mb3"></div></div>
         </div>
-        <div class="mc">
-          <div class="mc-head"><div class="mc-ico" style="background:var(--grns);">⚡</div><div class="mc-delta" style="background:var(--grns);color:var(--grn);" id="md4">—</div></div>
+        <div class="mc grn">
+          <div class="mc-top"><div class="mc-ico" style="background:var(--grns);">⚡</div><div class="mc-delta" style="background:var(--grns);color:var(--grn);" id="md4">—</div></div>
           <div class="mc-val" style="color:var(--grn);" id="m4">—</div>
           <div class="mc-lbl">TMA médio</div><div class="mc-sub">tempo médio de atendimento</div>
           <div class="mc-bar"><div class="mc-barf" style="background:var(--grn);" id="mb4"></div></div>
@@ -319,11 +607,11 @@ tbody td{padding:11px 14px;vertical-align:middle;}
       </div>
       <div class="grid2">
         <div>
-          <div class="panel">
-            <div class="ph">
-              <div class="ph-l"><div class="ph-title">Chamados abertos</div><div class="ph-cnt" id="ph-cnt">—</div></div>
-              <div class="ph-r">
-                <select id="filtro-hora" onchange="filtrarHora(this.value)" style="font-family:'Inter',sans-serif;font-size:12px;padding:5px 10px;border:1px solid var(--bor);border-radius:7px;background:var(--sur2);color:var(--t2);outline:none;cursor:pointer;height:30px;">
+          <div class="card">
+            <div class="card-head">
+              <div style="display:flex;align-items:center;gap:10px;"><div class="card-title">Chamados abertos</div><div class="card-cnt" id="ph-cnt">—</div></div>
+              <div class="card-r">
+                <select class="sel-filter" id="filtro-hora" onchange="filtrarHora(this.value)">
                   <option value="todos">🕐 Todos os horários</option>
                   <option value="comercial">💼 Comercial (10h–17h)</option>
                   <option value="manha">🌅 Manhã (08h–12h)</option>
@@ -335,43 +623,64 @@ tbody td{padding:11px 14px;vertical-align:middle;}
               </div>
             </div>
             <div class="tbl-wrap"><table>
-              <thead><tr><th style="padding-left:18px;">Cliente</th><th>Departamento</th><th>Protocolo</th><th>Agente</th><th>Origem</th><th>Tempo aberto</th></tr></thead>
+              <thead><tr>
+                <th style="padding-left:20px;">Cliente</th>
+                <th>Departamento</th>
+                <th>Protocolo</th>
+                <th>Agente</th>
+                <th>Origem</th>
+                <th>Tempo aberto</th>
+              </tr></thead>
               <tbody id="tbody-atend"></tbody>
             </table></div>
           </div>
           <div class="scards" id="scards"></div>
         </div>
-        <div class="panel" style="position:sticky;top:0;">
-          <div class="ph"><div class="ph-l"><div class="ph-title">Detalhes</div></div><span id="p-id" style="font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;"></span></div>
-          <div id="perfil"><div class="p-empty"><div class="p-eico">📋</div><p>Selecione um chamado para ver os detalhes.</p></div></div>
+        <div class="card" style="position:sticky;top:0;">
+          <div class="card-head">
+            <div class="card-title">Detalhes do chamado</div>
+            <span id="p-id" style="font-size:11px;color:var(--t4);font-family:'JetBrains Mono',monospace;font-weight:500;"></span>
+          </div>
+          <div id="perfil">
+            <div class="p-empty">
+              <div class="p-eico">📋</div>
+              <div class="p-empty-title">Nenhum chamado selecionado</div>
+              <p>Clique em um chamado na tabela para ver o perfil completo e histórico.</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- PAGE: CHAMADOS -->
+    <!-- CHAMADOS -->
     <div class="page" id="page-chamados">
-      <div class="panel">
-        <div class="ph">
-          <div class="ph-l"><div class="ph-title">Histórico de chamados</div><div class="ph-cnt" id="ph-hist">—</div></div>
-          <div class="ph-r">
+      <div class="page-header"><h1>Histórico de Chamados</h1><p>Todos os chamados abertos e encerrados.</p></div>
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:10px;"><div class="card-title">Todos os chamados</div><div class="card-cnt" id="ph-hist">—</div></div>
+          <div class="card-r">
             <div class="srch"><span class="srch-ic">🔍</span><input type="text" placeholder="Buscar protocolo…" oninput="filtrarHist(this.value)" id="srch-hist"></div>
             <button class="ib" onclick="carregarHistorico(1)" title="Atualizar">↻</button>
           </div>
         </div>
         <div class="tbl-wrap"><table>
-          <thead><tr><th style="padding-left:18px;">Departamento</th><th>Protocolo</th><th>Status</th><th>Origem</th><th>Comentário</th><th>Data</th><th>Duração</th></tr></thead>
+          <thead><tr>
+            <th style="padding-left:20px;">Departamento</th>
+            <th>Protocolo</th><th>Status</th><th>Origem</th><th>Comentário</th><th>Data</th><th>Duração</th>
+          </tr></thead>
           <tbody id="tbody-hist"></tbody>
         </table></div>
         <div class="pag" id="pag-hist"></div>
       </div>
     </div>
 
-    <!-- PAGE: CLIENTES -->
+    <!-- CLIENTES -->
     <div class="page" id="page-clientes">
-      <div class="panel">
-        <div class="ph">
-          <div class="ph-l"><div class="ph-title">Clientes / Contatos</div><div class="ph-cnt" id="ph-cli">—</div></div>
-          <div class="ph-r">
+      <div class="page-header"><h1>Clientes e Contatos</h1><p>Todos os contatos cadastrados no DIGISAC.</p></div>
+      <div class="card">
+        <div class="card-head">
+          <div style="display:flex;align-items:center;gap:10px;"><div class="card-title">Contatos</div><div class="card-cnt" id="ph-cli">—</div></div>
+          <div class="card-r">
             <div class="srch"><span class="srch-ic">🔍</span><input type="text" placeholder="Buscar nome ou telefone…" oninput="buscarClientes(this.value)" id="srch-cli"></div>
             <button class="ib" onclick="carregarClientes(1)" title="Atualizar">↻</button>
           </div>
@@ -381,69 +690,74 @@ tbody td{padding:11px 14px;vertical-align:middle;}
       </div>
     </div>
 
-    <!-- PAGE: RELATÓRIOS -->
+    <!-- RELATÓRIOS -->
     <div class="page" id="page-relatorios">
+      <div class="page-header"><h1>Relatórios</h1><p>Visão consolidada do atendimento.</p></div>
       <div class="rel-grid" id="rel-content">
-        <div class="rel-card" style="grid-column:1/-1;"><div class="loading"><span class="spin"></span>Carregando relatórios…</div></div>
+        <div class="rel-card" style="grid-column:1/-1;"><div class="loading"><span class="spin"></span>Carregando…</div></div>
       </div>
     </div>
 
-    <!-- PAGE: CONFIGURAÇÕES -->
+    <!-- CONFIG -->
     <div class="page" id="page-config">
+      <div class="page-header"><h1>Configurações</h1><p>Estrutura do escritório, SLA e fluxo de escalonamento.</p></div>
       <div class="cfg-grid">
         <div class="cfg-card">
           <div class="cfg-title">🏢 Informações do escritório</div>
-          <div class="cfg-row"><span class="cfg-k">Nome</span><span class="p-v">OUTTAX Gestão Contábil</span></div>
-          <div class="cfg-row"><span class="cfg-k">Sócios</span><span class="p-v">Marcos Xavier · Maiccon Dornelles</span></div>
-          <div class="cfg-row"><span class="cfg-k">Clientes ativos</span><span class="p-v">330</span></div>
-          <div class="cfg-row"><span class="cfg-k">Plataforma</span><span class="p-v">DIGISAC Multicanal</span></div>
+          <div class="cfg-row"><span class="cfg-k">Nome</span><span class="cfg-v">OUTTAX Gestão Contábil</span></div>
+          <div class="cfg-row"><span class="cfg-k">Sócios</span><span class="cfg-v">Marcos Xavier · Maiccon Dornelles</span></div>
+          <div class="cfg-row"><span class="cfg-k">Clientes ativos</span><span class="cfg-v">330</span></div>
+          <div class="cfg-row"><span class="cfg-k">Plataforma</span><span class="cfg-v">DIGISAC Multicanal</span></div>
         </div>
         <div class="cfg-card">
           <div class="cfg-title">👥 Gestores por setor</div>
-          <div class="cfg-row"><span class="cfg-k">Fiscal</span><span class="p-v">André Rocha</span></div>
-          <div class="cfg-row"><span class="cfg-k">Dep. Pessoal</span><span class="p-v">Edgar de Paula</span></div>
-          <div class="cfg-row"><span class="cfg-k">Contabilidade</span><span class="p-v">Carla Rosa</span></div>
-          <div class="cfg-row"><span class="cfg-k">Legalização</span><span class="p-v">Michelle Costa</span></div>
-          <div class="cfg-row"><span class="cfg-k">BPO Financeiro</span><span class="p-v">Nivea Carvalho</span></div>
+          <div class="cfg-row"><span class="cfg-k">Fiscal</span><span class="cfg-v">André Rocha</span></div>
+          <div class="cfg-row"><span class="cfg-k">Dep. Pessoal</span><span class="cfg-v">Edgar de Paula</span></div>
+          <div class="cfg-row"><span class="cfg-k">Contabilidade</span><span class="cfg-v">Carla Rosa</span></div>
+          <div class="cfg-row"><span class="cfg-k">Legalização</span><span class="cfg-v">Michelle Costa</span></div>
+          <div class="cfg-row"><span class="cfg-k">BPO Financeiro</span><span class="cfg-v">Nivea Carvalho</span></div>
         </div>
         <div class="cfg-card">
           <div class="cfg-title">⏱ Regras de SLA</div>
-          <div class="cfg-row"><span class="cfg-k">Triagem (recepcionista)</span><span class="p-v">15 min</span></div>
-          <div class="cfg-row"><span class="cfg-k">Primeira resposta</span><span class="p-v">1h</span></div>
-          <div class="cfg-row"><span class="cfg-k">Resolução pelo setor</span><span class="p-v">4h</span></div>
-          <div class="cfg-row"><span class="cfg-k">Resolução pelo gestor</span><span class="p-v">8h</span></div>
-          <div class="cfg-row"><span class="cfg-k">Aguardando cliente</span><span class="p-v">48h → arquivar</span></div>
+          <div class="cfg-row"><span class="cfg-k">Triagem</span><span class="cfg-v">15 minutos</span></div>
+          <div class="cfg-row"><span class="cfg-k">Primeira resposta</span><span class="cfg-v">1 hora</span></div>
+          <div class="cfg-row"><span class="cfg-k">Resolução pelo setor</span><span class="cfg-v">4 horas</span></div>
+          <div class="cfg-row"><span class="cfg-k">Resolução pelo gestor</span><span class="cfg-v">8 horas</span></div>
+          <div class="cfg-row"><span class="cfg-k">Aguardando cliente</span><span class="cfg-v">48h → arquivar</span></div>
         </div>
         <div class="cfg-card">
           <div class="cfg-title">📋 Fluxo de escalonamento</div>
-          <div class="cfg-row"><span class="cfg-k">Nível 1</span><span class="p-v">Responsável do setor</span></div>
-          <div class="cfg-row"><span class="cfg-k">Nível 2</span><span class="p-v">Gestor da área</span></div>
-          <div class="cfg-row"><span class="cfg-k">Nível 3</span><span class="p-v">Sócio (último recurso)</span></div>
-          <div class="cfg-row"><span class="cfg-k">Dashboard</span><span class="p-v">Atualiza a cada 60s</span></div>
+          <div class="cfg-row"><span class="cfg-k">Nível 1</span><span class="cfg-v">Responsável do setor</span></div>
+          <div class="cfg-row"><span class="cfg-k">Nível 2</span><span class="cfg-v">Gestor da área</span></div>
+          <div class="cfg-row"><span class="cfg-k">Nível 3</span><span class="cfg-v">Sócio (último recurso)</span></div>
+          <div class="cfg-row"><span class="cfg-k">Alertas</span><span class="cfg-v">Google Chat + Dashboard</span></div>
+          <div class="cfg-row"><span class="cfg-k">Atualização</span><span class="cfg-v">A cada 60 segundos</span></div>
         </div>
       </div>
     </div>
 
-    <!-- PAGE: API -->
+    <!-- API -->
     <div class="page" id="page-api">
+      <div class="page-header"><h1>DIGISAC API</h1><p>Status da conexão e dados da conta.</p></div>
       <div class="cfg-grid">
         <div class="cfg-card">
-          <div class="cfg-title">🔗 Conexão DIGISAC</div>
-          <div class="cfg-row"><span class="cfg-k">Status</span><span class="cfg-v"><span class="status-dot status-ok"></span>Conectado</span></div>
-          <div class="cfg-row"><span class="cfg-k">URL base</span><span class="cfg-v">outtax.digisac.me/api/v1</span></div>
-          <div class="cfg-row"><span class="cfg-k">Token</span><span class="cfg-v">••••••••••••••••</span></div>
+          <div class="cfg-title">🔗 Conexão</div>
+          <div class="cfg-row"><span class="cfg-k">Status</span><span class="cfg-v" style="color:var(--grn);">✓ Conectado</span></div>
+          <div class="cfg-row"><span class="cfg-k">URL base</span><span class="cfg-v cfg-mono">outtax.digisac.me/api/v1</span></div>
+          <div class="cfg-row"><span class="cfg-k">Token</span><span class="cfg-v cfg-mono">••••••••••••</span></div>
           <div class="cfg-row"><span class="cfg-k">Atualização</span><span class="cfg-v">A cada 60 segundos</span></div>
         </div>
         <div class="cfg-card">
-          <div class="cfg-title">📡 Endpoints ativos</div>
+          <div class="cfg-title">📡 Endpoints</div>
           <div class="cfg-row"><span class="cfg-k">/api/tickets</span><span class="bdg b-grn">Ativo</span></div>
           <div class="cfg-row"><span class="cfg-k">/api/history</span><span class="bdg b-grn">Ativo</span></div>
           <div class="cfg-row"><span class="cfg-k">/api/contacts</span><span class="bdg b-grn">Ativo</span></div>
           <div class="cfg-row"><span class="cfg-k">/api/departments</span><span class="bdg b-grn">Ativo</span></div>
-          <div class="cfg-row"><span class="cfg-k">/api/stats</span><span class="bdg b-grn">Ativo</span></div>
+          <div class="cfg-row"><span class="cfg-k">/api/alerts</span><span class="bdg b-grn">Ativo</span></div>
+          <div class="cfg-row"><span class="cfg-k">/api/messages</span><span class="bdg b-grn">Ativo</span></div>
         </div>
         <div class="cfg-card" style="grid-column:1/-1;" id="api-stats-card">
-          <div class="cfg-title">📊 Estatísticas da API</div>
+          <div class="cfg-title">📊 Estatísticas</div>
           <div class="loading"><span class="spin"></span>Carregando…</div>
         </div>
       </div>
@@ -457,6 +771,7 @@ tbody td{padding:11px 14px;vertical-align:middle;}
 let TICKETS=[], DEPTS={}, DEPTS_LIST=[], filtroSetor='todos', buscaAtend='', selAtend=null, filtroHoraAtend='todos';
 let HIST=[], histPage=1, histTotal=0, buscaHist='';
 let CLIENTES=[], cliPage=1, cliTotal=0;
+let ALERTAS=[], ALERTAS_DISPARADOS=new Set(), MARCOS_ALERTAS=new Set(), USUARIOS={};
 
 const CORES=[
   {bg:'#eff6ff',fg:'#1d4ed8',dot:'#3b82f6',top:'#3b82f6'},
@@ -468,32 +783,125 @@ const CORES=[
   {bg:'#fefce8',fg:'#854d0e',dot:'#eab308',top:'#eab308'},
   {bg:'#fdf4ff',fg:'#7e22ce',dot:'#a855f7',top:'#a855f7'},
 ];
-
-function getCor(idx){return CORES[idx%CORES.length];}
-
+const getCor=idx=>CORES[idx%CORES.length];
 const fmt=m=>{if(!m||m<=0)return '—';if(m<60)return m+'min';const h=Math.floor(m/60),mn=m%60;return h+'h'+(mn?' '+mn+'min':'');};
 const tempoMin=s=>s?Math.floor((Date.now()-new Date(s).getTime())/60000):0;
-const corHex=m=>m>=240?'#dc3545':m>=120?'#e8920a':'#0e9e6e';
+const corHex=m=>m>=240?'#e53935':m>=120?'#e8920a':'#0d9e6e';
 const pct=m=>Math.min(100,Math.round(m/480*100));
 const ini=n=>{if(!n)return '??';return n.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'??';};
 const fmtDate=s=>{if(!s)return '—';return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});};
 
-function navTo(page, el){
+// ── NAVEGAÇÃO ──
+function navTo(page,el){
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  if(el) el.classList.add('on');
+  if(el)el.classList.add('on');
   document.getElementById('page-'+page).classList.add('on');
   const titles={atendimento:'Central de Atendimento',chamados:'Histórico de Chamados',clientes:'Clientes e Contatos',relatorios:'Relatórios',config:'Configurações',api:'DIGISAC API'};
   document.getElementById('tb-title').textContent=titles[page]||page;
-  if(page==='chamados'&&HIST.length===0) carregarHistorico(1);
-  if(page==='clientes'&&CLIENTES.length===0) carregarClientes(1);
-  if(page==='relatorios') carregarRelatorios();
-  if(page==='api') carregarApiStats();
+  if(page==='chamados'&&HIST.length===0)carregarHistorico(1);
+  if(page==='clientes'&&CLIENTES.length===0)carregarClientes(1);
+  if(page==='relatorios')carregarRelatorios();
+  if(page==='api')carregarApiStats();
 }
 
-/* ── ATENDIMENTO ── */
+// ── ALERTAS ──
+function toggleAlertPanel(){
+  const p=document.getElementById('alert-panel');
+  p.classList.toggle('open');
+  if(p.classList.contains('open')){document.getElementById('alert-btn').classList.remove('has-alert');renderAlertList(false);}
+}
+document.addEventListener('click',e=>{
+  const p=document.getElementById('alert-panel');
+  const b=document.getElementById('alert-btn');
+  if(p&&!p.contains(e.target)&&!b.contains(e.target))p.classList.remove('open');
+});
+function limparAlertas(){
+  ALERTAS=[];renderAlertList(false);
+  document.getElementById('alert-cnt').style.display='none';
+  document.getElementById('alert-btn').classList.remove('has-alert');
+}
+function renderAlertList(isNew){
+  const list=document.getElementById('alert-list');
+  const cnt=document.getElementById('alert-cnt');
+  if(ALERTAS.length===0){list.innerHTML='<div class="alert-empty">Nenhum alerta no momento.</div>';cnt.style.display='none';document.getElementById('alert-btn').classList.remove('has-alert');return;}
+  cnt.textContent=ALERTAS.length;cnt.style.display='flex';
+  if(isNew)document.getElementById('alert-btn').classList.add('has-alert');
+  list.innerHTML=ALERTAS.slice().reverse().map(a=>`
+    <div class="alert-item ${a.isNew?'new':''}">
+      <div class="alert-ico">${a.tipo==='transferencia_sem_atendimento'?'🔀':a.tipo==='horario_comercial'?'🕐':'⚠️'}</div>
+      <div class="alert-info">
+        <div class="alert-name">${a.contactName}</div>
+        <div class="alert-desc">${a.departmentName} · Protocolo ${a.protocol}</div>
+        <div class="alert-time">${a.minutesOpen}min · ${a.hora}</div>
+        ${a.sent?'<span class="alert-tag">✓ Google Chat notificado</span>':''}
+      </div>
+    </div>`).join('');
+}
+
+function faixaMin(min){if(min>=120)return 120;if(min>=90)return 90;if(min>=60)return 60;if(min>=30)return 30;return 0;}
+function emHorarioComercial(){const h=new Date().getHours();return h>=10&&h<17;}
+
+async function dispararAlerta(tipo,ticket,dept,contactName,minutesOpen){
+  const faixa=faixaMin(minutesOpen);
+  if(faixa===0)return false;
+  const chave=`${ticket.id}_${tipo}_${faixa}`;
+  if(MARCOS_ALERTAS.has(chave))return false;
+  MARCOS_ALERTAS.add(chave);
+  try{
+    const r=await fetch('/api/alerts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo,ticketId:ticket.id,protocol:ticket.protocol,departmentName:dept.name,contactName,minutesOpen})});
+    const d=await r.json();
+    return d.ok===true;
+  }catch(e){return false;}
+}
+
+async function verificarMensagensTicket(ticket){
+  try{const r=await fetch(`/api/messages?ticketId=${ticket.id}`);const d=await r.json();return d.data||[];}catch(e){return [];}
+}
+
+async function verificarAlertas(){
+  if(TICKETS.length===0)return;
+  for(const t of TICKETS){
+    const min=tempoMin(t.startedAt);
+    if(min<30)continue;
+    const dept=DEPTS[t.departmentId]||{name:'Sem setor',cor:CORES[0]};
+    const contactName=t.contact?(t.contact.name||t.contact.pushname||t.contact.number||'Sem nome'):'Sem nome';
+    const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const msgs=await verificarMensagensTicket(t);
+    const ultimaMsg=msgs.length>0?msgs[msgs.length-1]:null;
+    let sent=false;
+    if(ultimaMsg){
+      const ultimaAt=new Date(ultimaMsg.createdAt||ultimaMsg.timestamp);
+      const minSemResp=Math.floor((Date.now()-ultimaAt.getTime())/60000);
+      const foiCliente=ultimaMsg.fromMe===false||ultimaMsg.direction==='inbound';
+      const foiTime=ultimaMsg.fromMe===true||ultimaMsg.direction==='outbound';
+      if(foiCliente&&minSemResp>=30)sent=await dispararAlerta('time_sem_resposta',t,dept,contactName,minSemResp);
+      if(foiTime&&minSemResp>=30)sent=await dispararAlerta('cliente_sem_resposta',t,dept,contactName,minSemResp);
+      if(foiCliente&&emHorarioComercial()&&minSemResp>=30){
+        const chaveHC=`${t.id}_horario_comercial`;
+        if(!MARCOS_ALERTAS.has(chaveHC)){MARCOS_ALERTAS.add(chaveHC);await dispararAlerta('horario_comercial',t,dept,contactName,minSemResp);}
+      }
+    }else if(min>=30){
+      sent=await dispararAlerta('time_sem_resposta',t,dept,contactName,min);
+    }
+    if(!t.userId&&t.currentTicketTransferId){
+      const chaveT=`${t.id}_transferencia`;
+      if(!MARCOS_ALERTAS.has(chaveT)&&min>=30){MARCOS_ALERTAS.add(chaveT);await dispararAlerta('transferencia_sem_atendimento',t,dept,contactName,min);}
+    }
+    if(MARCOS_ALERTAS.has(`${t.id}_time_sem_resposta_${faixaMin(min)}`)||sent){
+      const jaExiste=ALERTAS.find(a=>a.id===t.id);
+      if(!jaExiste){
+        ALERTAS.push({id:t.id,tipo:'time_sem_resposta',protocol:t.protocol||'—',departmentName:dept.name,contactName,minutesOpen:min,hora,sent,isNew:true});
+        try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=880;gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.5);}catch(e){}
+      }
+    }
+  }
+  if(ALERTAS.some(a=>a.isNew)){renderAlertList(true);ALERTAS.forEach(a=>a.isNew=false);}
+}
+
+// ── ATENDIMENTO ──
 async function carregarAtendimento(){
-  document.getElementById('tbody-atend').innerHTML=`<tr><td colspan="5"><div class="loading"><span class="spin"></span>Buscando chamados abertos…</div></td></tr>`;
+  document.getElementById('tbody-atend').innerHTML=`<tr><td colspan="6"><div class="loading"><span class="spin"></span>Buscando chamados abertos…</div></td></tr>`;
   try{
     const [tickRes,deptRes]=await Promise.all([fetch('/api/tickets'),fetch('/api/departments')]);
     const [tickData,deptData]=await Promise.all([tickRes.json(),deptRes.json()]);
@@ -501,12 +909,20 @@ async function carregarAtendimento(){
     DEPTS={};
     DEPTS_LIST.forEach((d,i)=>{DEPTS[d.id]={name:d.name,idx:i,cor:getCor(i)};});
     TICKETS=tickData.data||[];
-    renderAtendimento();
-    renderSidebar();
-    verificarAlertas();
+    renderAtendimento();renderSidebar();
   }catch(e){
-    document.getElementById('tbody-atend').innerHTML=`<tr><td colspan="5"><div class="err-msg">Erro ao carregar. Tente novamente.</div></td></tr>`;
+    document.getElementById('tbody-atend').innerHTML=`<tr><td colspan="6"><div class="err">Erro ao carregar. Tente novamente.</div></td></tr>`;
   }
+}
+
+function dentroFaixaHora(ticket){
+  if(filtroHoraAtend==='todos')return true;
+  const h=new Date(ticket.startedAt).getHours();
+  if(filtroHoraAtend==='manha')return h>=8&&h<12;
+  if(filtroHoraAtend==='tarde')return h>=12&&h<18;
+  if(filtroHoraAtend==='noite')return h>=18&&h<22;
+  if(filtroHoraAtend==='comercial')return h>=10&&h<17;
+  return true;
 }
 
 function renderAtendimento(){
@@ -516,13 +932,11 @@ function renderAtendimento(){
     if(!dentroFaixaHora(t))return false;
     return true;
   });
-
   const semResp=TICKETS.filter(t=>!t.userId).length;
   const depsAtivos=new Set(TICKETS.map(t=>t.departmentId)).size;
   const tmas=TICKETS.filter(t=>t.metrics?.messagingTime>0).map(t=>Math.floor(t.metrics.messagingTime/60));
   const tmaMedia=tmas.length?Math.floor(tmas.reduce((a,b)=>a+b,0)/tmas.length):0;
   const urg=TICKETS.filter(t=>tempoMin(t.startedAt)>=240).length;
-
   document.getElementById('m1').textContent=TICKETS.length||'0';
   document.getElementById('m2').textContent=semResp;
   document.getElementById('m3').textContent=depsAtivos;
@@ -539,8 +953,7 @@ function renderAtendimento(){
   document.getElementById('ph-cnt').textContent=list.length;
   const utag=document.getElementById('urg-tag');
   document.getElementById('urg-txt').textContent=urg?urg+' acima do SLA':'Tudo no prazo';
-  utag.className='urg-tag'+(urg?'':' ok');
-
+  utag.className='urg-tag'+(urg?' danger':' ok');
   document.getElementById('tbody-atend').innerHTML=list.length?list.map(t=>{
     const dept=DEPTS[t.departmentId]||{name:'Sem setor',idx:0,cor:CORES[0]};
     const cor=dept.cor;
@@ -549,63 +962,36 @@ function renderAtendimento(){
     const cli=t.contact;
     const cliNome=cli?(cli.name||cli.pushname||cli.number||'Sem nome'):'Sem nome';
     const cliTel=cli?(cli.number||cli.phone||''):'';
-    const cliIni=cli?(cliNome.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'?'):ini(dept.name);
+    const cliIni=ini(cliNome);
     const agenteNome=t.agent?(t.agent.name||t.agent.username||'Atribuído'):null;
     return`<tr class="${selAtend===t.id?'sel':''}" onclick="pickAtend('${t.id}')">
-      <td style="padding-left:18px;"><div class="td-cl"><div class="td-av" style="background:${cor.bg};color:${cor.fg};">${cliIni}</div><div><div class="td-name">${cliNome}</div><div class="td-sub">${cliTel||dept.name}</div></div></div></td>
-      <td><span class="bdg b-gray" style="font-size:11px;">${dept.name}</span></td>
+      <td style="padding-left:20px;"><div class="td-cl"><div class="td-av" style="background:${cor.bg};color:${cor.fg};">${cliIni}</div><div><div class="td-name">${cliNome}</div><div class="td-sub">${cliTel||dept.name}</div></div></div></td>
+      <td><span class="bdg b-gray"><span style="width:6px;height:6px;border-radius:50%;background:${cor.dot};display:inline-block;margin-right:4px;flex-shrink:0;"></span>${dept.name}</span></td>
       <td><span class="td-id">${t.protocol||'—'}</span></td>
       <td>${agenteNome?`<span class="bdg b-grn">${agenteNome}</span>`:'<span class="bdg b-amb">Sem agente</span>'}</td>
       <td>${t.origin==='manual'?'<span class="bdg b-blue">Manual</span>':'<span class="bdg b-gray">Auto</span>'}</td>
-      <td>
-        <div class="tbar"><div class="tbar-f" style="width:${pct(min)}%;background:${corHex(min)};"></div></div>
-        <span class="tbdg ${tcls}" style="margin-top:4px;display:inline-flex;">${fmt(min)}</span>
-      </td>
+      <td><div class="tbar-mini"><div class="tbar-mini-f" style="width:${pct(min)}%;background:${corHex(min)};"></div></div><span class="tbdg ${tcls}">${fmt(min)}</span></td>
     </tr>`;
-  }).join(''):`<tr><td colspan="5" style="padding:2rem;text-align:center;color:var(--t4);">Nenhum chamado aberto no momento.</td></tr>`;
+  }).join(''):`<tr><td colspan="6" style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum chamado aberto no momento.</td></tr>`;
 
-  const deptCounts={};
-  TICKETS.forEach(t=>{deptCounts[t.departmentId]=(deptCounts[t.departmentId]||0)+1;});
+  const deptCounts={};TICKETS.forEach(t=>{deptCounts[t.departmentId]=(deptCounts[t.departmentId]||0)+1;});
   document.getElementById('scards').innerHTML=DEPTS_LIST.slice(0,5).map(d=>{
     const cor=DEPTS[d.id]?.cor||CORES[0];
+    const tot=deptCounts[d.id]||0;
     return`<div class="sc" style="border-top-color:${cor.top};" onclick="filtrarSetor('${d.id}')">
-      <div class="sc-val" style="color:${cor.fg};">${deptCounts[d.id]||0}</div>
+      <div class="sc-val" style="color:${cor.fg};">${tot}</div>
       <div class="sc-name">${d.name}</div>
     </div>`;
   }).join('');
 }
 
 function renderSidebar(){
-  const deptCounts={};
-  TICKETS.forEach(t=>{deptCounts[t.departmentId]=(deptCounts[t.departmentId]||0)+1;});
+  const deptCounts={};TICKETS.forEach(t=>{deptCounts[t.departmentId]=(deptCounts[t.departmentId]||0)+1;});
   document.getElementById('sb-total').textContent=TICKETS.length;
   document.getElementById('sb-setores').innerHTML=
-    DEPTS_LIST.map(d=>{
-      const cor=DEPTS[d.id]?.cor||CORES[0];
-      return`<div class="sb-setor${filtroSetor===d.id?' on':''}" onclick="filtrarSetor('${d.id}');navTo('atendimento',null)">
-        <span class="sb-sdot" style="background:${cor.dot};"></span>${d.name}
-        <span class="sb-scount">${deptCounts[d.id]||0}</span>
-      </div>`;
-    }).join('')+
-    `<div class="sb-setor${filtroSetor==='todos'?' on':''}" style="margin-top:6px;" onclick="filtrarSetor('todos');navTo('atendimento',null)">
-      <span class="sb-sdot" style="background:rgba(255,255,255,0.2);"></span>Todos
-      <span class="sb-scount">${TICKETS.length}</span>
-    </div>`;
+    DEPTS_LIST.map(d=>{const cor=DEPTS[d.id]?.cor||CORES[0];return`<div class="sb-setor${filtroSetor===d.id?' on':''}" onclick="filtrarSetor('${d.id}');navTo('atendimento',null)"><span class="sb-sdot" style="background:${cor.dot};"></span>${d.name}<span class="sb-scount">${deptCounts[d.id]||0}</span></div>`;}).join('')+
+    `<div class="sb-setor${filtroSetor==='todos'?' on':''}" style="margin-top:8px;" onclick="filtrarSetor('todos');navTo('atendimento',null)"><span class="sb-sdot" style="background:rgba(255,255,255,0.2);"></span>Todos<span class="sb-scount">${TICKETS.length}</span></div>`;
 }
-
-function filtrarSetor(s){filtroSetor=s;renderAtendimento();}
-function filtrarHora(v){filtroHoraAtend=v;renderAtendimento();}
-
-function dentroFaixaHora(ticket) {
-  if (filtroHoraAtend === 'todos') return true;
-  const h = new Date(ticket.startedAt).getHours();
-  if (filtroHoraAtend === 'manha')    return h >= 8  && h < 12;
-  if (filtroHoraAtend === 'tarde')    return h >= 12 && h < 18;
-  if (filtroHoraAtend === 'noite')    return h >= 18 && h < 22;
-  if (filtroHoraAtend === 'comercial')return h >= 10 && h < 17;
-  return true;
-}
-function filtrarAtend(v){buscaAtend=v.toLowerCase();renderAtendimento();}
 
 function pickAtend(id){
   selAtend=id;
@@ -615,94 +1001,90 @@ function pickAtend(id){
   const cor=dept.cor;
   const min=tempoMin(t.startedAt);
   const c=corHex(min);
+  const cli=t.contact;
+  const cliNome=cli?(cli.name||cli.pushname||cli.number||'Sem nome'):'Sem nome';
   document.getElementById('p-id').textContent=t.protocol||t.id.slice(0,8);
   const tmaMin=t.metrics?.messagingTime?Math.floor(t.metrics.messagingTime/60):null;
   document.getElementById('perfil').innerHTML=`
   <div>
     <div class="p-hero">
-      <div class="p-avlg" style="background:${cor.bg};color:${cor.fg};">${(()=>{const c=t.contact;const n=c?(c.name||c.pushname||c.number||'?'):dept.name;return n.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'?';})()}</div>
-      <div class="p-name">${t.contact?(t.contact.name||t.contact.pushname||t.contact.number||'Sem nome'):'Sem nome'}</div>
-      <div class="p-assunto">${t.contact&&t.contact.number?t.contact.number+' · ':''} ${dept.name}</div>
+      <div class="p-avlg" style="background:${cor.bg};color:${cor.fg};">${ini(cliNome)}</div>
+      <div class="p-name">${cliNome}</div>
+      <div class="p-assunto">${dept.name}</div>
       <div class="p-idrow">
-        <span class="bdg b-gray">Protocolo ${t.protocol||'—'}</span>
-        <span class="bdg b-gray">${t.origin==='manual'?'Manual':'Automático'}</span>
-        ${t.agent?`<span class="bdg b-grn">${t.agent.name||t.agent.username||'Atribuído'}</span>`:'<span class="bdg b-amb">Sem agente</span>'}
+        <span class="p-tag">Protocolo ${t.protocol||'—'}</span>
+        <span class="p-tag">${t.origin==='manual'?'Manual':'Automático'}</span>
+        ${t.agent?`<span class="p-tag orange">${t.agent.name||t.agent.username}</span>`:''}
       </div>
     </div>
-    <div class="p-sec">
-      <div class="p-seclbl">Cliente</div>
-      ${t.contact?`<div class="p-row"><span class="p-k">Nome</span><span class="p-v">${t.contact.name||t.contact.pushname||'—'}</span></div>`:''}
-      ${t.contact&&t.contact.number?`<div class="p-row"><span class="p-k">Telefone</span><span class="p-v" style="font-family:monospace;">${t.contact.number}</span></div>`:''}
-      ${t.contact&&t.contact.email?`<div class="p-row"><span class="p-k">E-mail</span><span class="p-v">${t.contact.email}</span></div>`:''}
-    </div>
-    <div class="p-sec">
-      <div class="p-seclbl">Chamado</div>
-      <div class="p-row"><span class="p-k">Protocolo</span><span class="p-v" style="font-family:monospace;">${t.protocol||'—'}</span></div>
-      <div class="p-row"><span class="p-k">Departamento</span><span class="p-v">${dept.name}</span></div>
-      ${t.agent?`<div class="p-row"><span class="p-k">Agente</span><span class="p-v">${t.agent.name||t.agent.username||'—'}</span></div>`:''}
-      <div class="p-row"><span class="p-k">Origem</span><span class="p-v">${t.origin==='manual'?'Manual':'Automático'}</span></div>
-      <div class="p-row"><span class="p-k">Aberto em</span><span class="p-v">${fmtDate(t.startedAt)}</span></div>
-      ${t.comments?`<div class="p-row"><span class="p-k">Comentário</span><span class="p-v" style="max-width:180px;text-align:right;font-size:11px;">${t.comments}</span></div>`:''}
-    </div>
-    <div class="p-sec">
-      <div class="p-seclbl">Tempo em aberto</div>
-      <div class="tbar-wrap">
-        <div class="tbar-head"><span style="color:var(--t3);">Decorrido</span><span style="color:var(--t4);">SLA: 4h</span></div>
-        <div class="tbar-track"><div class="tbar-fill" style="width:${pct(min)}%;background:${c};"></div></div>
-        <div class="tbar-val" style="color:${c};">${fmt(min)}</div>
+    <div class="p-body">
+      ${cli?`<div class="p-sec">
+        <div class="p-seclbl">Cliente</div>
+        ${cli.name||cli.pushname?`<div class="p-row"><span class="p-k">Nome</span><span class="p-v">${cli.name||cli.pushname}</span></div>`:''}
+        ${cli.number?`<div class="p-row"><span class="p-k">Telefone</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${cli.number}</span></div>`:''}
+        ${cli.email?`<div class="p-row"><span class="p-k">E-mail</span><span class="p-v">${cli.email}</span></div>`:''}
+      </div>`:''}
+      <div class="p-sec">
+        <div class="p-seclbl">Chamado</div>
+        <div class="p-row"><span class="p-k">Protocolo</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${t.protocol||'—'}</span></div>
+        <div class="p-row"><span class="p-k">Departamento</span><span class="p-v">${dept.name}</span></div>
+        ${t.agent?`<div class="p-row"><span class="p-k">Agente</span><span class="p-v">${t.agent.name||t.agent.username||'—'}</span></div>`:''}
+        <div class="p-row"><span class="p-k">Origem</span><span class="p-v">${t.origin==='manual'?'Manual':'Automático'}</span></div>
+        <div class="p-row"><span class="p-k">Aberto em</span><span class="p-v">${fmtDate(t.startedAt)}</span></div>
+        ${t.comments?`<div class="p-row"><span class="p-k">Comentário</span><span class="p-v" style="font-size:11px;max-width:200px;text-align:right;">${t.comments}</span></div>`:''}
       </div>
+      <div class="p-sec">
+        <div class="p-seclbl">Tempo em aberto</div>
+        <div class="tbar-hero">
+          <div class="tbar-hero-head"><span style="color:var(--t3);">Decorrido</span><span style="color:var(--t4);">SLA: 4h</span></div>
+          <div class="tbar-hero-track"><div class="tbar-hero-fill" style="width:${pct(min)}%;background:${c};"></div></div>
+          <div class="tbar-hero-val" style="color:${c};">${fmt(min)}</div>
+        </div>
+      </div>
+      ${t.metrics?`<div class="p-sec">
+        <div class="p-seclbl">Métricas</div>
+        ${t.metrics.ticketTime?`<div class="p-row"><span class="p-k">Tempo total</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.ticketTime/60))}</span></div>`:''}
+        ${t.metrics.waitingTime?`<div class="p-row"><span class="p-k">Tempo espera</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.waitingTime/60))}</span></div>`:''}
+        ${t.metrics.ticketTransferCount?`<div class="p-row"><span class="p-k">Transferências</span><span class="p-v">${t.metrics.ticketTransferCount}</span></div>`:''}
+      </div>`:''}
     </div>
-    ${t.metrics?`<div class="p-sec">
-      <div class="p-seclbl">Métricas</div>
-      ${t.metrics.ticketTime?`<div class="p-row"><span class="p-k">Tempo total</span><span class="p-v" style="font-family:monospace;">${fmt(Math.floor(t.metrics.ticketTime/60))}</span></div>`:''}
-      ${t.metrics.waitingTime?`<div class="p-row"><span class="p-k">Tempo espera</span><span class="p-v" style="font-family:monospace;">${fmt(Math.floor(t.metrics.waitingTime/60))}</span></div>`:''}
-      ${t.metrics.ticketTransferCount?`<div class="p-row"><span class="p-k">Transferências</span><span class="p-v">${t.metrics.ticketTransferCount}</span></div>`:''}
-    </div>`:''}
   </div>`;
   renderAtendimento();
 }
 
-/* ── HISTÓRICO ── */
+function filtrarSetor(s){filtroSetor=s;renderAtendimento();}
+function filtrarAtend(v){buscaAtend=v.toLowerCase();renderAtendimento();}
+function filtrarHora(v){filtroHoraAtend=v;renderAtendimento();}
+
+// ── HISTÓRICO ──
 async function carregarHistorico(page){
   histPage=page;
-  document.getElementById('tbody-hist').innerHTML=`<tr><td colspan="7"><div class="loading"><span class="spin"></span>Carregando histórico…</div></td></tr>`;
+  document.getElementById('tbody-hist').innerHTML=`<tr><td colspan="7"><div class="loading"><span class="spin"></span>Carregando…</div></td></tr>`;
   try{
     const r=await fetch(`/api/history?limit=50&page=${page}`);
     const d=await r.json();
-    HIST=d.data||[];
-    histTotal=d.total||0;
-    if(Object.keys(DEPTS).length===0){
-      const dr=await fetch('/api/departments');
-      const dd=await dr.json();
-      (dd.data||[]).forEach((dep,i)=>{DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)};});
-      DEPTS_LIST=dd.data||[];
-    }
+    HIST=d.data||[];histTotal=d.total||0;
+    if(Object.keys(DEPTS).length===0){const dr=await fetch('/api/departments');const dd=await dr.json();(dd.data||[]).forEach((dep,i)=>{DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)};});DEPTS_LIST=dd.data||[];}
     renderHistorico();
-  }catch(e){
-    document.getElementById('tbody-hist').innerHTML=`<tr><td colspan="7"><div class="err-msg">Erro ao carregar histórico.</div></td></tr>`;
-  }
+  }catch(e){document.getElementById('tbody-hist').innerHTML=`<tr><td colspan="7"><div class="err">Erro ao carregar.</div></td></tr>`;}
 }
-
 function filtrarHist(v){buscaHist=v.toLowerCase();renderHistorico();}
-
 function renderHistorico(){
   const list=HIST.filter(t=>!buscaHist||(t.protocol||'').toLowerCase().includes(buscaHist));
   document.getElementById('ph-hist').textContent=histTotal.toLocaleString('pt-BR')+' total';
   document.getElementById('tbody-hist').innerHTML=list.map(t=>{
     const dept=DEPTS[t.departmentId]||{name:'Sem setor',cor:CORES[0]};
     const dur=t.metrics?.ticketTime?fmt(Math.floor(t.metrics.ticketTime/60)):'—';
-    const status=t.isOpen?'<span class="bdg b-amb">Aberto</span>':'<span class="bdg b-grn">Encerrado</span>';
     return`<tr>
-      <td style="padding-left:18px;"><div class="td-cl"><div class="td-av" style="background:${dept.cor.bg};color:${dept.cor.fg};font-size:10px;">${ini(dept.name)}</div><div class="td-name">${dept.name}</div></div></td>
+      <td style="padding-left:20px;"><div class="td-cl"><div class="td-av" style="background:${dept.cor.bg};color:${dept.cor.fg};font-size:10px;">${ini(dept.name)}</div><div class="td-name">${dept.name}</div></div></td>
       <td><span class="td-id">${t.protocol||'—'}</span></td>
-      <td>${status}</td>
+      <td>${t.isOpen?'<span class="bdg b-amb">Aberto</span>':'<span class="bdg b-grn">Encerrado</span>'}</td>
       <td>${t.origin==='manual'?'<span class="bdg b-blue">Manual</span>':'<span class="bdg b-gray">Auto</span>'}</td>
       <td style="max-width:160px;"><span style="font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">${t.comments||'—'}</span></td>
       <td><span style="font-size:11px;color:var(--t3);">${fmtDate(t.startedAt)}</span></td>
-      <td><span class="tdg b-gray" style="font-size:11px;font-family:monospace;">${dur}</span></td>
+      <td><span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--t2);font-weight:600;">${dur}</span></td>
     </tr>`;
   }).join('');
-
   const lastPage=Math.ceil(histTotal/50);
   document.getElementById('pag-hist').innerHTML=`
     <span>${((histPage-1)*50)+1}–${Math.min(histPage*50,histTotal)} de ${histTotal.toLocaleString('pt-BR')}</span>
@@ -713,50 +1095,36 @@ function renderHistorico(){
     </div>`;
 }
 
-/* ── CLIENTES ── */
+// ── CLIENTES ──
 async function carregarClientes(page){
   cliPage=page;
-  document.getElementById('lista-cli').innerHTML=`<div class="loading"><span class="spin"></span>Carregando contatos…</div>`;
+  document.getElementById('lista-cli').innerHTML=`<div class="loading"><span class="spin"></span>Carregando…</div>`;
   try{
     const r=await fetch(`/api/contacts?limit=50&page=${page}`);
-    const d=await r.json();
-    CLIENTES=d.data||[];
-    cliTotal=d.total||0;
-    renderClientes();
-  }catch(e){
-    document.getElementById('lista-cli').innerHTML=`<div class="err-msg">Erro ao carregar contatos.</div>`;
-  }
+    const d=await r.json();CLIENTES=d.data||[];cliTotal=d.total||0;renderClientes();
+  }catch(e){document.getElementById('lista-cli').innerHTML=`<div class="err">Erro ao carregar.</div>`;}
 }
-
 async function buscarClientes(v){
-  if(v.length<2&&v.length>0)return;
+  if(v.length>0&&v.length<2)return;
   document.getElementById('lista-cli').innerHTML=`<div class="loading"><span class="spin"></span>Buscando…</div>`;
   try{
     const r=await fetch(`/api/contacts?limit=50&page=1${v?'&search='+encodeURIComponent(v):''}`);
-    const d=await r.json();
-    CLIENTES=d.data||[];
-    cliTotal=d.total||0;
-    renderClientes();
+    const d=await r.json();CLIENTES=d.data||[];cliTotal=d.total||0;renderClientes();
   }catch(e){}
 }
-
 function renderClientes(){
+  const cores=['#3b82f6','#10b981','#8b5cf6','#f97316','#dc3545','#0e9e6e'];
   document.getElementById('ph-cli').textContent=cliTotal.toLocaleString('pt-BR')+' contatos';
-  const cores=['#3b82f6','#10b981','#8b5cf6','#f97316','#dc3545','#0e9e6e','#eab308'];
   document.getElementById('lista-cli').innerHTML=CLIENTES.length?CLIENTES.map((c,i)=>{
     const nome=c.name||c.pushname||'Sem nome';
     const tel=c.number||c.phone||'—';
     const cor=cores[i%cores.length];
-    return`<div class="cli-card">
+    return`<div class="cli-row">
       <div class="cli-av" style="background:${cor}20;color:${cor};">${ini(nome)}</div>
-      <div class="cli-info">
-        <div class="cli-name">${nome}</div>
-        <div class="cli-sub">${tel}${c.email?' · '+c.email:''}</div>
-      </div>
+      <div class="cli-info"><div class="cli-name">${nome}</div><div class="cli-sub">${tel}${c.email?' · '+c.email:''}</div></div>
       ${c.isActive===false?'<span class="bdg b-gray">Inativo</span>':'<span class="bdg b-grn">Ativo</span>'}
     </div>`;
-  }).join(''):`<div style="padding:2rem;text-align:center;color:var(--t4);">Nenhum contato encontrado.</div>`;
-
+  }).join(''):`<div style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum contato encontrado.</div>`;
   const lastPage=Math.ceil(cliTotal/50);
   document.getElementById('pag-cli').innerHTML=`
     <span>${((cliPage-1)*50)+1}–${Math.min(cliPage*50,cliTotal)} de ${cliTotal.toLocaleString('pt-BR')}</span>
@@ -767,29 +1135,18 @@ function renderClientes(){
     </div>`;
 }
 
-/* ── RELATÓRIOS ── */
+// ── RELATÓRIOS ──
 async function carregarRelatorios(){
   try{
-    const r=await fetch('/api/stats');
-    const d=await r.json();
-    if(Object.keys(DEPTS).length===0&&d.departments){
-      d.departments.forEach((dep,i)=>{DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)};});
-    }
+    const r=await fetch('/api/stats');const d=await r.json();
+    if(Object.keys(DEPTS).length===0&&d.departments)d.departments.forEach((dep,i)=>{DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)};});
     const porDept=d.porDept||{};
     const maxDept=Math.max(...Object.values(porDept),1);
     const deptBars=Object.entries(porDept).map(([id,n])=>{
       const dept=DEPTS[id]||{name:'Outro',cor:CORES[0]};
-      const w=Math.round(n/maxDept*100);
-      return`<div class="chart-bar-row">
-        <div class="chart-bar-label">${dept.name}</div>
-        <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${w}%;background:${dept.cor.dot};"></div></div>
-        <div class="chart-bar-val">${n}</div>
-      </div>`;
+      return`<div class="cbar-row"><div class="cbar-lbl">${dept.name}</div><div class="cbar-track"><div class="cbar-fill" style="width:${Math.round(n/maxDept*100)}%;background:${dept.cor.dot};"></div></div><div class="cbar-val">${n}</div></div>`;
     }).join('');
-
-    const ori=d.origens||{};
-    const totOri=(ori.manual||0)+(ori.automatic||0)||1;
-
+    const ori=d.origens||{};const totOri=(ori.manual||0)+(ori.automatic||0)||1;
     document.getElementById('rel-content').innerHTML=`
       <div class="rel-card">
         <div class="rel-title">📊 Visão geral</div>
@@ -800,264 +1157,37 @@ async function carregarRelatorios(){
       </div>
       <div class="rel-card">
         <div class="rel-title">📬 Origem dos chamados</div>
-        <div class="chart-bar-row" style="margin-bottom:8px;">
-          <div class="chart-bar-label">Manual</div>
-          <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round((ori.manual||0)/totOri*100)}%;background:#2563eb;"></div></div>
-          <div class="chart-bar-val">${ori.manual||0}</div>
-        </div>
-        <div class="chart-bar-row">
-          <div class="chart-bar-label">Automático</div>
-          <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Math.round((ori.automatic||0)/totOri*100)}%;background:#10b981;"></div></div>
-          <div class="chart-bar-val">${ori.automatic||0}</div>
-        </div>
+        <div class="cbar-row"><div class="cbar-lbl">Manual</div><div class="cbar-track"><div class="cbar-fill" style="width:${Math.round((ori.manual||0)/totOri*100)}%;background:#2563eb;"></div></div><div class="cbar-val">${ori.manual||0}</div></div>
+        <div class="cbar-row"><div class="cbar-lbl">Automático</div><div class="cbar-track"><div class="cbar-fill" style="width:${Math.round((ori.automatic||0)/totOri*100)}%;background:#10b981;"></div></div><div class="cbar-val">${ori.automatic||0}</div></div>
       </div>
       <div class="rel-card">
-        <div class="rel-title">🏢 Chamados por departamento</div>
-        <div class="chart-bar-wrap">${deptBars||'<span style="color:var(--t4);font-size:12px;">Sem dados</span>'}</div>
+        <div class="rel-title">🏢 Por departamento</div>
+        <div>${deptBars||'<span style="color:var(--t4);font-size:12px;">Sem dados</span>'}</div>
       </div>`;
-  }catch(e){
-    document.getElementById('rel-content').innerHTML=`<div class="rel-card" style="grid-column:1/-1;"><div class="err-msg">Erro ao carregar relatórios.</div></div>`;
-  }
+  }catch(e){document.getElementById('rel-content').innerHTML=`<div class="rel-card" style="grid-column:1/-1;"><div class="err">Erro ao carregar.</div></div>`;}
 }
 
-/* ── API STATS ── */
+// ── API STATS ──
 async function carregarApiStats(){
   try{
-    const r=await fetch('/api/stats');
-    const d=await r.json();
+    const r=await fetch('/api/stats');const d=await r.json();
     document.getElementById('api-stats-card').innerHTML=`
       <div class="cfg-title">📊 Dados da conta DIGISAC</div>
-      <div class="cfg-row"><span class="cfg-k">Total de tickets</span><span class="p-v">${(d.totalTickets||0).toLocaleString('pt-BR')}</span></div>
-      <div class="cfg-row"><span class="cfg-k">Total de contatos</span><span class="p-v">${(d.totalContacts||0).toLocaleString('pt-BR')}</span></div>
-      <div class="cfg-row"><span class="cfg-k">Departamentos ativos</span><span class="p-v">${d.totalDepts||0}</span></div>
-      <div class="cfg-row"><span class="cfg-k">TMA geral</span><span class="p-v">${fmt(d.tmaMedia||0)}</span></div>
-      <div class="cfg-row"><span class="cfg-k">Última atualização</span><span class="cfg-v">${new Date().toLocaleTimeString('pt-BR')}</span></div>`;
+      <div class="cfg-row"><span class="cfg-k">Total de tickets</span><span class="cfg-v">${(d.totalTickets||0).toLocaleString('pt-BR')}</span></div>
+      <div class="cfg-row"><span class="cfg-k">Total de contatos</span><span class="cfg-v">${(d.totalContacts||0).toLocaleString('pt-BR')}</span></div>
+      <div class="cfg-row"><span class="cfg-k">Departamentos ativos</span><span class="cfg-v">${d.totalDepts||0}</span></div>
+      <div class="cfg-row"><span class="cfg-k">TMA geral</span><span class="cfg-v">${fmt(d.tmaMedia||0)}</span></div>
+      <div class="cfg-row"><span class="cfg-k">Última atualização</span><span class="cfg-v cfg-mono">${new Date().toLocaleTimeString('pt-BR')}</span></div>`;
   }catch(e){}
 }
 
-/* ── CLOCK ── */
+// ── CLOCK ──
 function tick(){
   const n=new Date();
   document.getElementById('clock').textContent=n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('tb-date').textContent=n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+  document.getElementById('tb-date').textContent='· '+n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
 }
 
-
-/* ── SISTEMA DE ALERTAS ── */
-let ALERTAS = [];
-let ALERTAS_DISPARADOS = new Set();
-let USUARIOS = {};
-
-async function carregarUsuarios() {
-  try {
-    const r = await fetch('/api/users');
-    const d = await r.json();
-    (d.data || []).forEach(u => { USUARIOS[u.id] = u; });
-  } catch(e) {}
-}
-
-function toggleAlertPanel() {
-  const panel = document.getElementById('alert-panel');
-  panel.classList.toggle('open');
-  if (panel.classList.contains('open')) {
-    document.getElementById('alert-btn').classList.remove('has-alert');
-    renderAlertList(false);
-  }
-}
-
-document.addEventListener('click', e => {
-  const panel = document.getElementById('alert-panel');
-  const btn = document.getElementById('alert-btn');
-  if (panel && !panel.contains(e.target) && !btn.contains(e.target)) {
-    panel.classList.remove('open');
-  }
-});
-
-function limparAlertas() {
-  ALERTAS = [];
-  renderAlertList(false);
-  document.getElementById('alert-count').style.display = 'none';
-  document.getElementById('alert-btn').classList.remove('has-alert');
-}
-
-function renderAlertList(isNew) {
-  const list = document.getElementById('alert-list');
-  const cnt = document.getElementById('alert-count');
-  if (ALERTAS.length === 0) {
-    list.innerHTML = '<div class="alert-empty">Nenhum alerta no momento.</div>';
-    cnt.style.display = 'none';
-    document.getElementById('alert-btn').classList.remove('has-alert');
-    return;
-  }
-  cnt.textContent = ALERTAS.length;
-  cnt.style.display = 'flex';
-  if (isNew) document.getElementById('alert-btn').classList.add('has-alert');
-  list.innerHTML = ALERTAS.slice().reverse().map(a => `
-    <div class="alert-item ${a.isNew?'new':''}">
-      <div class="alert-ico">⚠️</div>
-      <div class="alert-info">
-        <div class="alert-name">${a.contactName}</div>
-        <div class="alert-desc">${a.departmentName} · Protocolo ${a.protocol}</div>
-        <div class="alert-time">${a.minutesOpen}min em aberto · ${a.hora}</div>
-        ${a.whatsappSent ? '<span class="alert-whats">✓ Google Chat notificado</span>' : ''}
-      </div>
-    </div>`).join('');
-}
-
-// Marcos de alertas já disparados: chave = ticketId + tipo + faixa
-const MARCOS_ALERTAS = new Set();
-
-function faixaMinutos(min) {
-  if (min >= 120) return 120;
-  if (min >= 90)  return 90;
-  if (min >= 60)  return 60;
-  if (min >= 30)  return 30;
-  return 0;
-}
-
-function emHorarioComercial() {
-  const now = new Date();
-  const h = now.getHours();
-  return h >= 10 && h < 17;
-}
-
-async function dispararAlerta(tipo, ticket, dept, contactName, minutesOpen) {
-  const faixa = faixaMinutos(minutesOpen);
-  if (faixa === 0) return false;
-  const chave = `${ticket.id}_${tipo}_${faixa}`;
-  if (MARCOS_ALERTAS.has(chave)) return false;
-  MARCOS_ALERTAS.add(chave);
-
-  try {
-    const r = await fetch('/api/alerts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tipo,
-        ticketId: ticket.id,
-        protocol: ticket.protocol,
-        departmentName: dept.name,
-        contactName,
-        minutesOpen
-      })
-    });
-    const d = await r.json();
-    return d.ok === true;
-  } catch(e) { return false; }
-}
-
-async function verificarMensagensTicket(ticket) {
-  try {
-    const r = await fetch(`/api/messages?ticketId=${ticket.id}`);
-    const d = await r.json();
-    return d.data || [];
-  } catch(e) { return []; }
-}
-
-async function dispararAlertaGoogleChat(ticket, dept, contactName) {
-  const minutesOpen = Math.floor((Date.now() - new Date(ticket.startedAt).getTime()) / 60000);
-  if (minutesOpen < 30) return false;
-
-  // Busca últimas mensagens para saber quem foi o último a falar
-  const msgs = await verificarMensagensTicket(ticket);
-  const ultimaMsg = msgs[msgs.length - 1] || msgs[0];
-
-  let sent = false;
-
-  if (ultimaMsg) {
-    const ultimaAt = new Date(ultimaMsg.createdAt || ultimaMsg.timestamp);
-    const minSemResp = Math.floor((Date.now() - ultimaAt.getTime()) / 60000);
-    const foiCliente = ultimaMsg.fromMe === false || ultimaMsg.direction === 'inbound';
-    const foiTime   = ultimaMsg.fromMe === true  || ultimaMsg.direction === 'outbound';
-
-    // Alerta: cliente mandou, time não respondeu
-    if (foiCliente && minSemResp >= 30) {
-      sent = await dispararAlerta('time_sem_resposta', ticket, dept, contactName, minSemResp);
-    }
-
-    // Alerta: time mandou, cliente não respondeu
-    if (foiTime && minSemResp >= 30) {
-      sent = await dispararAlerta('cliente_sem_resposta', ticket, dept, contactName, minSemResp);
-    }
-
-    // Alerta: horário comercial sem resposta do time
-    if (foiCliente && emHorarioComercial() && minSemResp >= 30) {
-      const chaveHC = `${ticket.id}_horario_comercial`;
-      if (!MARCOS_ALERTAS.has(chaveHC)) {
-        MARCOS_ALERTAS.add(chaveHC);
-        await dispararAlerta('horario_comercial', ticket, dept, contactName, minSemResp);
-      }
-    }
-  } else {
-    // Sem mensagens — usa tempo de abertura
-    if (minutesOpen >= 30) {
-      sent = await dispararAlerta('time_sem_resposta', ticket, dept, contactName, minutesOpen);
-    }
-  }
-
-  // Alerta: transferência sem atendimento (30min sem userId)
-  if (!ticket.userId && ticket.currentTicketTransferId) {
-    const chaveTransf = `${ticket.id}_transferencia`;
-    if (!MARCOS_ALERTAS.has(chaveTransf)) {
-      const minTransf = minutesOpen;
-      if (minTransf >= 30) {
-        MARCOS_ALERTAS.add(chaveTransf);
-        await dispararAlerta('transferencia_sem_atendimento', ticket, dept, contactName, minTransf);
-      }
-    }
-  }
-
-  return sent;
-}
-
-async function verificarAlertas() {
-  if (TICKETS.length === 0) return;
-
-  for (const t of TICKETS) {
-    const min = tempoMin(t.startedAt);
-    if (min < 60) continue;
-    if (ALERTAS_DISPARADOS.has(t.id)) continue;
-
-    ALERTAS_DISPARADOS.add(t.id);
-    const dept = DEPTS[t.departmentId] || { name: 'Sem setor', cor: CORES[0] };
-    const contactName = t.contact ? (t.contact.name || t.contact.pushname || t.contact.number || 'Sem nome') : 'Sem nome';
-    const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-    const whatsappSent = await dispararAlertaGoogleChat(t, dept, contactName);
-
-    ALERTAS.push({
-      id: t.id,
-      protocol: t.protocol || '—',
-      departmentName: dept.name,
-      contactName,
-      minutesOpen: min,
-      hora,
-      whatsappSent,
-      isNew: true
-    });
-
-    // Som de notificação
-    try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.5);
-    } catch(e) {}
-  }
-
-  if (ALERTAS.some(a => a.isNew)) {
-    renderAlertList(true);
-    ALERTAS.forEach(a => a.isNew = false);
-  }
-}
-
-carregarUsuarios();
 carregarAtendimento();
 tick();
 setInterval(tick,30000);
