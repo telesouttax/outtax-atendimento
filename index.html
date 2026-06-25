@@ -130,7 +130,7 @@ input,textarea,select{user-select:text;-webkit-user-select:text;}
   width:36px;text-align:center;
   display:flex;align-items:center;justify-content:center;
 }
-.sb-item.on .sb-ico{filter:drop-shadow(0 0 6px rgba(255,142,42,0.5));}
+.sb-item.on .sb-ico img{opacity:1 !important;filter:brightness(10) drop-shadow(0 0 4px rgba(255,142,42,0.6)) !important;}
 .sb-lbl{
   font-size:12px;font-weight:600;margin-left:8px;
   opacity:0;transform:translateX(-6px);
@@ -487,10 +487,10 @@ tbody td{padding:12px 18px;vertical-align:middle;}
   </div>
   <div class="sb-sec">
     <div class="sb-sec-lbl">Principal</div>
-    <div class="sb-item on" onclick="navTo('atendimento',this)"><span class="sb-ico">📊</span><span class="sb-lbl">Atendimento</span><span class="sb-bdg alert" id="sb-urg">0</span></div>
-    <div class="sb-item" onclick="navTo('chamados',this)"><span class="sb-ico">📋</span><span class="sb-lbl">Chamados</span><span class="sb-bdg" id="sb-total">—</span></div>
-    <div class="sb-item" onclick="navTo('clientes',this)"><span class="sb-ico">👥</span><span class="sb-lbl">Clientes</span><span class="sb-bdg">330</span></div>
-    <div class="sb-item" onclick="navTo('relatorios',this)"><span class="sb-ico">📈</span><span class="sb-lbl">Relatórios</span></div>
+    <div class="sb-item on" onclick="navTo('atendimento',this)"><span class="sb-ico"><img src="/icons/atendimento.png" style="width:22px;height:22px;opacity:0.7;filter:brightness(10);"></span><span class="sb-lbl">Atendimento</span><span class="sb-bdg alert" id="sb-urg">0</span></div>
+    <div class="sb-item" onclick="navTo('chamados',this)"><span class="sb-ico"><img src="/icons/chamados.png" style="width:22px;height:22px;opacity:0.7;filter:brightness(10);"></span><span class="sb-lbl">Chamados</span><span class="sb-bdg" id="sb-total">—</span></div>
+    <div class="sb-item" onclick="navTo('clientes',this)"><span class="sb-ico"><img src="/icons/clientes.png" style="width:22px;height:22px;opacity:0.7;filter:brightness(10);"></span><span class="sb-lbl">Clientes</span><span class="sb-bdg">330</span></div>
+    <div class="sb-item" onclick="navTo('relatorios',this)"><span class="sb-ico"><img src="/icons/relatorios.png" style="width:22px;height:22px;opacity:0.7;filter:brightness(10);"></span><span class="sb-lbl">Relatórios</span></div>
   </div>
   <div class="sb-div"></div>
   <div class="sb-sec"><div class="sb-sec-lbl">Setores</div></div>
@@ -500,8 +500,8 @@ tbody td{padding:12px 18px;vertical-align:middle;}
   <div class="sb-div"></div>
   <div class="sb-sec">
     <div class="sb-sec-lbl">Sistema</div>
-    <div class="sb-item" onclick="navTo('config',this)"><span class="sb-ico">⚙️</span><span class="sb-lbl">Configurações</span></div>
-    <div class="sb-item" onclick="navTo('api',this)"><span class="sb-ico">🔗</span><span class="sb-lbl">DIGISAC API</span></div>
+    <div class="sb-item" onclick="navTo('config',this)"><span class="sb-ico"><img src="/icons/config.png" style="width:22px;height:22px;opacity:0.7;filter:brightness(10);"></span><span class="sb-lbl">Configurações</span></div>
+    <div class="sb-item" onclick="navTo('api',this)"><span class="sb-ico"><img src="/icons/api.png" style="width:22px;height:22px;opacity:0.7;filter:brightness(10);"></span><span class="sb-lbl">DIGISAC API</span></div>
   </div>
   <div class="sb-bot">
     <div class="sb-user"><div class="sb-uav">LT</div><div class="sb-uinfo"><div class="sb-uname">Lucas Teles</div><div class="sb-urole">Administrador</div></div></div>
