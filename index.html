@@ -473,6 +473,29 @@ tbody td{padding:12px 18px;vertical-align:middle;}
 /* GRID */
 .grid2{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:20px;align-items:start;}
 
+/* COPY + DIGISAC BUTTON */
+.p-row-copy{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bg2);font-size:12px;}
+.p-row-copy:last-child{border-bottom:none;}
+.copy-btn{
+  width:24px;height:24px;border-radius:5px;border:1px solid var(--bor);
+  background:var(--bg);color:var(--t4);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:11px;transition:all 0.15s;flex-shrink:0;margin-left:6px;
+}
+.copy-btn:hover{background:var(--p1);color:#fff;border-color:var(--p1);}
+.copy-btn.copied{background:var(--grn);color:#fff;border-color:var(--grn);}
+.p-row-val{display:flex;align-items:center;gap:4px;font-weight:600;color:var(--t1);text-align:right;}
+.btn-digisac{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:12px;margin:0;
+  background:var(--p1);color:#fff;
+  border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;font-size:13px;font-weight:700;
+  transition:background 0.15s;
+}
+.btn-digisac:hover{background:var(--p2);}
+.btn-digisac-wrap{border-top:1px solid var(--bg2);padding:0;}
+
 @media(max-width:1100px){.grid2{grid-template-columns:1fr;}.metrics{grid-template-columns:repeat(2,1fr);}.scards{grid-template-columns:repeat(3,1fr);}.rel-grid{grid-template-columns:1fr;}.cfg-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -999,6 +1022,7 @@ function pickAtend(id) {
   const c    = corHex(minAberto);
   const cliNome = t.contact ? (t.contact.name||t.contact.number||'Sem nome') : 'Sem nome';
   document.getElementById('p-id').textContent = t.protocol||t.id.slice(0,8);
+  const digisacUrl = `https://outtax.digisac.me/tickets/${t.id}`;
   document.getElementById('perfil').innerHTML = `
   <div>
     <div class="p-hero">
@@ -1014,17 +1038,17 @@ function pickAtend(id) {
     <div class="p-body">
       ${t.contact ? `<div class="p-sec">
         <div class="p-seclbl">Cliente</div>
-        ${t.contact.name ? `<div class="p-row"><span class="p-k">Nome</span><span class="p-v">${t.contact.name}</span></div>` : ''}
-        ${t.contact.number ? `<div class="p-row"><span class="p-k">Telefone</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${t.contact.number}</span></div>` : ''}
+        ${t.contact.name ? `<div class="p-row-copy"><span class="p-k">Nome</span><div class="p-row-val"><span>${t.contact.name}</span><button class="copy-btn" onclick="copiar(this,'${t.contact.name}')" title="Copiar">⧉</button></div></div>` : ''}
+        ${t.contact.number ? `<div class="p-row-copy"><span class="p-k">Telefone</span><div class="p-row-val"><span style="font-family:'JetBrains Mono',monospace;">${t.contact.number}</span><button class="copy-btn" onclick="copiar(this,'${t.contact.number}')" title="Copiar">⧉</button></div></div>` : ''}
       </div>` : ''}
       <div class="p-sec">
         <div class="p-seclbl">Chamado</div>
-        <div class="p-row"><span class="p-k">Protocolo</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${t.protocol||'—'}</span></div>
-        <div class="p-row"><span class="p-k">Departamento</span><span class="p-v">${dept.name}</span></div>
-        ${t.agent ? `<div class="p-row"><span class="p-k">Agente</span><span class="p-v">${t.agent.name||'—'}</span></div>` : ''}
-        <div class="p-row"><span class="p-k">Origem</span><span class="p-v">${t.origin==='manual'?'Manual':'Automático'}</span></div>
-        <div class="p-row"><span class="p-k">Aberto em</span><span class="p-v">${fmtDate(t.startedAt)}</span></div>
-        ${t.comments ? `<div class="p-row"><span class="p-k">Comentário</span><span class="p-v" style="font-size:11px;max-width:200px;text-align:right;">${t.comments}</span></div>` : ''}
+        <div class="p-row-copy"><span class="p-k">Protocolo</span><div class="p-row-val"><span style="font-family:'JetBrains Mono',monospace;">${t.protocol||'—'}</span><button class="copy-btn" onclick="copiar(this,'${t.protocol||''}')" title="Copiar">⧉</button></div></div>
+        <div class="p-row-copy"><span class="p-k">Departamento</span><div class="p-row-val"><span>${dept.name}</span><button class="copy-btn" onclick="copiar(this,'${dept.name}')" title="Copiar">⧉</button></div></div>
+        ${t.agent ? `<div class="p-row-copy"><span class="p-k">Agente</span><div class="p-row-val"><span>${t.agent.name||'—'}</span><button class="copy-btn" onclick="copiar(this,'${t.agent.name||''}')" title="Copiar">⧉</button></div></div>` : ''}
+        <div class="p-row-copy"><span class="p-k">Origem</span><div class="p-row-val"><span>${t.origin==='manual'?'Manual':'Automático'}</span></div></div>
+        <div class="p-row-copy"><span class="p-k">Aberto em</span><div class="p-row-val"><span>${fmtDate(t.startedAt)}</span><button class="copy-btn" onclick="copiar(this,'${fmtDate(t.startedAt)}')" title="Copiar">⧉</button></div></div>
+        ${t.comments ? `<div class="p-row-copy"><span class="p-k">Comentário</span><div class="p-row-val"><span style="font-size:11px;max-width:160px;text-align:right;">${t.comments}</span><button class="copy-btn" onclick="copiar(this,'${t.comments}')" title="Copiar">⧉</button></div></div>` : ''}
       </div>
       <div class="p-sec">
         <div class="p-seclbl">Tempo em aberto</div>
@@ -1036,10 +1060,15 @@ function pickAtend(id) {
       </div>
       ${t.metrics ? `<div class="p-sec">
         <div class="p-seclbl">Métricas</div>
-        ${t.metrics.ticketTime ? `<div class="p-row"><span class="p-k">Tempo total</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.ticketTime/60))}</span></div>` : ''}
-        ${t.metrics.waitingTime ? `<div class="p-row"><span class="p-k">Tempo espera</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.waitingTime/60))}</span></div>` : ''}
-        ${t.metrics.ticketTransferCount ? `<div class="p-row"><span class="p-k">Transferências</span><span class="p-v">${t.metrics.ticketTransferCount}</span></div>` : ''}
+        ${t.metrics.ticketTime ? `<div class="p-row-copy"><span class="p-k">Tempo total</span><div class="p-row-val"><span style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.ticketTime/60))}</span></div></div>` : ''}
+        ${t.metrics.waitingTime ? `<div class="p-row-copy"><span class="p-k">Tempo espera</span><div class="p-row-val"><span style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.waitingTime/60))}</span></div></div>` : ''}
+        ${t.metrics.ticketTransferCount ? `<div class="p-row-copy"><span class="p-k">Transferências</span><div class="p-row-val"><span>${t.metrics.ticketTransferCount}</span></div></div>` : ''}
       </div>` : ''}
+      <div class="btn-digisac-wrap">
+        <button class="btn-digisac" onclick="window.open('${digisacUrl}','_blank')">
+          🔗 Abrir no DIGISAC
+        </button>
+      </div>
     </div>
   </div>`;
   renderAtendimento();
@@ -1192,6 +1221,32 @@ async function carregarApiStats() {
       <div class="cfg-row"><span class="cfg-k">TMA geral</span><span class="cfg-v">${fmt(d.tmaMedia||0)}</span></div>
       <div class="cfg-row"><span class="cfg-k">Última atualização</span><span class="cfg-v cfg-mono">${new Date().toLocaleTimeString('pt-BR')}</span></div>`;
   } catch(e) {}
+}
+
+// ── COPIAR ──
+function copiar(btn, texto) {
+  navigator.clipboard.writeText(texto).then(() => {
+    btn.textContent = '✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '⧉';
+      btn.classList.remove('copied');
+    }, 1500);
+  }).catch(() => {
+    // Fallback para navegadores sem clipboard API
+    const el = document.createElement('textarea');
+    el.value = texto;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    btn.textContent = '✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '⧉';
+      btn.classList.remove('copied');
+    }, 1500);
+  });
 }
 
 // ── CLOCK ──
