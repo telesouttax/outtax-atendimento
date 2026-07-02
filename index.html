@@ -525,6 +525,26 @@ tbody td{padding:12px 18px;vertical-align:middle;}
 .mc-tooltip-k{color:rgba(255,255,255,0.7);}
 .mc-tooltip-v{font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;}
 
+/* AGENTES STATUS */
+.agentes-wrap{background:var(--sur);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--bor);overflow:hidden;}
+.agentes-head{padding:16px 20px;border-bottom:2px solid var(--bg2);display:flex;align-items:center;justify-content:space-between;}
+.agentes-title{font-size:14px;font-weight:800;color:var(--p1);}
+.agentes-list{max-height:320px;overflow-y:auto;scrollbar-width:thin;}
+.agente-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bg2);transition:background 0.12s;}
+.agente-row:last-child{border-bottom:none;}
+.agente-row:hover{background:var(--bg);}
+.agente-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;position:relative;}
+.agente-status-dot{position:absolute;bottom:0;right:0;width:10px;height:10px;border-radius:50%;border:2px solid var(--sur);}
+.s-online{background:#0d9e6e;}
+.s-away{background:#e8920a;}
+.s-offline{background:#94a3b8;}
+.agente-info{flex:1;min-width:0;}
+.agente-name{font-size:12px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.agente-status{font-size:10px;font-weight:600;margin-top:1px;}
+.agente-chamados{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--bg2);color:var(--t3);font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+.agente-chamados.has{background:var(--blus);color:var(--p2);}
+.pizza-agentes-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+
 /* PIZZA CHART */
 .pizza-wrap{background:var(--sur);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--bor);padding:22px;margin-top:20px;}
 .pizza-title{font-size:14px;font-weight:800;color:var(--p1);margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--bg2);}
@@ -632,11 +652,22 @@ tbody td{padding:12px 18px;vertical-align:middle;}
           <div class="mc-tooltip"><div class="mc-tooltip-title">Tempo médio por setor</div><div id="tt-tma">—</div></div>
         </div>
       </div>
-      <div class="pizza-wrap" style="margin-bottom:20px;">
-        <div class="pizza-title">🍕 Chamados por departamento</div>
-        <div class="pizza-grid">
-          <div class="pizza-svg-wrap"><svg id="pizza-svg" width="180" height="180" viewBox="0 0 180 180"></svg></div>
-          <div class="pizza-legend" id="pizza-legend"></div>
+      <div class="pizza-agentes-grid">
+        <div class="pizza-wrap">
+          <div class="pizza-title">🍕 Chamados por departamento</div>
+          <div class="pizza-grid">
+            <div class="pizza-svg-wrap"><svg id="pizza-svg" width="160" height="160" viewBox="0 0 160 160"></svg></div>
+            <div class="pizza-legend" id="pizza-legend"></div>
+          </div>
+        </div>
+        <div class="agentes-wrap">
+          <div class="agentes-head">
+            <span class="agentes-title">👥 Equipe</span>
+            <span id="agentes-resumo" style="font-size:11px;color:var(--t4);"></span>
+          </div>
+          <div class="agentes-list" id="agentes-list">
+            <div class="loading"><span class="spin"></span>Carregando…</div>
+          </div>
         </div>
       </div>
       <div class="grid2">
@@ -1085,6 +1116,7 @@ function renderAtendimento() {
 
   // ── PIZZA CHART ──
   renderPizza(deptCounts);
+  carregarAgentes();
 }
 
 function renderSidebar() {
@@ -1187,7 +1219,7 @@ function renderPizza(deptCounts) {
   const total = entries.reduce((a,[,n])=>a+n,0);
   if(total===0) { svg.innerHTML=''; legend.innerHTML=''; return; }
 
-  const cx=90, cy=90, r=80, rInner=40;
+  const cx=80, cy=80, r=70, rInner=32;
   let angle = -Math.PI/2;
   let paths = '';
 
@@ -1211,9 +1243,9 @@ function renderPizza(deptCounts) {
   });
 
   // Centro
-  paths += `<circle cx="${cx}" cy="${cy}" r="${rInner}" fill="white"/>`;
-  paths += `<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="20" font-weight="800" fill="#152c6b">${total}</text>`;
-  paths += `<text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="10" fill="#6e809e">chamados</text>`;
+  paths += `<circle cx="${cx}" cy="${cy}" r="${rInner}" fill="white" stroke="#eef2fb" stroke-width="1"/>`;
+  paths += `<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="18" font-weight="800" fill="#152c6b">${total}</text>`;
+  paths += `<text x="${cx}" y="${cy+11}" text-anchor="middle" font-size="9" fill="#6e809e">chamados</text>`;
   svg.innerHTML = paths;
 
   // Legenda com agentes
@@ -1232,6 +1264,59 @@ function renderPizza(deptCounts) {
       <div class="pizza-leg-pct" style="color:${cor.dot};">${pct}%</div>
     </div>`;
   }).join('');
+}
+
+
+async function carregarAgentes() {
+  try {
+    const r = await fetch('/api/agents');
+    const d = await r.json();
+    const agentes = d.data || [];
+
+    // Conta chamados por agente
+    const chamadosPorAgente = {};
+    TICKETS.forEach(t => {
+      if(t.userId) chamadosPorAgente[t.userId] = (chamadosPorAgente[t.userId]||0)+1;
+    });
+
+    const online  = agentes.filter(a => a.status==='online').length;
+    const away    = agentes.filter(a => a.status==='away').length;
+    const offline = agentes.filter(a => a.status==='offline').length;
+
+    const resumoEl = document.getElementById('agentes-resumo');
+    if(resumoEl) resumoEl.innerHTML = `
+      <span style="color:#0d9e6e;font-weight:700;">${online} online</span> ·
+      <span style="color:#e8920a;font-weight:700;">${away} ausente</span> ·
+      <span style="color:#94a3b8;">${offline} offline</span>`;
+
+    const cores = ['#3b82f6','#8b5cf6','#f97316','#e53935','#0e9e6e','#eab308','#ec4899'];
+    const list = document.getElementById('agentes-list');
+    if(!list) return;
+
+    list.innerHTML = agentes.map((a,i) => {
+      const statusLabel = a.status==='online'?'Online':a.status==='away'?'Ausente':'Offline';
+      const statusColor = a.status==='online'?'#0d9e6e':a.status==='away'?'#e8920a':'#94a3b8';
+      const dotClass    = a.status==='online'?'s-online':a.status==='away'?'s-away':'s-offline';
+      const cor = cores[i%cores.length];
+      const nChamados = chamadosPorAgente[a.id]||0;
+      const ini2 = a.name.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase();
+      return `<div class="agente-row">
+        <div class="agente-av" style="background:${cor}20;color:${cor};">
+          ${ini2}
+          <span class="agente-status-dot ${dotClass}"></span>
+        </div>
+        <div class="agente-info">
+          <div class="agente-name">${a.name}</div>
+          <div class="agente-status" style="color:${statusColor};">${statusLabel}</div>
+        </div>
+        <span class="agente-chamados ${nChamados>0?'has':''}">${nChamados>0?nChamados+'✓':'—'}</span>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    const list = document.getElementById('agentes-list');
+    if(list) list.innerHTML = '<div class="err">Erro ao carregar equipe.</div>';
+  }
 }
 
 function filtrarSetor(s) { filtroSetor=s; renderAtendimento(); }
@@ -1437,6 +1522,7 @@ carregarAtendimento();
 tick();
 setInterval(tick, 30000);
 setInterval(carregarAtendimento, 30000);
+setInterval(carregarAgentes, 60000);
 setInterval(verificarAlertas, 300000);
 
 // Sidebar hover expand
