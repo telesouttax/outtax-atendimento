@@ -800,10 +800,7 @@ function renderAlertList(isNew){
 
 
 
-async function dispararAlerta(tipo,ticket,dept,contactName,minutesOpen){
-  const faixa=faixaMin(minutesOpen);
-  if(faixa===0)return false;
-  const chave=`${ticket.id}_${tipo}_${faixa}`;
+_${tipo}_${faixa}`;
   if(MARCOS_ALERTAS.has(chave))return false;
   MARCOS_ALERTAS.add(chave);
   try{
