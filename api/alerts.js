@@ -4,57 +4,38 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   try {
-    const { tipo, protocol, departmentName, contactName, minutesOpen, transferredAt } = req.body;
+    const { tipo, protocol, departmentName, contactName, minutesOpen, nivel } = req.body;
     const webhookUrl = process.env.GOOGLE_CHAT_WEBHOOK;
 
-    // Define emoji e urgência baseado no tipo e tempo
-    let emoji, titulo, cor, descricao;
+    const fmtMin = m => m < 60 ? `${m}min` : `${Math.floor(m/60)}h${m%60 > 0 ? ` ${m%60}min` : ''}`;
 
+    let emoji, titulo, descricao;
     if (tipo === 'time_sem_resposta') {
-      emoji = minutesOpen >= 120 ? '🔴' : minutesOpen >= 90 ? '🟠' : minutesOpen >= 60 ? '🟡' : '🟡';
-      titulo = `Cliente aguardando resposta do time`;
-      descricao = `O cliente enviou uma mensagem e o time ainda não respondeu.`;
-    } else if (tipo === 'cliente_sem_resposta') {
-      emoji = minutesOpen >= 120 ? '🔴' : minutesOpen >= 90 ? '🟠' : minutesOpen >= 60 ? '🟡' : '🟡';
-      titulo = `Time aguardando resposta do cliente`;
-      descricao = `O time enviou uma mensagem e o cliente ainda não respondeu.`;
-    } else if (tipo === 'horario_comercial') {
-      emoji = '🕐';
-      titulo = `Mensagem recebida em horário comercial sem resposta`;
-      descricao = `Cliente enviou mensagem entre 10h e 17h e não foi respondido.`;
-    } else if (tipo === 'transferencia_sem_atendimento') {
-      emoji = '🔀';
-      titulo = `Transferência sem atendimento`;
-      descricao = `Chamado transferido há 30 minutos e ninguém atendeu.`;
+      emoji = nivel <= 1 ? '🟡' : nivel <= 2 ? '🟠' : '🔴';
+      titulo = `Time não respondeu o cliente`;
+      descricao = `O cliente enviou uma mensagem e o time está sem responder há *${fmtMin(minutesOpen)}*.`;
     } else {
-      emoji = '⚠️';
-      titulo = `Alerta de SLA`;
-      descricao = `Chamado requer atenção.`;
+      emoji = nivel <= 1 ? '🟡' : nivel <= 2 ? '🟠' : '🔴';
+      titulo = `Cliente não respondeu o time`;
+      descricao = `O time enviou uma mensagem e o cliente está sem responder há *${fmtMin(minutesOpen)}*.`;
     }
 
-    const fmtMin = m => m < 60 ? `${m}min` : `${Math.floor(m/60)}h${m%60 > 0 ? ` ${m%60}min` : ''}`;
+    const urgencia = nivel <= 1 ? 'Atenção' : nivel <= 2 ? 'Urgente' : 'Crítico';
 
     const payload = {
       cards: [{
         header: {
-          title: `${emoji} ${titulo}`,
-          subtitle: `OUTTAX — Dashboard de Atendimento`,
+          title: `${emoji} ${titulo} — ${urgencia}`,
+          subtitle: `OUTTAX · Alerta #${nivel} · ${fmtMin(minutesOpen)} sem resposta`,
         },
         sections: [{
           widgets: [
             { keyValue: { topLabel: 'Cliente', content: contactName || 'Não identificado', icon: 'PERSON' } },
-            { keyValue: { topLabel: 'Setor', content: departmentName, icon: 'BUILDING_INSIGHTS_1' } },
+            { keyValue: { topLabel: 'Setor', content: departmentName, icon: 'DESCRIPTION' } },
             { keyValue: { topLabel: 'Protocolo', content: protocol || '—', icon: 'TICKET' } },
             { keyValue: { topLabel: 'Tempo sem resposta', content: fmtMin(minutesOpen), icon: 'CLOCK' } },
-            { textParagraph: { text: `<i>${descricao}</i>` } },
-            {
-              buttons: [{
-                textButton: {
-                  text: '🔗 Abrir Dashboard',
-                  onClick: { openLink: { url: 'https://outtax-atendimento.vercel.app' } }
-                }
-              }]
-            }
+            { textParagraph: { text: descricao } },
+            { buttons: [{ textButton: { text: '🔗 Abrir Dashboard', onClick: { openLink: { url: 'https://outtax-atendimento.vercel.app' } } } }] }
           ]
         }]
       }]
