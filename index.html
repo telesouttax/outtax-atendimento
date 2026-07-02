@@ -797,8 +797,8 @@ function renderAlertList(isNew){
     </div>`).join('');
 }
 
-function faixaMin(min){if(min>=120)return 120;if(min>=90)return 90;if(min>=60)return 60;if(min>=30)return 30;return 0;}
-function emHorarioComercial(){const h=new Date().getHours();return h>=10&&h<17;}
+
+
 
 async function dispararAlerta(tipo,ticket,dept,contactName,minutesOpen){
   const faixa=faixaMin(minutesOpen);
@@ -817,44 +817,114 @@ async function verificarMensagensTicket(ticket){
   try{const r=await fetch(`/api/messages?ticketId=${ticket.id}`);const d=await r.json();return d.data||[];}catch(e){return [];}
 }
 
+// Sistema de alertas crescente
+// Estrutura: { ticketId_tipo: { nivel: N, proximoMin: M } }
+const ESTADO_ALERTAS = {};
+
+function proximoLimite(nivel) {
+  let total = 0;
+  for (let i = 1; i <= nivel; i++) { total += 30 * i; }
+  return total;
+}
+
+async function dispararAlerta(tipo, ticket, dept, contactName, minutesOpen, nivel) {
+  try {
+    const r = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo, ticketId: ticket.id, protocol: ticket.protocol, departmentName: dept.name, contactName, minutesOpen, nivel })
+    });
+    const d = await r.json();
+    return d.ok === true;
+  } catch(e) { return false; }
+}
+
 async function verificarAlertas(){
   if(TICKETS.length===0)return;
+
   for(const t of TICKETS){
-    const min=tempoMin(t.startedAt);
-    if(min<30)continue;
     const dept=DEPTS[t.departmentId]||{name:'Sem setor',cor:CORES[0]};
-    const contactName=t.contact?(t.contact.name||t.contact.pushname||t.contact.number||'Sem nome'):'Sem nome';
+    const contactName=t.contact?(t.contact.name||t.contact.number||'Sem nome'):'Sem nome';
     const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    const msgs=await verificarMensagensTicket(t);
-    const ultimaMsg=msgs.length>0?msgs[msgs.length-1]:null;
-    let sent=false;
-    if(ultimaMsg){
-      const ultimaAt=new Date(ultimaMsg.createdAt||ultimaMsg.timestamp);
-      const minSemResp=Math.floor((Date.now()-ultimaAt.getTime())/60000);
-      const foiCliente=ultimaMsg.fromMe===false||ultimaMsg.direction==='inbound';
-      const foiTime=ultimaMsg.fromMe===true||ultimaMsg.direction==='outbound';
-      if(foiCliente&&minSemResp>=30)sent=await dispararAlerta('time_sem_resposta',t,dept,contactName,minSemResp);
-      if(foiTime&&minSemResp>=30)sent=await dispararAlerta('cliente_sem_resposta',t,dept,contactName,minSemResp);
-      if(foiCliente&&emHorarioComercial()&&minSemResp>=30){
-        const chaveHC=`${t.id}_horario_comercial`;
-        if(!MARCOS_ALERTAS.has(chaveHC)){MARCOS_ALERTAS.add(chaveHC);await dispararAlerta('horario_comercial',t,dept,contactName,minSemResp);}
+
+    // Busca últimas mensagens para saber quem foi o último a falar
+    let foiCliente = false;
+    let foiTime = false;
+    let minSemResp = Math.floor((Date.now()-new Date(t.startedAt).getTime())/60000);
+
+    try {
+      const r = await fetch(`/api/messages?ticketId=${t.id}`);
+      const d = await r.json();
+      const msgs = d.data || [];
+      if(msgs.length > 0){
+        const ultima = msgs[msgs.length-1];
+        const ultimaAt = new Date(ultima.createdAt||ultima.timestamp);
+        minSemResp = Math.floor((Date.now()-ultimaAt.getTime())/60000);
+        foiCliente = ultima.fromMe===false||ultima.direction==='inbound';
+        foiTime    = ultima.fromMe===true ||ultima.direction==='outbound';
+      } else {
+        foiCliente = true; // sem mensagens = considera cliente esperando
       }
-    }else if(min>=30){
-      sent=await dispararAlerta('time_sem_resposta',t,dept,contactName,min);
+    } catch(e) {
+      foiCliente = true;
     }
-    if(!t.userId&&t.currentTicketTransferId){
-      const chaveT=`${t.id}_transferencia`;
-      if(!MARCOS_ALERTAS.has(chaveT)&&min>=30){MARCOS_ALERTAS.add(chaveT);await dispararAlerta('transferencia_sem_atendimento',t,dept,contactName,min);}
-    }
-    if(MARCOS_ALERTAS.has(`${t.id}_time_sem_resposta_${faixaMin(min)}`)||sent){
-      const jaExiste=ALERTAS.find(a=>a.id===t.id);
-      if(!jaExiste){
-        ALERTAS.push({id:t.id,tipo:'time_sem_resposta',protocol:t.protocol||'—',departmentName:dept.name,contactName,minutesOpen:min,hora,sent,isNew:true});
-        try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=880;gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.5);}catch(e){}
+
+    // Verifica cada tipo de alerta
+    const tipos = [];
+    if(foiCliente) tipos.push('time_sem_resposta');
+    if(foiTime)   tipos.push('cliente_sem_resposta');
+
+    for(const tipo of tipos){
+      const chave = `${t.id}_${tipo}`;
+      if(!ESTADO_ALERTAS[chave]){
+        ESTADO_ALERTAS[chave] = { nivel: 0, proximoMin: 30 };
+      }
+      const estado = ESTADO_ALERTAS[chave];
+
+      // Verifica se chegou no próximo limite
+      if(minSemResp >= estado.proximoMin){
+        estado.nivel++;
+        const nivelAtual = estado.nivel;
+
+        // Calcula próximo alerta (acrescenta 30min × nivel atual)
+        estado.proximoMin += 30 * nivelAtual;
+
+        // Dispara alerta
+        const sent = await dispararAlerta(tipo, t, dept, contactName, minSemResp, nivelAtual);
+
+        // Adiciona no painel do dashboard
+        const jaExiste = ALERTAS.find(a=>a.id===t.id&&a.tipo===tipo&&a.nivel===nivelAtual);
+        if(!jaExiste){
+          ALERTAS.push({
+            id: t.id, tipo, nivel: nivelAtual,
+            protocol: t.protocol||'—',
+            departmentName: dept.name,
+            contactName,
+            minutesOpen: minSemResp,
+            hora, sent, isNew: true
+          });
+
+          // Som de notificação
+          try{
+            const ctx=new(window.AudioContext||window.webkitAudioContext)();
+            const osc=ctx.createOscillator();
+            const gain=ctx.createGain();
+            osc.connect(gain);gain.connect(ctx.destination);
+            osc.frequency.value=880;
+            gain.gain.setValueAtTime(0.3,ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+            osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.5);
+          }catch(e){}
+        }
       }
     }
   }
-  if(ALERTAS.some(a=>a.isNew)){renderAlertList(true);ALERTAS.forEach(a=>a.isNew=false);}
+
+  if(ALERTAS.some(a=>a.isNew)){
+    renderAlertList(true);
+    ALERTAS.forEach(a=>a.isNew=false);
+  }
+}
 }
 
 // ── ATENDIMENTO ──
