@@ -725,11 +725,12 @@ tbody td{padding:12px 18px;vertical-align:middle;}
 </div>
 </div>
 
+
 <script>
 let TICKETS=[], DEPTS={}, DEPTS_LIST=[], filtroSetor='todos', buscaAtend='', selAtend=null, filtroHoraAtend='todos';
 let HIST=[], histPage=1, histTotal=0, buscaHist='';
 let CLIENTES=[], cliPage=1, cliTotal=0;
-let ALERTAS=[], ALERTAS_DISPARADOS=new Set(), MARCOS_ALERTAS=new Set(), USUARIOS={};
+let ALERTAS=[], ESTADO_ALERTAS={};
 
 const CORES=[
   {bg:'#eff6ff',fg:'#1d4ed8',dot:'#3b82f6',top:'#3b82f6'},
@@ -741,90 +742,73 @@ const CORES=[
   {bg:'#fefce8',fg:'#854d0e',dot:'#eab308',top:'#eab308'},
   {bg:'#fdf4ff',fg:'#7e22ce',dot:'#a855f7',top:'#a855f7'},
 ];
-const getCor=idx=>CORES[idx%CORES.length];
-const fmt=m=>{if(!m||m<=0)return '—';if(m<60)return m+'min';const h=Math.floor(m/60),mn=m%60;return h+'h'+(mn?' '+mn+'min':'');};
-const tempoMin=s=>s?Math.floor((Date.now()-new Date(s).getTime())/60000):0;
-const corHex=m=>m>=240?'#e53935':m>=120?'#e8920a':'#0d9e6e';
-const pct=m=>Math.min(100,Math.round(m/480*100));
-const ini=n=>{if(!n)return '??';return n.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'??';};
-const fmtDate=s=>{if(!s)return '—';return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});};
+const getCor = idx => CORES[idx % CORES.length];
+const fmt = m => { if(!m||m<=0)return '—'; if(m<60)return m+'min'; const h=Math.floor(m/60),mn=m%60; return h+'h'+(mn?' '+mn+'min':''); };
+const tempoMin = s => s ? Math.floor((Date.now()-new Date(s).getTime())/60000) : 0;
+const corHex = m => m>=240?'#e53935':m>=120?'#e8920a':'#0d9e6e';
+const pct = m => Math.min(100,Math.round(m/480*100));
+const ini = n => { if(!n)return '??'; return n.split(' ').slice(0,2).map(p=>p[0]||'').join('').toUpperCase()||'??'; };
+const fmtDate = s => { if(!s)return '—'; return new Date(s).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}); };
 
 // ── NAVEGAÇÃO ──
-function navTo(page,el){
-  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  if(el)el.classList.add('on');
+function navTo(page, el) {
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  if(el) el.classList.add('on');
   document.getElementById('page-'+page).classList.add('on');
-  const titles={atendimento:'Central de Atendimento',chamados:'Histórico de Chamados',clientes:'Clientes e Contatos',relatorios:'Relatórios',config:'Configurações',api:'DIGISAC API'};
-  document.getElementById('tb-title').textContent=titles[page]||page;
-  if(page==='chamados'&&HIST.length===0)carregarHistorico(1);
-  if(page==='clientes'&&CLIENTES.length===0)carregarClientes(1);
-  if(page==='relatorios')carregarRelatorios();
-  if(page==='api')carregarApiStats();
+  const titles = {atendimento:'Central de Atendimento',chamados:'Histórico de Chamados',clientes:'Clientes e Contatos',relatorios:'Relatórios',config:'Configurações',api:'DIGISAC API'};
+  document.getElementById('tb-title').textContent = titles[page]||page;
+  if(page==='chamados' && HIST.length===0) carregarHistorico(1);
+  if(page==='clientes' && CLIENTES.length===0) carregarClientes(1);
+  if(page==='relatorios') carregarRelatorios();
+  if(page==='api') carregarApiStats();
 }
 
 // ── ALERTAS ──
-function toggleAlertPanel(){
-  const p=document.getElementById('alert-panel');
+function toggleAlertPanel() {
+  const p = document.getElementById('alert-panel');
   p.classList.toggle('open');
-  if(p.classList.contains('open')){document.getElementById('alert-btn').classList.remove('has-alert');renderAlertList(false);}
+  if(p.classList.contains('open')) {
+    document.getElementById('alert-btn').classList.remove('has-alert');
+    renderAlertList(false);
+  }
 }
-document.addEventListener('click',e=>{
-  const p=document.getElementById('alert-panel');
-  const b=document.getElementById('alert-btn');
-  if(p&&!p.contains(e.target)&&!b.contains(e.target))p.classList.remove('open');
+document.addEventListener('click', e => {
+  const p = document.getElementById('alert-panel');
+  const b = document.getElementById('alert-btn');
+  if(p && !p.contains(e.target) && !b.contains(e.target)) p.classList.remove('open');
 });
-function limparAlertas(){
-  ALERTAS=[];renderAlertList(false);
-  document.getElementById('alert-cnt').style.display='none';
+function limparAlertas() {
+  ALERTAS = [];
+  renderAlertList(false);
+  document.getElementById('alert-cnt').style.display = 'none';
   document.getElementById('alert-btn').classList.remove('has-alert');
 }
-function renderAlertList(isNew){
-  const list=document.getElementById('alert-list');
-  const cnt=document.getElementById('alert-cnt');
-  if(ALERTAS.length===0){list.innerHTML='<div class="alert-empty">Nenhum alerta no momento.</div>';cnt.style.display='none';document.getElementById('alert-btn').classList.remove('has-alert');return;}
-  cnt.textContent=ALERTAS.length;cnt.style.display='flex';
-  if(isNew)document.getElementById('alert-btn').classList.add('has-alert');
-  list.innerHTML=ALERTAS.slice().reverse().map(a=>`
+function renderAlertList(isNew) {
+  const list = document.getElementById('alert-list');
+  const cnt  = document.getElementById('alert-cnt');
+  if(ALERTAS.length===0) {
+    list.innerHTML = '<div class="alert-empty">Nenhum alerta no momento.</div>';
+    cnt.style.display = 'none';
+    document.getElementById('alert-btn').classList.remove('has-alert');
+    return;
+  }
+  cnt.textContent = ALERTAS.length;
+  cnt.style.display = 'flex';
+  if(isNew) document.getElementById('alert-btn').classList.add('has-alert');
+  list.innerHTML = ALERTAS.slice().reverse().map(a => `
     <div class="alert-item ${a.isNew?'new':''}">
-      <div class="alert-ico">${a.tipo==='transferencia_sem_atendimento'?'🔀':a.tipo==='horario_comercial'?'🕐':'⚠️'}</div>
+      <div class="alert-ico">${a.tipo==='cliente_sem_resposta'?'👤':'⚠️'}</div>
       <div class="alert-info">
         <div class="alert-name">${a.contactName}</div>
-        <div class="alert-desc">${a.departmentName} · Protocolo ${a.protocol}</div>
+        <div class="alert-desc">${a.departmentName} · Protocolo ${a.protocol} · Alerta #${a.nivel}</div>
         <div class="alert-time">${a.minutesOpen}min · ${a.hora}</div>
-        ${a.sent?'<span class="alert-tag">✓ Google Chat notificado</span>':''}
+        ${a.sent ? '<span class="alert-tag">✓ Google Chat notificado</span>' : ''}
       </div>
     </div>`).join('');
 }
 
-
-
-
-_${tipo}_${faixa}`;
-  if(MARCOS_ALERTAS.has(chave))return false;
-  MARCOS_ALERTAS.add(chave);
-  try{
-    const r=await fetch('/api/alerts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tipo,ticketId:ticket.id,protocol:ticket.protocol,departmentName:dept.name,contactName,minutesOpen})});
-    const d=await r.json();
-    return d.ok===true;
-  }catch(e){return false;}
-}
-
-async function verificarMensagensTicket(ticket){
-  try{const r=await fetch(`/api/messages?ticketId=${ticket.id}`);const d=await r.json();return d.data||[];}catch(e){return [];}
-}
-
-// Sistema de alertas crescente
-// Estrutura: { ticketId_tipo: { nivel: N, proximoMin: M } }
-const ESTADO_ALERTAS = {};
-
-function proximoLimite(nivel) {
-  let total = 0;
-  for (let i = 1; i <= nivel; i++) { total += 30 * i; }
-  return total;
-}
-
-async function dispararAlerta(tipo, ticket, dept, contactName, minutesOpen, nivel) {
+async function dispararAlertaGC(tipo, ticket, dept, contactName, minutesOpen, nivel) {
   try {
     const r = await fetch('/api/alerts', {
       method: 'POST',
@@ -836,201 +820,186 @@ async function dispararAlerta(tipo, ticket, dept, contactName, minutesOpen, nive
   } catch(e) { return false; }
 }
 
-async function verificarAlertas(){
-  if(TICKETS.length===0)return;
-
-  for(const t of TICKETS){
-    const dept=DEPTS[t.departmentId]||{name:'Sem setor',cor:CORES[0]};
-    const contactName=t.contact?(t.contact.name||t.contact.number||'Sem nome'):'Sem nome';
-    const hora=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-
-    // Busca últimas mensagens para saber quem foi o último a falar
-    let foiCliente = false;
-    let foiTime = false;
-    let minSemResp = Math.floor((Date.now()-new Date(t.startedAt).getTime())/60000);
+async function verificarAlertas() {
+  if(TICKETS.length===0) return;
+  for(const t of TICKETS) {
+    const dept = DEPTS[t.departmentId] || { name:'Sem setor', cor:CORES[0] };
+    const contactName = t.contact ? (t.contact.name||t.contact.number||'Sem nome') : 'Sem nome';
+    const hora = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    let foiCliente = true, foiTime = false;
+    let minSemResp = tempoMin(t.startedAt);
 
     try {
-      const r = await fetch(`/api/messages?ticketId=${t.id}`);
-      const d = await r.json();
-      const msgs = d.data || [];
-      if(msgs.length > 0){
+      const mr = await fetch(`/api/messages?ticketId=${t.id}`);
+      const md = await mr.json();
+      const msgs = md.data || [];
+      if(msgs.length > 0) {
         const ultima = msgs[msgs.length-1];
         const ultimaAt = new Date(ultima.createdAt||ultima.timestamp);
         minSemResp = Math.floor((Date.now()-ultimaAt.getTime())/60000);
-        foiCliente = ultima.fromMe===false||ultima.direction==='inbound';
-        foiTime    = ultima.fromMe===true ||ultima.direction==='outbound';
-      } else {
-        foiCliente = true; // sem mensagens = considera cliente esperando
+        foiCliente = ultima.fromMe===false || ultima.direction==='inbound';
+        foiTime    = ultima.fromMe===true  || ultima.direction==='outbound';
       }
-    } catch(e) {
-      foiCliente = true;
-    }
+    } catch(e) {}
 
-    // Verifica cada tipo de alerta
     const tipos = [];
     if(foiCliente) tipos.push('time_sem_resposta');
     if(foiTime)   tipos.push('cliente_sem_resposta');
 
-    for(const tipo of tipos){
-      const chave = `${t.id}_${tipo}`;
-      if(!ESTADO_ALERTAS[chave]){
-        ESTADO_ALERTAS[chave] = { nivel: 0, proximoMin: 30 };
-      }
+    for(const tipo of tipos) {
+      const chave = t.id+'_'+tipo;
+      if(!ESTADO_ALERTAS[chave]) ESTADO_ALERTAS[chave] = { nivel:0, proximoMin:30 };
       const estado = ESTADO_ALERTAS[chave];
-
-      // Verifica se chegou no próximo limite
-      if(minSemResp >= estado.proximoMin){
+      if(minSemResp >= estado.proximoMin) {
         estado.nivel++;
         const nivelAtual = estado.nivel;
-
-        // Calcula próximo alerta (acrescenta 30min × nivel atual)
         estado.proximoMin += 30 * nivelAtual;
-
-        // Dispara alerta
-        const sent = await dispararAlerta(tipo, t, dept, contactName, minSemResp, nivelAtual);
-
-        // Adiciona no painel do dashboard
-        const jaExiste = ALERTAS.find(a=>a.id===t.id&&a.tipo===tipo&&a.nivel===nivelAtual);
-        if(!jaExiste){
-          ALERTAS.push({
-            id: t.id, tipo, nivel: nivelAtual,
-            protocol: t.protocol||'—',
-            departmentName: dept.name,
-            contactName,
-            minutesOpen: minSemResp,
-            hora, sent, isNew: true
-          });
-
-          // Som de notificação
-          try{
-            const ctx=new(window.AudioContext||window.webkitAudioContext)();
-            const osc=ctx.createOscillator();
-            const gain=ctx.createGain();
-            osc.connect(gain);gain.connect(ctx.destination);
-            osc.frequency.value=880;
-            gain.gain.setValueAtTime(0.3,ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
-            osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.5);
-          }catch(e){}
+        const sent = await dispararAlertaGC(tipo, t, dept, contactName, minSemResp, nivelAtual);
+        const jaExiste = ALERTAS.find(a => a.id===t.id && a.tipo===tipo && a.nivel===nivelAtual);
+        if(!jaExiste) {
+          ALERTAS.push({ id:t.id, tipo, nivel:nivelAtual, protocol:t.protocol||'—', departmentName:dept.name, contactName, minutesOpen:minSemResp, hora, sent, isNew:true });
+          try {
+            const ctx = new(window.AudioContext||window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = 880;
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.5);
+            osc.start(ctx.currentTime); osc.stop(ctx.currentTime+0.5);
+          } catch(e) {}
         }
       }
     }
   }
-
-  if(ALERTAS.some(a=>a.isNew)){
-    renderAlertList(true);
-    ALERTAS.forEach(a=>a.isNew=false);
-  }
-}
+  if(ALERTAS.some(a => a.isNew)) { renderAlertList(true); ALERTAS.forEach(a => a.isNew=false); }
 }
 
 // ── ATENDIMENTO ──
-async function carregarAtendimento(){
-  document.getElementById('tbody-atend').innerHTML=`<tr><td colspan="6"><div class="loading"><span class="spin"></span>Buscando chamados abertos…</div></td></tr>`;
-  try{
-    const [tickRes,deptRes]=await Promise.all([fetch('/api/tickets'),fetch('/api/departments')]);
-    const [tickData,deptData]=await Promise.all([tickRes.json(),deptRes.json()]);
-    DEPTS_LIST=deptData.data||[];
-    DEPTS={};
-    DEPTS_LIST.forEach((d,i)=>{DEPTS[d.id]={name:d.name,idx:i,cor:getCor(i)};});
-    TICKETS=tickData.data||[];
-    renderAtendimento();renderSidebar();
-  }catch(e){
-    document.getElementById('tbody-atend').innerHTML=`<tr><td colspan="6"><div class="err">Erro ao carregar. Tente novamente.</div></td></tr>`;
+async function carregarAtendimento() {
+  document.getElementById('tbody-atend').innerHTML = `<tr><td colspan="6"><div class="loading"><span class="spin"></span>Buscando chamados abertos…</div></td></tr>`;
+  try {
+    const [tickRes, deptRes] = await Promise.all([fetch('/api/tickets'), fetch('/api/departments')]);
+    const [tickData, deptData] = await Promise.all([tickRes.json(), deptRes.json()]);
+    DEPTS_LIST = deptData.data || [];
+    DEPTS = {};
+    DEPTS_LIST.forEach((d,i) => { DEPTS[d.id] = { name:d.name, idx:i, cor:getCor(i) }; });
+    TICKETS = tickData.data || [];
+    renderAtendimento();
+    renderSidebar();
+  } catch(e) {
+    document.getElementById('tbody-atend').innerHTML = `<tr><td colspan="6"><div class="err">Erro ao carregar. Tente novamente.</div></td></tr>`;
   }
 }
 
-function dentroFaixaHora(ticket){
-  if(filtroHoraAtend==='todos')return true;
-  const h=new Date(ticket.startedAt).getHours();
-  if(filtroHoraAtend==='manha')return h>=8&&h<12;
-  if(filtroHoraAtend==='tarde')return h>=12&&h<18;
-  if(filtroHoraAtend==='noite')return h>=18&&h<22;
-  if(filtroHoraAtend==='comercial')return h>=10&&h<17;
+function dentroFaixaHora(ticket) {
+  if(filtroHoraAtend==='todos') return true;
+  const h = new Date(ticket.startedAt).getHours();
+  if(filtroHoraAtend==='manha')    return h>=8  && h<12;
+  if(filtroHoraAtend==='tarde')    return h>=12 && h<18;
+  if(filtroHoraAtend==='noite')    return h>=18 && h<22;
+  if(filtroHoraAtend==='comercial')return h>=10 && h<17;
   return true;
 }
 
-function renderAtendimento(){
-  const list=TICKETS.filter(t=>{
-    if(filtroSetor!=='todos'&&t.departmentId!==filtroSetor)return false;
-    if(buscaAtend&&!(t.protocol||'').toLowerCase().includes(buscaAtend))return false;
-    if(!dentroFaixaHora(t))return false;
+function renderAtendimento() {
+  const list = TICKETS.filter(t => {
+    if(filtroSetor!=='todos' && t.departmentId!==filtroSetor) return false;
+    if(buscaAtend && !(t.protocol||'').toLowerCase().includes(buscaAtend)) return false;
+    if(!dentroFaixaHora(t)) return false;
     return true;
   });
-  const semResp=TICKETS.filter(t=>!t.userId).length;
-  const depsAtivos=new Set(TICKETS.map(t=>t.departmentId)).size;
-  const tmas=TICKETS.filter(t=>t.metrics?.messagingTime>0).map(t=>Math.floor(t.metrics.messagingTime/60));
-  const tmaMedia=tmas.length?Math.floor(tmas.reduce((a,b)=>a+b,0)/tmas.length):0;
-  const urg=TICKETS.filter(t=>tempoMin(t.startedAt)>=240).length;
-  document.getElementById('m1').textContent=TICKETS.length||'0';
-  document.getElementById('m2').textContent=semResp;
-  document.getElementById('m3').textContent=depsAtivos;
-  document.getElementById('m4').textContent=fmt(tmaMedia);
-  document.getElementById('md1').textContent=TICKETS.length+' em aberto';
-  document.getElementById('md2').textContent=semResp+' sem agente';
-  document.getElementById('md3').textContent=depsAtivos+' ativos';
-  document.getElementById('md4').textContent='tempo médio';
-  document.getElementById('mb1').style.width=Math.min(100,TICKETS.length*5)+'%';document.getElementById('mb1').style.background='linear-gradient(90deg,#e53935,#ff6b6b)';
-  document.getElementById('mb2').style.width=TICKETS.length?Math.round(semResp/TICKETS.length*100)+'%':'0%';document.getElementById('mb2').style.background='linear-gradient(90deg,#e8920a,#fbbf24)';
-  document.getElementById('mb3').style.width=Math.min(100,depsAtivos*20)+'%';document.getElementById('mb3').style.background='linear-gradient(90deg,#285199,#60a5fa)';
-  document.getElementById('mb4').style.width=Math.min(100,Math.round(tmaMedia/240*100))+'%';document.getElementById('mb4').style.background='linear-gradient(90deg,#0d9e6e,#34d399)';
-  document.getElementById('sb-urg').textContent=urg;
-  document.getElementById('ph-cnt').textContent=list.length;
-  const utag=document.getElementById('urg-tag');
-  document.getElementById('urg-txt').textContent=urg?urg+' acima do SLA':'Tudo no prazo';
-  utag.className='urg-tag'+(urg?' danger':' ok');
-  document.getElementById('tbody-atend').innerHTML=list.length?list.map(t=>{
-    const dept=DEPTS[t.departmentId]||{name:'Sem setor',idx:0,cor:CORES[0]};
-    const cor=dept.cor;
-    const min=tempoMin(t.startedAt);
-    const tcls=min>=240?'t-hot':min>=120?'t-mid':t.userId?'t-ok':'t-cli';
-    const cli=t.contact;
-    const cliNome=cli?(cli.name||cli.pushname||cli.number||'Sem nome'):'Sem nome';
-    const cliTel=cli?(cli.number||cli.phone||''):'';
-    const cliIni=ini(cliNome);
-    const agenteNome=t.agent?(t.agent.name||t.agent.username||'Atribuído'):null;
-    return`<tr class="${selAtend===t.id?'sel':''}" onclick="pickAtend('${t.id}')">
+
+  const semResp   = TICKETS.filter(t => !t.userId).length;
+  const depsAtivos = new Set(TICKETS.map(t => t.departmentId)).size;
+  const tmas      = TICKETS.filter(t => t.metrics&&t.metrics.messagingTime>0).map(t => Math.floor(t.metrics.messagingTime/60));
+  const tmaMedia  = tmas.length ? Math.floor(tmas.reduce((a,b)=>a+b,0)/tmas.length) : 0;
+  const urg       = TICKETS.filter(t => tempoMin(t.startedAt)>=240).length;
+
+  document.getElementById('m1').textContent = TICKETS.length||'0';
+  document.getElementById('m2').textContent = semResp;
+  document.getElementById('m3').textContent = depsAtivos;
+  document.getElementById('m4').textContent = fmt(tmaMedia);
+  document.getElementById('md1').textContent = TICKETS.length+' em aberto';
+  document.getElementById('md2').textContent = semResp+' sem agente';
+  document.getElementById('md3').textContent = depsAtivos+' ativos';
+  document.getElementById('md4').textContent = 'tempo médio';
+  document.getElementById('mb1').style.width = Math.min(100,TICKETS.length*5)+'%';
+  document.getElementById('mb1').style.background = 'linear-gradient(90deg,#e53935,#ff6b6b)';
+  document.getElementById('mb2').style.width = TICKETS.length ? Math.round(semResp/TICKETS.length*100)+'%' : '0%';
+  document.getElementById('mb2').style.background = 'linear-gradient(90deg,#e8920a,#fbbf24)';
+  document.getElementById('mb3').style.width = Math.min(100,depsAtivos*20)+'%';
+  document.getElementById('mb3').style.background = 'linear-gradient(90deg,#285199,#60a5fa)';
+  document.getElementById('mb4').style.width = Math.min(100,Math.round(tmaMedia/240*100))+'%';
+  document.getElementById('mb4').style.background = 'linear-gradient(90deg,#0d9e6e,#34d399)';
+  document.getElementById('sb-urg').textContent = urg;
+  document.getElementById('ph-cnt').textContent = list.length;
+
+  const utag = document.getElementById('urg-tag');
+  document.getElementById('urg-txt').textContent = urg ? urg+' acima do SLA' : 'Tudo no prazo';
+  utag.className = 'urg-tag'+(urg?' danger':' ok');
+
+  document.getElementById('tbody-atend').innerHTML = list.length ? list.map(t => {
+    const dept = DEPTS[t.departmentId] || { name:'Sem setor', idx:0, cor:CORES[0] };
+    const cor  = dept.cor;
+    const minAberto = tempoMin(t.startedAt);
+    const tcls = minAberto>=240?'t-hot':minAberto>=120?'t-mid':t.userId?'t-ok':'t-cli';
+    const cliNome = t.contact ? (t.contact.name||t.contact.number||'Sem nome') : 'Sem nome';
+    const cliTel  = t.contact ? (t.contact.number||'') : '';
+    const cliIni  = ini(cliNome);
+    const agenteNome = t.agent ? (t.agent.name||'Atribuído') : null;
+    return `<tr class="${selAtend===t.id?'sel':''}" onclick="pickAtend('${t.id}')">
       <td style="padding-left:20px;"><div class="td-cl"><div class="td-av" style="background:${cor.bg};color:${cor.fg};">${cliIni}</div><div><div class="td-name">${cliNome}</div><div class="td-sub">${cliTel||dept.name}</div></div></div></td>
       <td><span class="bdg b-gray"><span style="width:6px;height:6px;border-radius:50%;background:${cor.dot};display:inline-block;margin-right:4px;flex-shrink:0;"></span>${dept.name}</span></td>
       <td><span class="td-id">${t.protocol||'—'}</span></td>
-      <td>${agenteNome?`<span class="bdg b-grn">${agenteNome}</span>`:'<span class="bdg b-amb">Sem agente</span>'}</td>
-      <td>${t.origin==='manual'?'<span class="bdg b-blue">Manual</span>':'<span class="bdg b-gray">Auto</span>'}</td>
-      <td><div class="tbar-mini"><div class="tbar-mini-f" style="width:${pct(min)}%;background:${corHex(min)};"></div></div><span class="tbdg ${tcls}">${fmt(min)}</span></td>
+      <td>${agenteNome ? `<span class="bdg b-grn">${agenteNome}</span>` : '<span class="bdg b-amb">Sem agente</span>'}</td>
+      <td>${t.origin==='manual' ? '<span class="bdg b-blue">Manual</span>' : '<span class="bdg b-gray">Auto</span>'}</td>
+      <td><div class="tbar-mini"><div class="tbar-mini-f" style="width:${pct(minAberto)}%;background:${corHex(minAberto)};"></div></div><span class="tbdg ${tcls}">${fmt(minAberto)}</span></td>
     </tr>`;
-  }).join(''):`<tr><td colspan="6" style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum chamado aberto no momento.</td></tr>`;
+  }).join('') : `<tr><td colspan="6" style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum chamado aberto no momento.</td></tr>`;
 
-  const deptCounts={};TICKETS.forEach(t=>{deptCounts[t.departmentId]=(deptCounts[t.departmentId]||0)+1;});
-  document.getElementById('scards').innerHTML=DEPTS_LIST.slice(0,5).map(d=>{
-    const cor=DEPTS[d.id]?.cor||CORES[0];
-    const tot=deptCounts[d.id]||0;
-    return`<div class="sc" style="border-top-color:${cor.top};" onclick="filtrarSetor('${d.id}')">
-      <div class="sc-val" style="color:${cor.fg};">${tot}</div>
-      <div class="sc-name">${d.name}</div>
+  const deptCounts = {};
+  TICKETS.forEach(t => { deptCounts[t.departmentId] = (deptCounts[t.departmentId]||0)+1; });
+  document.getElementById('scards').innerHTML = DEPTS_LIST.slice(0,5).map(dep => {
+    const cor = DEPTS[dep.id]?.cor || CORES[0];
+    return `<div class="sc" style="border-top-color:${cor.top};" onclick="filtrarSetor('${dep.id}')">
+      <div class="sc-val" style="color:${cor.fg};">${deptCounts[dep.id]||0}</div>
+      <div class="sc-name">${dep.name}</div>
     </div>`;
   }).join('');
 }
 
-function renderSidebar(){
-  const deptCounts={};TICKETS.forEach(t=>{deptCounts[t.departmentId]=(deptCounts[t.departmentId]||0)+1;});
-  document.getElementById('sb-total').textContent=TICKETS.length;
-  document.getElementById('sb-setores').innerHTML=
-    DEPTS_LIST.map(d=>{const cor=DEPTS[d.id]?.cor||CORES[0];return`<div class="sb-setor${filtroSetor===d.id?' on':''}" onclick="filtrarSetor('${d.id}');navTo('atendimento',null)"><span class="sb-sdot" style="background:${cor.dot};"></span><span class="sb-slbl">${d.name}</span><span class="sb-scount">${deptCounts[d.id]||0}</span></div>`;}).join('')+
-    `<div class="sb-setor${filtroSetor==='todos'?' on':''}" style="margin-top:8px;" onclick="filtrarSetor('todos');navTo('atendimento',null)"><span class="sb-sdot" style="background:rgba(255,255,255,0.2);"></span><span class="sb-slbl">Todos os setores</span><span class="sb-scount">${TICKETS.length}</span></div>`;
+function renderSidebar() {
+  const deptCounts = {};
+  TICKETS.forEach(t => { deptCounts[t.departmentId] = (deptCounts[t.departmentId]||0)+1; });
+  document.getElementById('sb-total').textContent = TICKETS.length;
+  document.getElementById('sb-setores').innerHTML =
+    DEPTS_LIST.map(dep => {
+      const cor = DEPTS[dep.id]?.cor || CORES[0];
+      return `<div class="sb-setor${filtroSetor===dep.id?' on':''}" onclick="filtrarSetor('${dep.id}');navTo('atendimento',null)">
+        <span class="sb-sdot" style="background:${cor.dot};"></span>
+        <span class="sb-slbl">${dep.name}</span>
+        <span class="sb-scount">${deptCounts[dep.id]||0}</span>
+      </div>`;
+    }).join('') +
+    `<div class="sb-setor${filtroSetor==='todos'?' on':''}" style="margin-top:6px;" onclick="filtrarSetor('todos');navTo('atendimento',null)">
+      <span class="sb-sdot" style="background:rgba(255,255,255,0.2);"></span>
+      <span class="sb-slbl">Todos os setores</span>
+      <span class="sb-scount">${TICKETS.length}</span>
+    </div>`;
 }
 
-function pickAtend(id){
-  selAtend=id;
-  const t=TICKETS.find(x=>x.id===id);
-  if(!t)return;
-  const dept=DEPTS[t.departmentId]||{name:'Sem setor',cor:CORES[0]};
-  const cor=dept.cor;
-  const min=tempoMin(t.startedAt);
-  const c=corHex(min);
-  const cli=t.contact;
-  const cliNome=cli?(cli.name||cli.pushname||cli.number||'Sem nome'):'Sem nome';
-  document.getElementById('p-id').textContent=t.protocol||t.id.slice(0,8);
-  const tmaMin=t.metrics?.messagingTime?Math.floor(t.metrics.messagingTime/60):null;
-  document.getElementById('perfil').innerHTML=`
+function pickAtend(id) {
+  selAtend = id;
+  const t = TICKETS.find(x => x.id===id);
+  if(!t) return;
+  const dept = DEPTS[t.departmentId] || { name:'Sem setor', cor:CORES[0] };
+  const cor  = dept.cor;
+  const minAberto = tempoMin(t.startedAt);
+  const c    = corHex(minAberto);
+  const cliNome = t.contact ? (t.contact.name||t.contact.number||'Sem nome') : 'Sem nome';
+  document.getElementById('p-id').textContent = t.protocol||t.id.slice(0,8);
+  document.getElementById('perfil').innerHTML = `
   <div>
     <div class="p-hero">
       <div class="p-avlg" style="background:${cor.bg};color:${cor.fg};">${ini(cliNome)}</div>
@@ -1039,79 +1008,85 @@ function pickAtend(id){
       <div class="p-idrow">
         <span class="p-tag">Protocolo ${t.protocol||'—'}</span>
         <span class="p-tag">${t.origin==='manual'?'Manual':'Automático'}</span>
-        ${t.agent?`<span class="p-tag orange">${t.agent.name||t.agent.username}</span>`:''}
+        ${t.agent ? `<span class="p-tag acc">${t.agent.name||'Atribuído'}</span>` : ''}
       </div>
     </div>
     <div class="p-body">
-      ${cli?`<div class="p-sec">
+      ${t.contact ? `<div class="p-sec">
         <div class="p-seclbl">Cliente</div>
-        ${cli.name||cli.pushname?`<div class="p-row"><span class="p-k">Nome</span><span class="p-v">${cli.name||cli.pushname}</span></div>`:''}
-        ${cli.number?`<div class="p-row"><span class="p-k">Telefone</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${cli.number}</span></div>`:''}
-        ${cli.email?`<div class="p-row"><span class="p-k">E-mail</span><span class="p-v">${cli.email}</span></div>`:''}
-      </div>`:''}
+        ${t.contact.name ? `<div class="p-row"><span class="p-k">Nome</span><span class="p-v">${t.contact.name}</span></div>` : ''}
+        ${t.contact.number ? `<div class="p-row"><span class="p-k">Telefone</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${t.contact.number}</span></div>` : ''}
+      </div>` : ''}
       <div class="p-sec">
         <div class="p-seclbl">Chamado</div>
         <div class="p-row"><span class="p-k">Protocolo</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${t.protocol||'—'}</span></div>
         <div class="p-row"><span class="p-k">Departamento</span><span class="p-v">${dept.name}</span></div>
-        ${t.agent?`<div class="p-row"><span class="p-k">Agente</span><span class="p-v">${t.agent.name||t.agent.username||'—'}</span></div>`:''}
+        ${t.agent ? `<div class="p-row"><span class="p-k">Agente</span><span class="p-v">${t.agent.name||'—'}</span></div>` : ''}
         <div class="p-row"><span class="p-k">Origem</span><span class="p-v">${t.origin==='manual'?'Manual':'Automático'}</span></div>
         <div class="p-row"><span class="p-k">Aberto em</span><span class="p-v">${fmtDate(t.startedAt)}</span></div>
-        ${t.comments?`<div class="p-row"><span class="p-k">Comentário</span><span class="p-v" style="font-size:11px;max-width:200px;text-align:right;">${t.comments}</span></div>`:''}
+        ${t.comments ? `<div class="p-row"><span class="p-k">Comentário</span><span class="p-v" style="font-size:11px;max-width:200px;text-align:right;">${t.comments}</span></div>` : ''}
       </div>
       <div class="p-sec">
         <div class="p-seclbl">Tempo em aberto</div>
         <div class="tbar-hero">
           <div class="tbar-hero-head"><span style="color:var(--t3);">Decorrido</span><span style="color:var(--t4);">SLA: 4h</span></div>
-          <div class="tbar-hero-track"><div class="tbar-hero-fill" style="width:${pct(min)}%;background:${c};"></div></div>
-          <div class="tbar-hero-val" style="color:${c};">${fmt(min)}</div>
+          <div class="tbar-hero-track"><div class="tbar-hero-fill" style="width:${pct(minAberto)}%;background:${c};"></div></div>
+          <div class="tbar-hero-val" style="color:${c};">${fmt(minAberto)}</div>
         </div>
       </div>
-      ${t.metrics?`<div class="p-sec">
+      ${t.metrics ? `<div class="p-sec">
         <div class="p-seclbl">Métricas</div>
-        ${t.metrics.ticketTime?`<div class="p-row"><span class="p-k">Tempo total</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.ticketTime/60))}</span></div>`:''}
-        ${t.metrics.waitingTime?`<div class="p-row"><span class="p-k">Tempo espera</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.waitingTime/60))}</span></div>`:''}
-        ${t.metrics.ticketTransferCount?`<div class="p-row"><span class="p-k">Transferências</span><span class="p-v">${t.metrics.ticketTransferCount}</span></div>`:''}
-      </div>`:''}
+        ${t.metrics.ticketTime ? `<div class="p-row"><span class="p-k">Tempo total</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.ticketTime/60))}</span></div>` : ''}
+        ${t.metrics.waitingTime ? `<div class="p-row"><span class="p-k">Tempo espera</span><span class="p-v" style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.waitingTime/60))}</span></div>` : ''}
+        ${t.metrics.ticketTransferCount ? `<div class="p-row"><span class="p-k">Transferências</span><span class="p-v">${t.metrics.ticketTransferCount}</span></div>` : ''}
+      </div>` : ''}
     </div>
   </div>`;
   renderAtendimento();
 }
 
-function filtrarSetor(s){filtroSetor=s;renderAtendimento();}
-function filtrarAtend(v){buscaAtend=v.toLowerCase();renderAtendimento();}
-function filtrarHora(v){filtroHoraAtend=v;renderAtendimento();}
+function filtrarSetor(s) { filtroSetor=s; renderAtendimento(); }
+function filtrarAtend(v) { buscaAtend=v.toLowerCase(); renderAtendimento(); }
+function filtrarHora(v)  { filtroHoraAtend=v; renderAtendimento(); }
 
 // ── HISTÓRICO ──
-async function carregarHistorico(page){
-  histPage=page;
-  document.getElementById('tbody-hist').innerHTML=`<tr><td colspan="7"><div class="loading"><span class="spin"></span>Carregando…</div></td></tr>`;
-  try{
-    const r=await fetch(`/api/history?limit=50&page=${page}`);
-    const d=await r.json();
-    HIST=d.data||[];histTotal=d.total||0;
-    if(Object.keys(DEPTS).length===0){const dr=await fetch('/api/departments');const dd=await dr.json();(dd.data||[]).forEach((dep,i)=>{DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)};});DEPTS_LIST=dd.data||[];}
+async function carregarHistorico(page) {
+  histPage = page;
+  document.getElementById('tbody-hist').innerHTML = `<tr><td colspan="7"><div class="loading"><span class="spin"></span>Carregando…</div></td></tr>`;
+  try {
+    const r = await fetch(`/api/history?limit=50&page=${page}`);
+    const d = await r.json();
+    HIST = d.data||[]; histTotal = d.total||0;
+    if(Object.keys(DEPTS).length===0) {
+      const dr = await fetch('/api/departments');
+      const dd = await dr.json();
+      (dd.data||[]).forEach((dep,i) => { DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)}; });
+      DEPTS_LIST = dd.data||[];
+    }
     renderHistorico();
-  }catch(e){document.getElementById('tbody-hist').innerHTML=`<tr><td colspan="7"><div class="err">Erro ao carregar.</div></td></tr>`;}
+  } catch(e) {
+    document.getElementById('tbody-hist').innerHTML = `<tr><td colspan="7"><div class="err">Erro ao carregar.</div></td></tr>`;
+  }
 }
-function filtrarHist(v){buscaHist=v.toLowerCase();renderHistorico();}
-function renderHistorico(){
-  const list=HIST.filter(t=>!buscaHist||(t.protocol||'').toLowerCase().includes(buscaHist));
-  document.getElementById('ph-hist').textContent=histTotal.toLocaleString('pt-BR')+' total';
-  document.getElementById('tbody-hist').innerHTML=list.map(t=>{
-    const dept=DEPTS[t.departmentId]||{name:'Sem setor',cor:CORES[0]};
-    const dur=t.metrics?.ticketTime?fmt(Math.floor(t.metrics.ticketTime/60)):'—';
-    return`<tr>
+function filtrarHist(v) { buscaHist=v.toLowerCase(); renderHistorico(); }
+function renderHistorico() {
+  const filtered = HIST.filter(t => !buscaHist||(t.protocol||'').toLowerCase().includes(buscaHist));
+  document.getElementById('ph-hist').textContent = histTotal.toLocaleString('pt-BR')+' total';
+  document.getElementById('tbody-hist').innerHTML = filtered.map(t => {
+    const dept = DEPTS[t.departmentId]||{name:'Sem setor',cor:CORES[0]};
+    const dur  = t.metrics&&t.metrics.ticketTime ? fmt(Math.floor(t.metrics.ticketTime/60)) : '—';
+    return `<tr>
       <td style="padding-left:20px;"><div class="td-cl"><div class="td-av" style="background:${dept.cor.bg};color:${dept.cor.fg};font-size:10px;">${ini(dept.name)}</div><div class="td-name">${dept.name}</div></div></td>
       <td><span class="td-id">${t.protocol||'—'}</span></td>
-      <td>${t.isOpen?'<span class="bdg b-amb">Aberto</span>':'<span class="bdg b-grn">Encerrado</span>'}</td>
-      <td>${t.origin==='manual'?'<span class="bdg b-blue">Manual</span>':'<span class="bdg b-gray">Auto</span>'}</td>
-      <td style="max-width:160px;"><span style="font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">${t.comments||'—'}</span></td>
+      <td>${t.isOpen ? '<span class="bdg b-amb">Aberto</span>' : '<span class="bdg b-grn">Encerrado</span>'}</td>
+      <td>${t.origin==='manual' ? '<span class="bdg b-blue">Manual</span>' : '<span class="bdg b-gray">Auto</span>'}</td>
+      <td><span style="font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:160px;">${t.comments||'—'}</span></td>
       <td><span style="font-size:11px;color:var(--t3);">${fmtDate(t.startedAt)}</span></td>
       <td><span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--t2);font-weight:600;">${dur}</span></td>
     </tr>`;
   }).join('');
-  const lastPage=Math.ceil(histTotal/50);
-  document.getElementById('pag-hist').innerHTML=`
+  const lastPage = Math.ceil(histTotal/50);
+  document.getElementById('pag-hist').innerHTML = `
     <span>${((histPage-1)*50)+1}–${Math.min(histPage*50,histTotal)} de ${histTotal.toLocaleString('pt-BR')}</span>
     <div class="pag-btns">
       <button class="pag-btn" onclick="carregarHistorico(${histPage-1})" ${histPage<=1?'disabled':''}>← Anterior</button>
@@ -1121,37 +1096,43 @@ function renderHistorico(){
 }
 
 // ── CLIENTES ──
-async function carregarClientes(page){
-  cliPage=page;
-  document.getElementById('lista-cli').innerHTML=`<div class="loading"><span class="spin"></span>Carregando…</div>`;
-  try{
-    const r=await fetch(`/api/contacts?limit=50&page=${page}`);
-    const d=await r.json();CLIENTES=d.data||[];cliTotal=d.total||0;renderClientes();
-  }catch(e){document.getElementById('lista-cli').innerHTML=`<div class="err">Erro ao carregar.</div>`;}
+async function carregarClientes(page) {
+  cliPage = page;
+  document.getElementById('lista-cli').innerHTML = `<div class="loading"><span class="spin"></span>Carregando…</div>`;
+  try {
+    const r = await fetch(`/api/contacts?limit=50&page=${page}`);
+    const d = await r.json();
+    CLIENTES = d.data||[]; cliTotal = d.total||0;
+    renderClientes();
+  } catch(e) {
+    document.getElementById('lista-cli').innerHTML = `<div class="err">Erro ao carregar.</div>`;
+  }
 }
-async function buscarClientes(v){
-  if(v.length>0&&v.length<2)return;
-  document.getElementById('lista-cli').innerHTML=`<div class="loading"><span class="spin"></span>Buscando…</div>`;
-  try{
-    const r=await fetch(`/api/contacts?limit=50&page=1${v?'&search='+encodeURIComponent(v):''}`);
-    const d=await r.json();CLIENTES=d.data||[];cliTotal=d.total||0;renderClientes();
-  }catch(e){}
+async function buscarClientes(v) {
+  if(v.length>0 && v.length<2) return;
+  document.getElementById('lista-cli').innerHTML = `<div class="loading"><span class="spin"></span>Buscando…</div>`;
+  try {
+    const r = await fetch(`/api/contacts?limit=50&page=1${v?'&search='+encodeURIComponent(v):''}`);
+    const d = await r.json();
+    CLIENTES = d.data||[]; cliTotal = d.total||0;
+    renderClientes();
+  } catch(e) {}
 }
-function renderClientes(){
-  const cores=['#3b82f6','#10b981','#8b5cf6','#f97316','#dc3545','#0e9e6e'];
-  document.getElementById('ph-cli').textContent=cliTotal.toLocaleString('pt-BR')+' contatos';
-  document.getElementById('lista-cli').innerHTML=CLIENTES.length?CLIENTES.map((c,i)=>{
-    const nome=c.name||c.pushname||'Sem nome';
-    const tel=c.number||c.phone||'—';
-    const cor=cores[i%cores.length];
-    return`<div class="cli-row">
+function renderClientes() {
+  const cores = ['#3b82f6','#10b981','#8b5cf6','#f97316','#dc3545','#0e9e6e'];
+  document.getElementById('ph-cli').textContent = cliTotal.toLocaleString('pt-BR')+' contatos';
+  document.getElementById('lista-cli').innerHTML = CLIENTES.length ? CLIENTES.map((c,i) => {
+    const nome = c.name||c.pushname||'Sem nome';
+    const tel  = c.number||c.phone||'—';
+    const cor  = cores[i%cores.length];
+    return `<div class="cli-row">
       <div class="cli-av" style="background:${cor}20;color:${cor};">${ini(nome)}</div>
       <div class="cli-info"><div class="cli-name">${nome}</div><div class="cli-sub">${tel}${c.email?' · '+c.email:''}</div></div>
-      ${c.isActive===false?'<span class="bdg b-gray">Inativo</span>':'<span class="bdg b-grn">Ativo</span>'}
+      ${c.isActive===false ? '<span class="bdg b-gray">Inativo</span>' : '<span class="bdg b-grn">Ativo</span>'}
     </div>`;
-  }).join(''):`<div style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum contato encontrado.</div>`;
-  const lastPage=Math.ceil(cliTotal/50);
-  document.getElementById('pag-cli').innerHTML=`
+  }).join('') : `<div style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum contato encontrado.</div>`;
+  const lastPage = Math.ceil(cliTotal/50);
+  document.getElementById('pag-cli').innerHTML = `
     <span>${((cliPage-1)*50)+1}–${Math.min(cliPage*50,cliTotal)} de ${cliTotal.toLocaleString('pt-BR')}</span>
     <div class="pag-btns">
       <button class="pag-btn" onclick="carregarClientes(${cliPage-1})" ${cliPage<=1?'disabled':''}>← Anterior</button>
@@ -1161,18 +1142,22 @@ function renderClientes(){
 }
 
 // ── RELATÓRIOS ──
-async function carregarRelatorios(){
-  try{
-    const r=await fetch('/api/stats');const d=await r.json();
-    if(Object.keys(DEPTS).length===0&&d.departments)d.departments.forEach((dep,i)=>{DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)};});
-    const porDept=d.porDept||{};
-    const maxDept=Math.max(...Object.values(porDept),1);
-    const deptBars=Object.entries(porDept).map(([id,n])=>{
-      const dept=DEPTS[id]||{name:'Outro',cor:CORES[0]};
-      return`<div class="cbar-row"><div class="cbar-lbl">${dept.name}</div><div class="cbar-track"><div class="cbar-fill" style="width:${Math.round(n/maxDept*100)}%;background:${dept.cor.dot};"></div></div><div class="cbar-val">${n}</div></div>`;
+async function carregarRelatorios() {
+  try {
+    const r = await fetch('/api/stats');
+    const d = await r.json();
+    if(Object.keys(DEPTS).length===0 && d.departments) {
+      d.departments.forEach((dep,i) => { DEPTS[dep.id]={name:dep.name,idx:i,cor:getCor(i)}; });
+    }
+    const porDept = d.porDept||{};
+    const maxDept = Math.max(...Object.values(porDept),1);
+    const deptBars = Object.entries(porDept).map(([id,n]) => {
+      const dep2 = DEPTS[id]||{name:'Outro',cor:CORES[0]};
+      return `<div class="cbar-row"><div class="cbar-lbl">${dep2.name}</div><div class="cbar-track"><div class="cbar-fill" style="width:${Math.round(n/maxDept*100)}%;background:${dep2.cor.dot};"></div></div><div class="cbar-val">${n}</div></div>`;
     }).join('');
-    const ori=d.origens||{};const totOri=(ori.manual||0)+(ori.automatic||0)||1;
-    document.getElementById('rel-content').innerHTML=`
+    const ori = d.origens||{};
+    const totOri = (ori.manual||0)+(ori.automatic||0)||1;
+    document.getElementById('rel-content').innerHTML = `
       <div class="rel-card">
         <div class="rel-title">📊 Visão geral</div>
         <div class="p-row"><span class="p-k">Total de chamados</span><span class="p-v">${(d.totalTickets||0).toLocaleString('pt-BR')}</span></div>
@@ -1187,42 +1172,45 @@ async function carregarRelatorios(){
       </div>
       <div class="rel-card">
         <div class="rel-title">🏢 Por departamento</div>
-        <div>${deptBars||'<span style="color:var(--t4);font-size:12px;">Sem dados</span>'}</div>
+        ${deptBars||'<span style="color:var(--t4);font-size:12px;">Sem dados</span>'}
       </div>`;
-  }catch(e){document.getElementById('rel-content').innerHTML=`<div class="rel-card" style="grid-column:1/-1;"><div class="err">Erro ao carregar.</div></div>`;}
+  } catch(e) {
+    document.getElementById('rel-content').innerHTML = `<div class="rel-card" style="grid-column:1/-1;"><div class="err">Erro ao carregar.</div></div>`;
+  }
 }
 
 // ── API STATS ──
-async function carregarApiStats(){
-  try{
-    const r=await fetch('/api/stats');const d=await r.json();
-    document.getElementById('api-stats-card').innerHTML=`
+async function carregarApiStats() {
+  try {
+    const r = await fetch('/api/stats');
+    const d = await r.json();
+    document.getElementById('api-stats-card').innerHTML = `
       <div class="cfg-title">📊 Dados da conta DIGISAC</div>
       <div class="cfg-row"><span class="cfg-k">Total de tickets</span><span class="cfg-v">${(d.totalTickets||0).toLocaleString('pt-BR')}</span></div>
       <div class="cfg-row"><span class="cfg-k">Total de contatos</span><span class="cfg-v">${(d.totalContacts||0).toLocaleString('pt-BR')}</span></div>
       <div class="cfg-row"><span class="cfg-k">Departamentos ativos</span><span class="cfg-v">${d.totalDepts||0}</span></div>
       <div class="cfg-row"><span class="cfg-k">TMA geral</span><span class="cfg-v">${fmt(d.tmaMedia||0)}</span></div>
       <div class="cfg-row"><span class="cfg-k">Última atualização</span><span class="cfg-v cfg-mono">${new Date().toLocaleTimeString('pt-BR')}</span></div>`;
-  }catch(e){}
+  } catch(e) {}
 }
 
 // ── CLOCK ──
-function tick(){
-  const n=new Date();
-  document.getElementById('clock').textContent=n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('tb-date').textContent='· '+n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+function tick() {
+  const n = new Date();
+  document.getElementById('clock').textContent = n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('tb-date').textContent = '· '+n.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
 }
 
 carregarAtendimento();
 tick();
-setInterval(tick,30000);
-setInterval(carregarAtendimento,60000);
-setInterval(verificarAlertas,300000);
+setInterval(tick, 30000);
+setInterval(carregarAtendimento, 60000);
+setInterval(verificarAlertas, 300000);
 
 // Sidebar hover expand
 const sbEl = document.querySelector('.sb');
 const mainEl = document.querySelector('.main');
-if(sbEl && mainEl){
+if(sbEl && mainEl) {
   sbEl.addEventListener('mouseenter', () => { mainEl.style.marginLeft = '240px'; });
   sbEl.addEventListener('mouseleave', () => { mainEl.style.marginLeft = '64px'; });
 }
