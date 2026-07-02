@@ -1064,10 +1064,18 @@ function pickAtend(id) {
         ${t.metrics.waitingTime ? `<div class="p-row-copy"><span class="p-k">Tempo espera</span><div class="p-row-val"><span style="font-family:'JetBrains Mono',monospace;">${fmt(Math.floor(t.metrics.waitingTime/60))}</span></div></div>` : ''}
         ${t.metrics.ticketTransferCount ? `<div class="p-row-copy"><span class="p-k">Transferências</span><div class="p-row-val"><span>${t.metrics.ticketTransferCount}</span></div></div>` : ''}
       </div>` : ''}
-      <div class="btn-digisac-wrap">
-        <button class="btn-digisac" onclick="window.open('${digisacUrl}','_blank')">
-          🔗 Abrir no DIGISAC
-        </button>
+      <div class="btn-digisac-wrap" style="display:flex;gap:0;flex-direction:column;">
+        <div style="display:flex;">
+          <button class="btn-digisac" style="flex:1;border-right:1px solid rgba(255,255,255,0.15);" onclick="window.open('https://outtax.digisac.me/ticket-history/contacts/${t.contactId}/true','_blank')">
+            📋 Histórico
+          </button>
+          <button class="btn-digisac" style="flex:1;" onclick="abrirConversa('${t.contact ? (t.contact.number||'') : ''}')">
+            💬 Conversa
+          </button>
+        </div>
+        <div id="copy-hint" style="display:none;background:#1a3460;color:rgba(255,255,255,0.8);font-size:11px;text-align:center;padding:8px;border-top:1px solid rgba(255,255,255,0.1);">
+          ✓ Número copiado! Cole na barra de pesquisa do DIGISAC
+        </div>
       </div>
     </div>
   </div>`;
@@ -1221,6 +1229,23 @@ async function carregarApiStats() {
       <div class="cfg-row"><span class="cfg-k">TMA geral</span><span class="cfg-v">${fmt(d.tmaMedia||0)}</span></div>
       <div class="cfg-row"><span class="cfg-k">Última atualização</span><span class="cfg-v cfg-mono">${new Date().toLocaleTimeString('pt-BR')}</span></div>`;
   } catch(e) {}
+}
+
+// ── ABRIR CONVERSA DIGISAC ──
+function abrirConversa(numero) {
+  if(numero) {
+    navigator.clipboard.writeText(numero).catch(() => {
+      const el = document.createElement('textarea');
+      el.value = numero;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    });
+    const hint = document.getElementById('copy-hint');
+    if(hint) { hint.style.display='block'; setTimeout(()=>{ hint.style.display='none'; }, 4000); }
+  }
+  window.open('https://outtax.digisac.me', '_blank');
 }
 
 // ── COPIAR ──
