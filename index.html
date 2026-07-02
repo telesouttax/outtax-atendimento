@@ -496,6 +496,44 @@ tbody td{padding:12px 18px;vertical-align:middle;}
 .btn-digisac:hover{background:var(--p2);}
 .btn-digisac-wrap{border-top:1px solid var(--bg2);padding:0;}
 
+
+/* TOOLTIP CARDS */
+.mc{position:relative;}
+.mc-tooltip{
+  display:none;position:absolute;
+  top:calc(100% + 8px);left:50%;transform:translateX(-50%);
+  background:var(--p1);color:#fff;
+  border-radius:var(--rl);padding:12px 16px;
+  font-size:12px;min-width:220px;max-width:280px;
+  box-shadow:var(--sh2);z-index:300;
+  border:1px solid rgba(255,255,255,0.1);
+  pointer-events:none;
+}
+.mc-tooltip::before{
+  content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top:none;
+  border-bottom-color:var(--p1);
+}
+.mc:hover .mc-tooltip{display:block;}
+.mc-tooltip-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.5);margin-bottom:8px;}
+.mc-tooltip-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:12px;}
+.mc-tooltip-row:last-child{border-bottom:none;}
+.mc-tooltip-k{color:rgba(255,255,255,0.7);}
+.mc-tooltip-v{font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace;}
+
+/* PIZZA CHART */
+.pizza-wrap{background:var(--sur);border-radius:var(--rl);box-shadow:var(--sh);border:1px solid var(--bor);padding:22px;margin-top:20px;}
+.pizza-title{font-size:14px;font-weight:800;color:var(--p1);margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid var(--bg2);}
+.pizza-grid{display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:center;}
+.pizza-svg-wrap{display:flex;align-items:center;justify-content:center;}
+.pizza-legend{display:flex;flex-direction:column;gap:10px;}
+.pizza-leg-item{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:8px 10px;border-radius:var(--r);transition:background 0.15s;}
+.pizza-leg-item:hover{background:var(--bg2);}
+.pizza-leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0;margin-top:2px;}
+.pizza-leg-info{flex:1;min-width:0;}
+.pizza-leg-name{font-size:12px;font-weight:700;color:var(--p1);}
+.pizza-leg-sub{font-size:11px;color:var(--t3);margin-top:2px;}
+.pizza-leg-pct{font-size:12px;font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
 @media(max-width:1100px){.grid2{grid-template-columns:1fr;}.metrics{grid-template-columns:repeat(2,1fr);}.scards{grid-template-columns:repeat(3,1fr);}.rel-grid{grid-template-columns:1fr;}.cfg-grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -563,6 +601,7 @@ tbody td{padding:12px 18px;vertical-align:middle;}
           <div class="mc-val" style="color:var(--red);" id="m1">—</div>
           <div class="mc-lbl">Abertos agora</div><div class="mc-sub">chamados em aberto</div>
           <div class="mc-prog"><div class="mc-prog-track"><div class="mc-prog-fill" style="background:var(--red);" id="mb1"></div></div></div>
+          <div class="mc-tooltip"><div class="mc-tooltip-title">Chamados abertos</div><div id="tt-abertos">—</div></div>
         </div>
         <div class="mc amb">
           <div class="mc-stripe" style="background:linear-gradient(90deg,#e8920a,#fbbf24);"></div>
@@ -570,6 +609,7 @@ tbody td{padding:12px 18px;vertical-align:middle;}
           <div class="mc-val" style="color:var(--amb);" id="m2">—</div>
           <div class="mc-lbl">Sem responsável</div><div class="mc-sub">aguardando atribuição</div>
           <div class="mc-prog"><div class="mc-prog-track"><div class="mc-prog-fill" style="background:var(--amb);" id="mb2"></div></div></div>
+          <div class="mc-tooltip"><div class="mc-tooltip-title">Sem agente atribuído</div><div id="tt-semresp">—</div></div>
         </div>
         <div class="mc blu">
           <div class="mc-stripe" style="background:linear-gradient(90deg,#285199,#60a5fa);"></div>
@@ -577,6 +617,7 @@ tbody td{padding:12px 18px;vertical-align:middle;}
           <div class="mc-val" style="color:var(--blu);" id="m3">—</div>
           <div class="mc-lbl">Departamentos</div><div class="mc-sub">setores com chamados</div>
           <div class="mc-prog"><div class="mc-prog-track"><div class="mc-prog-fill" style="background:var(--blu);" id="mb3"></div></div></div>
+          <div class="mc-tooltip"><div class="mc-tooltip-title">Setores com chamados</div><div id="tt-depts">—</div></div>
         </div>
         <div class="mc grn">
           <div class="mc-stripe" style="background:linear-gradient(90deg,#0d9e6e,#34d399);"></div>
@@ -584,6 +625,7 @@ tbody td{padding:12px 18px;vertical-align:middle;}
           <div class="mc-val" style="color:var(--grn);" id="m4">—</div>
           <div class="mc-lbl">TMA médio</div><div class="mc-sub">tempo médio de atendimento</div>
           <div class="mc-prog"><div class="mc-prog-track"><div class="mc-prog-fill" style="background:var(--grn);" id="mb4"></div></div></div>
+          <div class="mc-tooltip"><div class="mc-tooltip-title">Tempo médio por setor</div><div id="tt-tma">—</div></div>
         </div>
       </div>
       <div class="grid2">
@@ -616,6 +658,13 @@ tbody td{padding:12px 18px;vertical-align:middle;}
             </table></div>
           </div>
           <div class="scards" id="scards"></div>
+          <div class="pizza-wrap">
+            <div class="pizza-title">🍕 Chamados por departamento</div>
+            <div class="pizza-grid">
+              <div class="pizza-svg-wrap"><svg id="pizza-svg" width="180" height="180" viewBox="0 0 180 180"></svg></div>
+              <div class="pizza-legend" id="pizza-legend"></div>
+            </div>
+          </div>
         </div>
         <div class="card" style="position:sticky;top:0;">
           <div class="card-head">
@@ -990,6 +1039,48 @@ function renderAtendimento() {
       <div class="sc-name">${dep.name}</div>
     </div>`;
   }).join('');
+
+  // ── TOOLTIPS ──
+  // Tooltip: Abertos agora
+  const ttAbertos = TICKETS.slice(0,8).map(t => {
+    const dept = DEPTS[t.departmentId]||{name:'Sem setor'};
+    const cli = t.contact?(t.contact.name||t.contact.number||'Sem nome'):'Sem nome';
+    return `<div class="mc-tooltip-row"><span class="mc-tooltip-k">${cli}</span><span class="mc-tooltip-v">${dept.name}</span></div>`;
+  }).join('');
+  const ttAbEl = document.getElementById('tt-abertos');
+  if(ttAbEl) ttAbEl.innerHTML = ttAbertos || '<span style="color:rgba(255,255,255,0.4);">Nenhum chamado</span>';
+
+  // Tooltip: Sem responsável
+  const semRespTickets = TICKETS.filter(t => !t.userId);
+  const ttSemResp = semRespTickets.slice(0,8).map(t => {
+    const dept = DEPTS[t.departmentId]||{name:'Sem setor'};
+    const cli = t.contact?(t.contact.name||t.contact.number||'Sem nome'):'Sem nome';
+    return `<div class="mc-tooltip-row"><span class="mc-tooltip-k">${cli}</span><span class="mc-tooltip-v">${dept.name}</span></div>`;
+  }).join('');
+  const ttSrEl = document.getElementById('tt-semresp');
+  if(ttSrEl) ttSrEl.innerHTML = ttSemResp || '<span style="color:rgba(255,255,255,0.4);">Todos atribuídos ✓</span>';
+
+  // Tooltip: Departamentos
+  const deptAtivos = Object.entries(deptCounts).map(([id,n]) => {
+    const dept = DEPTS[id]||{name:'Sem setor'};
+    const agentes = [...new Set(TICKETS.filter(t=>t.departmentId===id&&t.userId).map(t=>t.agent?.name||'—'))];
+    return `<div class="mc-tooltip-row"><span class="mc-tooltip-k">${dept.name}</span><span class="mc-tooltip-v">${n} chamado${n>1?'s':''}</span></div>`;
+  }).join('');
+  const ttDpEl = document.getElementById('tt-depts');
+  if(ttDpEl) ttDpEl.innerHTML = deptAtivos || '<span style="color:rgba(255,255,255,0.4);">Nenhum</span>';
+
+  // Tooltip: TMA por setor
+  const tmaPorDept = Object.entries(deptCounts).map(([id]) => {
+    const dept = DEPTS[id]||{name:'Sem setor'};
+    const tickets = TICKETS.filter(t=>t.departmentId===id&&t.metrics?.messagingTime>0);
+    const tmaLocal = tickets.length ? Math.floor(tickets.reduce((a,t)=>a+t.metrics.messagingTime,0)/tickets.length/60) : 0;
+    return `<div class="mc-tooltip-row"><span class="mc-tooltip-k">${dept.name}</span><span class="mc-tooltip-v">${tmaLocal?fmt(tmaLocal):'—'}</span></div>`;
+  }).join('');
+  const ttTmEl = document.getElementById('tt-tma');
+  if(ttTmEl) ttTmEl.innerHTML = tmaPorDept || '<span style="color:rgba(255,255,255,0.4);">Sem dados</span>';
+
+  // ── PIZZA CHART ──
+  renderPizza(deptCounts);
 }
 
 function renderSidebar() {
@@ -1080,6 +1171,63 @@ function pickAtend(id) {
     </div>
   </div>`;
   renderAtendimento();
+}
+
+
+function renderPizza(deptCounts) {
+  const svg = document.getElementById('pizza-svg');
+  const legend = document.getElementById('pizza-legend');
+  if(!svg || !legend) return;
+
+  const entries = Object.entries(deptCounts).filter(([,n])=>n>0);
+  const total = entries.reduce((a,[,n])=>a+n,0);
+  if(total===0) { svg.innerHTML=''; legend.innerHTML=''; return; }
+
+  const cx=90, cy=90, r=80, rInner=40;
+  let angle = -Math.PI/2;
+  let paths = '';
+
+  entries.forEach(([id,n],i) => {
+    const dept = DEPTS[id]||{name:'Sem setor',cor:CORES[0]};
+    const cor = dept.cor;
+    const slice = (n/total)*2*Math.PI;
+    const x1 = cx+r*Math.cos(angle);
+    const y1 = cy+r*Math.sin(angle);
+    const x2 = cx+r*Math.cos(angle+slice);
+    const y2 = cy+r*Math.sin(angle+slice);
+    const xi1 = cx+rInner*Math.cos(angle);
+    const yi1 = cy+rInner*Math.sin(angle);
+    const xi2 = cx+rInner*Math.cos(angle+slice);
+    const yi2 = cy+rInner*Math.sin(angle+slice);
+    const large = slice > Math.PI ? 1 : 0;
+    paths += `<path d="M${xi1},${yi1} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} L${xi2},${yi2} A${rInner},${rInner} 0 ${large},0 ${xi1},${yi1}" fill="${cor.dot}" stroke="#fff" stroke-width="2" opacity="0.9">
+      <title>${dept.name}: ${n} chamado${n>1?'s':''}</title>
+    </path>`;
+    angle += slice;
+  });
+
+  // Centro
+  paths += `<circle cx="${cx}" cy="${cy}" r="${rInner}" fill="white"/>`;
+  paths += `<text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="20" font-weight="800" fill="#152c6b">${total}</text>`;
+  paths += `<text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="10" fill="#6e809e">chamados</text>`;
+  svg.innerHTML = paths;
+
+  // Legenda com agentes
+  legend.innerHTML = entries.map(([id,n]) => {
+    const dept = DEPTS[id]||{name:'Sem setor',cor:CORES[0]};
+    const cor = dept.cor;
+    const pct = Math.round(n/total*100);
+    const agentes = [...new Set(TICKETS.filter(t=>t.departmentId===id&&t.agent?.name).map(t=>t.agent.name))];
+    const agentesStr = agentes.length ? agentes.slice(0,3).join(', ')+(agentes.length>3?'...':'') : 'Sem agente';
+    return `<div class="pizza-leg-item" onclick="filtrarSetor('${id}')">
+      <div class="pizza-leg-dot" style="background:${cor.dot};"></div>
+      <div class="pizza-leg-info">
+        <div class="pizza-leg-name">${dept.name}</div>
+        <div class="pizza-leg-sub">${n} chamado${n>1?'s':''} · ${agentesStr}</div>
+      </div>
+      <div class="pizza-leg-pct" style="color:${cor.dot};">${pct}%</div>
+    </div>`;
+  }).join('');
 }
 
 function filtrarSetor(s) { filtroSetor=s; renderAtendimento(); }
