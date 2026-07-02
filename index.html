@@ -1022,7 +1022,7 @@ function pickAtend(id) {
   const c    = corHex(minAberto);
   const cliNome = t.contact ? (t.contact.name||t.contact.number||'Sem nome') : 'Sem nome';
   document.getElementById('p-id').textContent = t.protocol||t.id.slice(0,8);
-  const digisacUrl = `https://outtax.digisac.me/tickets/${t.id}`;
+  const digisacUrl = `https://outtax.digisac.me/ticket-history/contacts/${t.contactId}/true`;
   document.getElementById('perfil').innerHTML = `
   <div>
     <div class="p-hero">
