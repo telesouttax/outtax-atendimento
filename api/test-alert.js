@@ -33,7 +33,11 @@ export default async function handler(req, res) {
             { keyValue: { topLabel: 'Protocolo', content: 'TESTE-001', icon: 'TICKET' } },
             { keyValue: { topLabel: 'Tempo sem resposta', content: fmtMin(minutos), icon: 'CLOCK' } },
             { textParagraph: { text: descricao } },
-            { buttons: [{ textButton: { text: '🔗 Abrir Dashboard', onClick: { openLink: { url: 'https://outtax-atendimento.vercel.app' } } } }] }
+            { buttons: [
+              { textButton: { text: '📊 Dashboard', onClick: { openLink: { url: 'https://outtax-atendimento.vercel.app' } } } },
+              { textButton: { text: '📋 Histórico DIGISAC', onClick: { openLink: { url: 'https://outtax.digisac.me/ticket-history/contacts/' } } } },
+              { textButton: { text: '💬 Abrir Conversa', onClick: { openLink: { url: 'https://outtax.digisac.me' } } } }
+            ] }
           ]
         }]
       }]
