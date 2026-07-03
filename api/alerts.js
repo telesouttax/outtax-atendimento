@@ -38,7 +38,7 @@ export default async function handler(req, res) {
             { buttons: [
               { textButton: { text: '📊 Dashboard', onClick: { openLink: { url: 'https://outtax-atendimento.vercel.app' } } } },
               { textButton: { text: '📋 Histórico', onClick: { openLink: { url: `https://outtax.digisac.me/ticket-history/contacts/${req.body.contactId || ''}/true` } } } },
-              { textButton: { text: '💬 Conversa', onClick: { openLink: { url: `https://outtax.digisac.me/chats/${req.body.contactId || ''}` } } } }
+              { textButton: { text: '💬 Conversa', onClick: { openLink: { url: `https://outtax.digisac.me/ticket-history/contacts/${req.body.contactId || ''}/true` } } } }
             ] }
           ]
         }]
