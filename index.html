@@ -661,7 +661,7 @@ async function dispararAlertaGC(tipo, ticket, dept, contactName, minutesOpen, ni
     const r = await fetch('/api/alerts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tipo, ticketId: ticket.id, contactId: ticket.contactId, protocol: ticket.protocol, departmentName: dept.name, contactName, minutesOpen, nivel })
+      body: JSON.stringify({ tipo, ticketId: ticket.id, contactId: ticket.contactId, contactNumber: ticket.contact?.number || null, protocol: ticket.protocol, departmentName: dept.name, contactName, minutesOpen, nivel })
     });
     const d = await r.json();
     return d.ok === true;
