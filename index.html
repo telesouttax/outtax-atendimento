@@ -1244,6 +1244,8 @@ async function dispararGCManual(ticketId, btn) {
     const msgs = md.data || [];
     if(msgs.length > 0) {
       const ultima = msgs[msgs.length-1];
+      // isFromMe:true = time foi o último a falar → cliente não respondeu
+      // isFromMe:false = cliente foi o último a falar → time não respondeu
       tipo = ultima.isFromMe === true ? 'cliente_sem_resposta' : 'time_sem_resposta';
     }
   } catch(e) {}
