@@ -2,52 +2,49 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
-  const { ticketId } = req.query;
-  if (!ticketId) return res.status(400).json({ error: 'ticketId obrigatório' });
+  const { ticketId, contactId } = req.query;
+  if (!ticketId && !contactId) return res.status(400).json({ error: 'ticketId ou contactId obrigatório' });
 
   try {
-    // Busca ticket
-    const ticketRes = await fetch(`https://outtax.digisac.me/api/v1/tickets/${ticketId}`, {
-      headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
-    });
-    const ticketData = await ticketRes.json();
-    const ticket = ticketData.data || ticketData;
+    let ticket = null;
+    let resolvedContactId = contactId;
 
-    const startedAt = new Date(ticket.startedAt);
-    const endedAt   = ticket.endedAt ? new Date(ticket.endedAt) : new Date();
+    // Se veio ticketId, busca o ticket para pegar o contactId
+    if (ticketId) {
+      const ticketRes = await fetch(`https://outtax.digisac.me/api/v1/tickets/${ticketId}`, {
+        headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
+      });
+      const ticketData = await ticketRes.json();
+      ticket = ticketData.data || ticketData;
+      resolvedContactId = ticket.contactId;
+    }
 
     // Busca contato
     let contact = null;
-    if (ticket.contactId) {
+    if (resolvedContactId) {
       try {
-        const cr = await fetch(`https://outtax.digisac.me/api/v1/contacts/${ticket.contactId}`, {
+        const cr = await fetch(`https://outtax.digisac.me/api/v1/contacts/${resolvedContactId}`, {
           headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
         });
         if (cr.ok) { const cd = await cr.json(); contact = cd.data || cd; }
       } catch(e) {}
     }
 
-    // Busca mensagens filtrando pela data de início/fim do ticket
+    // Busca TODAS as mensagens do contato (conversa completa)
     const allMsgs = [];
     let page = 1;
 
-    while (page <= 20) {
+    while (page <= 50) { // até 5000 mensagens
       const r = await fetch(
-        `https://outtax.digisac.me/api/v1/messages?ticketId=${ticketId}&limit=100&page=${page}`,
+        `https://outtax.digisac.me/api/v1/messages?contactId=${resolvedContactId}&limit=100&page=${page}`,
         { headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` } }
       );
       const d = await r.json();
       const msgs = d.data || [];
 
-      const filtradas = msgs.filter(m => {
-        if (!m.text || !m.text.trim()) return false;
-        if (m.type === 'system') return false;
-        // Filtra apenas mensagens dentro do período do ticket
-        const msgAt = new Date(m.createdAt);
-        return msgAt >= startedAt && msgAt <= endedAt;
-      });
+      const comTexto = msgs.filter(m => m.text && m.text.trim() && m.type !== 'system');
+      allMsgs.push(...comTexto);
 
-      allMsgs.push(...filtradas);
       if (msgs.length < 100) break;
       page++;
     }
@@ -55,15 +52,16 @@ export default async function handler(req, res) {
     allMsgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
     return res.status(200).json({
-      ticket: {
+      ticket: ticket ? {
         id: ticket.id,
         protocol: ticket.protocol,
         startedAt: ticket.startedAt,
         endedAt: ticket.endedAt,
         departmentId: ticket.departmentId,
         metrics: ticket.metrics,
-      },
+      } : null,
       contact: contact ? {
+        id: resolvedContactId,
         name: contact.name || contact.pushname || null,
         number: contact.number || null,
       } : null,
