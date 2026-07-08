@@ -678,15 +678,16 @@ async function verificarAlertas() {
     let minSemResp = tempoMin(t.startedAt);
 
     try {
-      const mr = await fetch(`/api/messages?ticketId=${t.id}`);
+      const lastMsgId = t.lastMessageId;
+      const mr = await fetch(`/api/messages?ticketId=${t.id}${lastMsgId ? '&lastMessageId='+lastMsgId : ''}`);
       const md = await mr.json();
       const msgs = md.data || [];
       if(msgs.length > 0) {
         const ultima = msgs[msgs.length-1];
         const ultimaAt = new Date(ultima.createdAt||ultima.timestamp);
         minSemResp = Math.floor((Date.now()-ultimaAt.getTime())/60000);
-        foiCliente = ultima.fromMe===false || ultima.direction==='inbound';
-        foiTime    = ultima.fromMe===true  || ultima.direction==='outbound';
+        foiCliente = ultima.isFromMe === false;
+        foiTime    = ultima.isFromMe === true;
       }
     } catch(e) {}
 
