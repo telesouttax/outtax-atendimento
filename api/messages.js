@@ -2,38 +2,23 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
-  const { ticketId, lastMessageId } = req.query;
-  if (!ticketId) return res.status(400).json({ error: 'ticketId obrigatório' });
+  const { lastMessageId } = req.query;
+  if (!lastMessageId) return res.status(200).json({ data: [] });
 
   try {
-    // Busca a última mensagem diretamente pelo ID
-    if (lastMessageId) {
-      const r = await fetch(
-        `https://outtax.digisac.me/api/v1/messages/${lastMessageId}`,
-        { headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` } }
-      );
-      if (r.ok) {
-        const d = await r.json();
-        const msg = d.data || d;
-        return res.status(200).json({
-          data: [{ isFromMe: msg.isFromMe, type: msg.type, createdAt: msg.createdAt }]
-        });
-      }
-    }
-
-    // Fallback: busca mensagens do ticket e pega a última
+    // Busca a última mensagem diretamente pelo ID — mais confiável
     const r = await fetch(
-      `https://outtax.digisac.me/api/v1/messages?ticketId=${ticketId}&limit=50`,
+      `https://outtax.digisac.me/api/v1/messages/${lastMessageId}`,
       { headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` } }
     );
-    if (!r.ok) return res.status(r.status).json({ error: 'Erro ao buscar mensagens' });
+
+    if (!r.ok) return res.status(200).json({ data: [] });
 
     const d = await r.json();
-    const all = (d.data || []).filter(m => m.ticketId === ticketId || m.type === 'chat');
-    const last = all[all.length - 1];
+    const msg = d.data || d;
 
     return res.status(200).json({
-      data: last ? [{ isFromMe: last.isFromMe, type: last.type, createdAt: last.createdAt }] : []
+      data: [{ isFromMe: msg.isFromMe, type: msg.type, createdAt: msg.createdAt }]
     });
 
   } catch (error) {
