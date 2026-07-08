@@ -6,21 +6,12 @@ export default async function handler(req, res) {
   if (!ticketId) return res.status(400).json({ error: 'ticketId obrigatório' });
 
   try {
-    // Busca dados do ticket
-    const [ticketRes, msgsRes] = await Promise.all([
-      fetch(`https://outtax.digisac.me/api/v1/tickets/${ticketId}`, {
-        headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
-      }),
-      fetch(`https://outtax.digisac.me/api/v1/messages?ticketId=${ticketId}&limit=500`, {
-        headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
-      })
-    ]);
-
+    // Busca dados do ticket e contato
+    const ticketRes = await fetch(`https://outtax.digisac.me/api/v1/tickets/${ticketId}`, {
+      headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
+    });
     const ticketData = await ticketRes.json();
-    const msgsData   = await msgsRes.json();
-
     const ticket = ticketData.data || ticketData;
-    const msgs   = (msgsData.data || []).filter(m => m.type === 'chat' && m.text);
 
     // Busca contato
     let contact = null;
@@ -32,6 +23,41 @@ export default async function handler(req, res) {
         if (cr.ok) { const cd = await cr.json(); contact = cd.data || cd; }
       } catch(e) {}
     }
+
+    // Busca todas as mensagens do ticket paginando
+    // A API retorna mensagens misturadas — filtramos pelo ticketId de cada mensagem
+    const allMsgs = [];
+    let page = 1;
+    let hasMore = true;
+
+    while (hasMore && page <= 20) { // máx 20 páginas = 2000 mensagens
+      const r = await fetch(
+        `https://outtax.digisac.me/api/v1/messages?ticketId=${ticketId}&limit=100&page=${page}`,
+        { headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` } }
+      );
+      const d = await r.json();
+      const msgs = d.data || [];
+
+      // Filtra apenas mensagens deste ticket
+      const filtradas = msgs.filter(m =>
+        m.ticketId === ticketId &&
+        m.type === 'chat' &&
+        m.text &&
+        m.text.trim()
+      );
+
+      allMsgs.push(...filtradas);
+
+      // Se retornou menos que o limite, chegou ao fim
+      if (msgs.length < 100) {
+        hasMore = false;
+      } else {
+        page++;
+      }
+    }
+
+    // Ordena por data crescente
+    allMsgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
     return res.status(200).json({
       ticket: {
@@ -46,7 +72,7 @@ export default async function handler(req, res) {
         name: contact.name || contact.pushname || null,
         number: contact.number || null,
       } : null,
-      messages: msgs.map(m => ({
+      messages: allMsgs.map(m => ({
         id: m.id,
         isFromMe: m.isFromMe,
         text: m.text || '',
@@ -54,7 +80,7 @@ export default async function handler(req, res) {
         createdAt: m.createdAt,
         userId: m.userId,
       })),
-      total: msgs.length,
+      total: allMsgs.length,
     });
 
   } catch (error) {
