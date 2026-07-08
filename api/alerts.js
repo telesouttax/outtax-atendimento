@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   try {
-    const { tipo, protocol, departmentName, contactName, minutesOpen, nivel, contactId, ticketId } = req.body;
+    const { tipo, protocol, departmentName, contactName, contactNumber, minutesOpen, nivel, contactId, ticketId } = req.body;
     const webhookUrl = process.env.GOOGLE_CHAT_WEBHOOK;
 
     const fmtMin = m => m < 60 ? `${m}min` : `${Math.floor(m/60)}h${m%60 > 0 ? ` ${m%60}min` : ''}`;
@@ -34,11 +34,12 @@ export default async function handler(req, res) {
             { keyValue: { topLabel: 'Setor', content: departmentName, icon: 'DESCRIPTION' } },
             { keyValue: { topLabel: 'Protocolo', content: protocol || '—', icon: 'TICKET' } },
             { keyValue: { topLabel: 'Tempo sem resposta', content: fmtMin(minutesOpen), icon: 'CLOCK' } },
+            { keyValue: { topLabel: '🔢 Nº para buscar no chat', content: contactNumber || contactId || '—', icon: 'PHONE' } },
             { textParagraph: { text: descricao } },
             { buttons: [
               { textButton: { text: '📊 Dashboard', onClick: { openLink: { url: 'https://outtax-atendimento.vercel.app' } } } },
               { textButton: { text: '📋 Histórico', onClick: { openLink: { url: `https://outtax.digisac.me/ticket-history/contacts/${contactId || ''}/true` } } } },
-              { textButton: { text: '💬 Conversa', onClick: { openLink: { url: `https://outtax.digisac.me/ticket-history/contacts/${contactId || ''}/true` } } } }
+              { textButton: { text: '💬 Abrir DIGISAC', onClick: { openLink: { url: 'https://outtax.digisac.me' } } } }
             ] }
           ]
         }]
