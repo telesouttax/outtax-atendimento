@@ -1273,8 +1273,10 @@ function renderExportar() {
   listaEl.innerHTML = list.length ? list.map(t => {
     const dept = DEPTS[t.departmentId] || { name: 'Sem setor', cor: CORES[0] };
     const cor = dept.cor;
-    const cliNomeExp = t.contact ? (t.contact.name || t.contact.number || '—') : '—';
-    const cliIniExp  = ini(cliNomeExp !== '—' ? cliNomeExp : dept.name);
+    const cliNomeExp = t.contact
+      ? (t.contact.name && t.contact.name !== t.contact.number ? t.contact.name : t.contact.number || '—')
+      : '—';
+    const cliIniExp = cliNomeExp !== '—' ? ini(cliNomeExp) : ini(dept.name);
     return `<div class="exp-item${expSelId===t.id?' sel':''}" onclick="selecionarExportar('${t.id}')">
       <div class="exp-av" style="background:${cor.bg};color:${cor.fg};">${cliIniExp}</div>
       <div style="flex:1;min-width:0;">
