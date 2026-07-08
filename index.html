@@ -1239,7 +1239,7 @@ async function carregarExportar(page) {
   try {
     const r = await fetch('/api/history?limit=30&page='+page);
     const d = await r.json();
-    EXP_TICKETS = d.data || [];
+    EXP_TICKETS = (d.data || []).sort((a,b) => new Date(b.startedAt) - new Date(a.startedAt));
     expTotal = d.total || 0;
     if(Object.keys(DEPTS).length === 0) {
       const dr = await fetch('/api/departments');
