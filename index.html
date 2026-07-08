@@ -859,7 +859,10 @@ function renderAtendimento() {
     const agenteNome = t.agent ? (t.agent.name||'Atribuído') : null;
     return `<tr class="${selAtend===t.id?'sel':''}" onclick="pickAtend('${t.id}')">
       <td style="padding-left:20px;"><div class="td-cl"><div class="td-av" style="background:${cor.bg};color:${cor.fg};">${cliIni}</div><div><div class="td-name">${cliNome}</div><div class="td-sub">${cliTel||dept.name}</div></div></div></td>
-      <td><span class="bdg b-gray"><span style="width:6px;height:6px;border-radius:50%;background:${cor.dot};display:inline-block;margin-right:4px;flex-shrink:0;"></span>${dept.name}</span></td>
+      <td>
+        <span class="bdg b-gray"><span style="width:6px;height:6px;border-radius:50%;background:${cor.dot};display:inline-block;margin-right:4px;flex-shrink:0;"></span>${dept.name}</span>
+        ${cliTel ? `<div style="font-size:10px;color:var(--t4);margin-top:3px;font-family:'JetBrains Mono',monospace;">${cliTel}</div>` : ''}
+      </td>
       <td><span class="td-id">${t.protocol||'—'}</span></td>
       <td>${agenteNome ? `<span class="bdg b-grn">${agenteNome}</span>` : '<span class="bdg b-amb">Sem agente</span>'}</td>
       <td>${t.origin==='manual' ? '<span class="bdg b-blue">Manual</span>' : '<span class="bdg b-gray">Auto</span>'}</td>
@@ -1270,12 +1273,12 @@ function renderExportar() {
   listaEl.innerHTML = list.length ? list.map(t => {
     const dept = DEPTS[t.departmentId] || { name: 'Sem setor', cor: CORES[0] };
     const cor = dept.cor;
-    const cliNomeExp = t.contact ? (t.contact.name || t.contact.number || '—') : dept.name;
-    const cliNumExp  = t.contact?.number || '';
+    const cliNomeExp = t.contact ? (t.contact.name || t.contact.number || '—') : '—';
+    const cliIniExp  = ini(cliNomeExp !== '—' ? cliNomeExp : dept.name);
     return `<div class="exp-item${expSelId===t.id?' sel':''}" onclick="selecionarExportar('${t.id}')">
-      <div class="exp-av" style="background:${cor.bg};color:${cor.fg};">${ini(cliNomeExp)}</div>
+      <div class="exp-av" style="background:${cor.bg};color:${cor.fg};">${cliIniExp}</div>
       <div style="flex:1;min-width:0;">
-        <div class="exp-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;">${cliNomeExp}</div>
+        <div class="exp-name" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${cliNomeExp}</div>
         <div class="exp-sub">${dept.name} · ${t.isOpen ? '🟢 Aberto' : '⚫ Encerrado'}</div>
       </div>
       <div class="exp-right"><div class="exp-proto">${t.protocol||'—'}</div><div class="exp-time" style="color:${t.isOpen?'var(--grn)':'var(--t4)'}">${fmtDate(t.startedAt)}</div></div>
