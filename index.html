@@ -1306,7 +1306,7 @@ async function selecionarExportar(id) {
     const r = await fetch('/api/export?ticketId='+id);
     const d = await r.json();
     const dept = DEPTS[d.ticket?.departmentId] || { name: 'Sem setor', cor: CORES[0] };
-    const cliNome = d.contact?.name || 'Sem nome';
+    const cliNome = d.contact?.name || d.contact?.number || 'Sem nome';
     const cliNum  = d.contact?.number || '—';
     const msgs = (d.messages || []).filter(m => m.text && m.text.trim());
     // Tenta pegar nome do contato da lista de tickets
@@ -1343,7 +1343,7 @@ async function exportarPDF(ticketId) {
     const r = await fetch('/api/export?ticketId='+ticketId);
     const d = await r.json();
     const dept = DEPTS[d.ticket?.departmentId] || { name: 'Sem setor' };
-    const cliNome = d.contact?.name || 'Sem nome';
+    const cliNome = d.contact?.name || d.contact?.number || 'Sem nome';
     const cliNum  = d.contact?.number || '—';
     const msgs = (d.messages || []).filter(m => m.text && m.text.trim());
     const fmtD = s => s ? new Date(s).toLocaleString('pt-BR') : '—';
