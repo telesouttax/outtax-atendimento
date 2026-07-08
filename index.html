@@ -257,6 +257,10 @@ tbody td{padding:12px 16px;vertical-align:middle;}
 .t-hot{background:var(--reds);color:var(--red);border-color:var(--redb);}
 .t-cli{background:rgba(139,92,246,0.12);color:#a78bfa;border-color:rgba(139,92,246,0.3);}
 .tbar-mini{height:3px;background:var(--bor);border-radius:2px;overflow:hidden;width:80px;margin-bottom:5px;}
+.btn-gc{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1px solid rgba(255,142,42,0.4);background:rgba(255,142,42,0.1);color:var(--acc);cursor:pointer;transition:all 0.15s;white-space:nowrap;font-family:'Inter',sans-serif;}
+.btn-gc:hover{background:var(--acc);color:#fff;border-color:var(--acc);}
+.btn-gc.sent{background:rgba(0,214,143,0.1);color:var(--grn);border-color:rgba(0,214,143,0.4);}
+.btn-gc.loading{opacity:0.5;cursor:default;}
 .tbar-mini-f{height:100%;border-radius:2px;}
 
 /* ── PERFIL ── */
@@ -500,7 +504,7 @@ tbody td{padding:12px 16px;vertical-align:middle;}
               </div>
             </div>
             <div class="tbl-wrap"><table>
-              <thead><tr><th style="padding-left:20px;">Cliente</th><th>Departamento</th><th>Protocolo</th><th>Agente</th><th>Origem</th><th>Tempo aberto</th></tr></thead>
+              <thead><tr><th style="padding-left:20px;">Cliente</th><th>Departamento</th><th>Protocolo</th><th>Agente</th><th>Origem</th><th>Tempo aberto</th><th>Alerta</th></tr></thead>
               <tbody id="tbody-atend"></tbody>
             </table></div>
           </div>
@@ -804,6 +808,7 @@ function renderAtendimento() {
       <td>${agenteNome ? `<span class="bdg b-grn">${agenteNome}</span>` : '<span class="bdg b-amb">Sem agente</span>'}</td>
       <td>${t.origin==='manual' ? '<span class="bdg b-blue">Manual</span>' : '<span class="bdg b-gray">Auto</span>'}</td>
       <td><div class="tbar-mini"><div class="tbar-mini-f" style="width:${pct(minAberto)}%;background:${corHex(minAberto)};"></div></div><span class="tbdg ${tcls}">${fmt(minAberto)}</span></td>
+      <td><button class="btn-gc" id="gc-${t.id}" onclick="dispararGCManual('${t.id}',this)">📢 GC</button></td>
     </tr>`;
   }).join('') : `<tr><td colspan="6" style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum chamado aberto no momento.</td></tr>`;
 
@@ -1216,6 +1221,65 @@ async function carregarApiStats() {
       <div class="cfg-row"><span class="cfg-k">TMA geral</span><span class="cfg-v">${fmt(d.tmaMedia||0)}</span></div>
       <div class="cfg-row"><span class="cfg-k">Última atualização</span><span class="cfg-v cfg-mono">${new Date().toLocaleTimeString('pt-BR')}</span></div>`;
   } catch(e) {}
+}
+
+// ── DISPARAR ALERTA MANUAL GOOGLE CHAT ──
+async function dispararGCManual(ticketId, btn) {
+  const t = TICKETS.find(x => x.id === ticketId);
+  if(!t) return;
+
+  btn.textContent = '⏳';
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  const dept = DEPTS[t.departmentId] || { name: 'Sem setor' };
+  const contactName = t.contact ? (t.contact.name || t.contact.number || 'Sem nome') : 'Sem nome';
+  const minAberto = tempoMin(t.startedAt);
+
+  // Descobre quem foi o último a falar
+  let tipo = 'time_sem_resposta';
+  try {
+    const mr = await fetch(`/api/messages?ticketId=${t.id}${t.lastMessageId ? '&lastMessageId='+t.lastMessageId : ''}`);
+    const md = await mr.json();
+    const msgs = md.data || [];
+    if(msgs.length > 0) {
+      const ultima = msgs[msgs.length-1];
+      tipo = ultima.isFromMe === true ? 'cliente_sem_resposta' : 'time_sem_resposta';
+    }
+  } catch(e) {}
+
+  try {
+    const r = await fetch('/api/alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo,
+        ticketId: t.id,
+        contactId: t.contactId,
+        contactNumber: t.contact?.number || null,
+        protocol: t.protocol,
+        departmentName: dept.name,
+        contactName,
+        minutesOpen: minAberto,
+        nivel: 1
+      })
+    });
+    const d = await r.json();
+    if(d.ok) {
+      btn.textContent = '✓ Enviado';
+      btn.classList.remove('loading');
+      btn.classList.add('sent');
+      setTimeout(() => {
+        btn.textContent = '📢 GC';
+        btn.classList.remove('sent');
+        btn.disabled = false;
+      }, 3000);
+    }
+  } catch(e) {
+    btn.textContent = '❌';
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
 }
 
 // ── ABRIR CONVERSA DIGISAC ──
