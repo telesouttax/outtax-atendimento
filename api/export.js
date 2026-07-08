@@ -72,7 +72,7 @@ export default async function handler(req, res) {
       } : null,
       contact: contact ? {
         id: resolvedContactId,
-        name: contact.name || contact.pushname || null,
+        name: contact.name || contact.pushname || contact.alternativeName || contact.number || null,
         number: contact.number || null,
       } : null,
       messages: allMsgs.map(m => ({
