@@ -110,7 +110,7 @@ input,textarea,select{user-select:text;-webkit-user-select:text;}
 .main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;margin-left:64px;transition:margin-left 0.28s cubic-bezier(0.4,0,0.2,1);}
 
 /* ── TOPBAR ── */
-.topbar{position:relative;z-index:500;
+.topbar{
   height:68px;flex-shrink:0;
   background:rgba(14,25,48,0.72);backdrop-filter:blur(14px);border-bottom:1px solid var(--bor);
   display:flex;align-items:center;padding:0 28px;gap:14px;
@@ -125,13 +125,13 @@ input,textarea,select{user-select:text;-webkit-user-select:text;}
 .tb-clock{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--t2);background:var(--glass);border:1px solid var(--bor2);padding:6px 14px;border-radius:var(--r);}
 
 /* SINO */
-.alert-wrap{position:relative;z-index:9999;}
+.alert-wrap{position:relative;}
 .alert-btn{width:38px;height:38px;border-radius:var(--r);border:1px solid var(--bor2);background:var(--glass);color:var(--t3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all 0.15s;position:relative;}
 .alert-btn:hover{background:var(--glass2);color:var(--t1);}
 .alert-btn.has-alert{border-color:rgba(255,77,77,0.4);background:rgba(255,77,77,0.1);color:var(--red);animation:ring 2s ease-in-out infinite;}
 @keyframes ring{0%,100%{transform:rotate(0);}10%{transform:rotate(-12deg);}20%{transform:rotate(12deg);}30%{transform:rotate(-8deg);}40%{transform:rotate(8deg);}50%{transform:rotate(0);}}
 .alert-cnt{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:9px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid var(--bg2);}
-.alert-panel{position:absolute;top:calc(100% + 10px);right:0;width:390px;background:var(--bg2);border-radius:var(--rl);box-shadow:0 20px 60px rgba(0,0,0,0.4);border:1px solid var(--bor2);z-index:9999;display:none;overflow:hidden;}
+.alert-panel{position:absolute;top:calc(100% + 10px);right:0;width:390px;background:var(--bg2);border-radius:var(--rl);box-shadow:0 20px 60px rgba(0,0,0,0.4);border:1px solid var(--bor2);z-index:500;display:none;overflow:hidden;}
 .alert-panel.open{display:block;}
 .alert-ph{padding:14px 18px;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;background:var(--bg3);}
 .alert-title{font-size:13px;font-weight:700;color:var(--t1);}
@@ -257,10 +257,6 @@ tbody td{padding:12px 16px;vertical-align:middle;}
 .t-hot{background:var(--reds);color:var(--red);border-color:var(--redb);}
 .t-cli{background:rgba(139,92,246,0.12);color:#a78bfa;border-color:rgba(139,92,246,0.3);}
 .tbar-mini{height:3px;background:var(--bor);border-radius:2px;overflow:hidden;width:80px;margin-bottom:5px;}
-.btn-gc{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1px solid rgba(255,142,42,0.4);background:rgba(255,142,42,0.1);color:var(--acc);cursor:pointer;transition:all 0.15s;white-space:nowrap;font-family:'Inter',sans-serif;}
-.btn-gc:hover{background:var(--acc);color:#fff;border-color:var(--acc);}
-.btn-gc.sent{background:rgba(0,214,143,0.1);color:var(--grn);border-color:rgba(0,214,143,0.4);}
-.btn-gc.loading{opacity:0.5;cursor:default;}
 .tbar-mini-f{height:100%;border-radius:2px;}
 
 /* ── PERFIL ── */
@@ -384,7 +380,6 @@ tbody td{padding:12px 16px;vertical-align:middle;}
 
 /* ── EXPORTAR ── */
 .exp-grid{display:grid;grid-template-columns:1fr 380px;gap:18px;align-items:start;}
-.exp-lista{background:var(--bg2);border-radius:var(--rl);border:1px solid var(--bor);overflow:hidden;}
 .exp-item{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--bor);cursor:pointer;transition:all 0.12s;}
 .exp-item:hover{background:var(--glass);}
 .exp-item:last-child{border-bottom:none;}
@@ -395,28 +390,25 @@ tbody td{padding:12px 16px;vertical-align:middle;}
 .exp-right{margin-left:auto;text-align:right;}
 .exp-proto{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t4);}
 .exp-time{font-size:11px;font-weight:700;margin-top:2px;}
-
-.exp-preview{background:var(--bg2);border-radius:var(--rl);border:1px solid var(--bor);overflow:hidden;position:sticky;top:0;}
+.exp-preview{background:linear-gradient(160deg,rgba(20,31,57,0.86),rgba(13,23,44,0.86));border-radius:var(--rl);border:1px solid var(--bor);overflow:hidden;position:sticky;top:0;}
 .exp-preview-empty{padding:60px 24px;text-align:center;}
 .exp-preview-head{padding:18px 20px;border-bottom:1px solid var(--bor);display:flex;align-items:center;justify-content:space-between;}
-.exp-preview-title{font-size:14px;font-weight:800;color:var(--t1);}
-.btn-export{display:flex;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;transition:all 0.15s;box-shadow:0 4px 12px rgba(255,142,42,0.3);}
+.exp-preview-title{font-size:14px;font-weight:800;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;}
+.btn-export{display:flex;align-items:center;gap:8px;padding:9px 18px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;border:none;border-radius:var(--r);cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;font-weight:700;transition:all 0.15s;box-shadow:0 4px 12px rgba(255,142,42,0.3);white-space:nowrap;}
 .btn-export:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,142,42,0.4);}
-.btn-export:disabled{opacity:0.5;cursor:default;transform:none;}
 .exp-msgs{max-height:500px;overflow-y:auto;padding:16px;}
 .exp-msg{margin-bottom:12px;display:flex;flex-direction:column;}
 .exp-msg.from-me{align-items:flex-end;}
 .exp-msg.from-client{align-items:flex-start;}
-.exp-bubble{max-width:85%;padding:9px 13px;border-radius:12px;font-size:12px;line-height:1.5;}
+.exp-bubble{max-width:85%;padding:9px 13px;border-radius:12px;font-size:12px;line-height:1.5;word-break:break-word;}
 .exp-msg.from-me .exp-bubble{background:rgba(40,81,153,0.3);color:var(--t1);border-radius:12px 2px 12px 12px;}
 .exp-msg.from-client .exp-bubble{background:var(--glass);color:var(--t1);border-radius:2px 12px 12px 12px;}
 .exp-msg-meta{font-size:10px;color:var(--t4);margin-top:3px;}
 .exp-info{padding:14px 18px;border-bottom:1px solid var(--bor);}
-.exp-info-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;}
+.exp-info-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:1px solid var(--bor);}
+.exp-info-row:last-child{border-bottom:none;}
 .exp-info-k{color:var(--t4);}
 .exp-info-v{font-weight:600;color:var(--t1);}
-
-@media(max-width:1100px){.exp-grid{grid-template-columns:1fr;}}
 
 @media(max-width:1100px){.grid2{grid-template-columns:1fr;}.metrics{grid-template-columns:repeat(2,1fr);}.scards{grid-template-columns:repeat(3,1fr);}.pizza-agentes-grid{grid-template-columns:1fr;}.rel-grid{grid-template-columns:1fr;}.cfg-grid{grid-template-columns:1fr;}}
 </style>
@@ -435,6 +427,7 @@ tbody td{padding:12px 16px;vertical-align:middle;}
     <div class="sb-item" onclick="navTo('chamados',this)"><span class="sb-ico"><img src="icons/chamados.png"></span><span class="sb-lbl">Chamados</span><span class="sb-bdg" id="sb-total">—</span></div>
     <div class="sb-item" onclick="navTo('clientes',this)"><span class="sb-ico"><img src="icons/clientes.png"></span><span class="sb-lbl">Clientes</span><span class="sb-bdg">330</span></div>
     <div class="sb-item" onclick="navTo('relatorios',this)"><span class="sb-ico"><img src="icons/relatorios.png"></span><span class="sb-lbl">Relatórios</span></div>
+    <div class="sb-item" onclick="navTo('exportar',this)"><span class="sb-ico">📤</span><span class="sb-lbl">Exportar</span></div>
     <div class="sb-div"></div>
     <div class="sb-sec-lbl">Setores</div>
     <div class="sb-setores" id="sb-setores">
@@ -540,7 +533,7 @@ tbody td{padding:12px 16px;vertical-align:middle;}
               </div>
             </div>
             <div class="tbl-wrap"><table>
-              <thead><tr><th style="padding-left:20px;">Cliente</th><th>Departamento</th><th>Protocolo</th><th>Agente</th><th>Origem</th><th>Tempo aberto</th><th>Alerta</th></tr></thead>
+              <thead><tr><th style="padding-left:20px;">Cliente</th><th>Departamento</th><th>Protocolo</th><th>Agente</th><th>Origem</th><th>Tempo aberto</th></tr></thead>
               <tbody id="tbody-atend"></tbody>
             </table></div>
           </div>
@@ -584,14 +577,14 @@ tbody td{padding:12px 16px;vertical-align:middle;}
 
     <!-- EXPORTAR -->
     <div class="page" id="page-exportar">
-      <div class="page-header"><h1>Exportar Conversa</h1><p>Selecione um chamado para exportar o histórico completo em PDF.</p></div>
+      <div class="page-header"><h1>Exportar Conversa</h1><p>Selecione um chamado para visualizar e exportar o histórico completo em PDF.</p></div>
       <div class="exp-grid">
         <div>
           <div class="card">
             <div class="card-head">
               <div style="display:flex;align-items:center;gap:10px;"><div class="card-title">Chamados</div><div class="card-cnt" id="exp-cnt">—</div></div>
               <div class="card-r">
-                <div class="srch"><span class="srch-ic">🔍</span><input type="text" placeholder="Buscar protocolo ou cliente…" oninput="filtrarExportar(this.value)" id="srch-exp"></div>
+                <div class="srch"><span class="srch-ic">🔍</span><input type="text" placeholder="Buscar protocolo…" oninput="filtrarExportar(this.value)"></div>
                 <button class="ib" onclick="iniciarExportar()" title="Atualizar">↻</button>
               </div>
             </div>
@@ -729,7 +722,7 @@ async function dispararAlertaGC(tipo, ticket, dept, contactName, minutesOpen, ni
     const r = await fetch('/api/alerts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tipo, ticketId: ticket.id, contactId: ticket.contactId, contactNumber: ticket.contact?.number || null, protocol: ticket.protocol, departmentName: dept.name, contactName, minutesOpen, nivel })
+      body: JSON.stringify({ tipo, ticketId: ticket.id, protocol: ticket.protocol, departmentName: dept.name, contactName, minutesOpen, nivel })
     });
     const d = await r.json();
     return d.ok === true;
@@ -746,16 +739,15 @@ async function verificarAlertas() {
     let minSemResp = tempoMin(t.startedAt);
 
     try {
-      const lastMsgId = t.lastMessageId;
-      const mr = await fetch(`/api/messages?ticketId=${t.id}${lastMsgId ? '&lastMessageId='+lastMsgId : ''}`);
+      const mr = await fetch(`/api/messages?ticketId=${t.id}`);
       const md = await mr.json();
       const msgs = md.data || [];
       if(msgs.length > 0) {
         const ultima = msgs[msgs.length-1];
         const ultimaAt = new Date(ultima.createdAt||ultima.timestamp);
         minSemResp = Math.floor((Date.now()-ultimaAt.getTime())/60000);
-        foiCliente = ultima.isFromMe === false;
-        foiTime    = ultima.isFromMe === true;
+        foiCliente = ultima.fromMe===false || ultima.direction==='inbound';
+        foiTime    = ultima.fromMe===true  || ultima.direction==='outbound';
       }
     } catch(e) {}
 
@@ -872,7 +864,6 @@ function renderAtendimento() {
       <td>${agenteNome ? `<span class="bdg b-grn">${agenteNome}</span>` : '<span class="bdg b-amb">Sem agente</span>'}</td>
       <td>${t.origin==='manual' ? '<span class="bdg b-blue">Manual</span>' : '<span class="bdg b-gray">Auto</span>'}</td>
       <td><div class="tbar-mini"><div class="tbar-mini-f" style="width:${pct(minAberto)}%;background:${corHex(minAberto)};"></div></div><span class="tbdg ${tcls}">${fmt(minAberto)}</span></td>
-      <td><button class="btn-gc" id="gc-${t.id}" onclick="dispararGCManual('${t.id}',this)">📢 GC</button></td>
     </tr>`;
   }).join('') : `<tr><td colspan="6" style="padding:2.5rem;text-align:center;color:var(--t4);">Nenhum chamado aberto no momento.</td></tr>`;
 
@@ -1246,7 +1237,7 @@ async function iniciarExportar() {
 async function carregarExportar(page) {
   expPage = page;
   try {
-    const r = await fetch(`/api/history?limit=30&page=${page}`);
+    const r = await fetch('/api/history?limit=30&page='+page);
     const d = await r.json();
     EXP_TICKETS = d.data || [];
     expTotal = d.total || 0;
@@ -1264,32 +1255,23 @@ async function carregarExportar(page) {
 function filtrarExportar(v) { expBusca = v.toLowerCase(); renderExportar(); }
 
 function renderExportar() {
-  const list = EXP_TICKETS.filter(t =>
-    !expBusca ||
-    (t.protocol||'').toLowerCase().includes(expBusca)
-  );
-  document.getElementById('exp-cnt').textContent = expTotal.toLocaleString('pt-BR') + ' total';
-
-  document.getElementById('exp-lista').innerHTML = list.length ? list.map(t => {
+  const list = EXP_TICKETS.filter(t => !expBusca || (t.protocol||'').toLowerCase().includes(expBusca));
+  const cntEl = document.getElementById('exp-cnt');
+  if(cntEl) cntEl.textContent = expTotal.toLocaleString('pt-BR') + ' total';
+  const listaEl = document.getElementById('exp-lista');
+  if(!listaEl) return;
+  listaEl.innerHTML = list.length ? list.map(t => {
     const dept = DEPTS[t.departmentId] || { name: 'Sem setor', cor: CORES[0] };
     const cor = dept.cor;
-    const ini2 = ini(dept.name);
-    const minAberto = tempoMin(t.startedAt);
     return `<div class="exp-item${expSelId===t.id?' sel':''}" onclick="selecionarExportar('${t.id}')">
-      <div class="exp-av" style="background:${cor.bg};color:${cor.fg};">${ini2}</div>
-      <div>
-        <div class="exp-name">${dept.name}</div>
-        <div class="exp-sub">${t.isOpen ? '🟢 Aberto' : '⚫ Encerrado'}</div>
-      </div>
-      <div class="exp-right">
-        <div class="exp-proto">${t.protocol||'—'}</div>
-        <div class="exp-time" style="color:${t.isOpen?'var(--grn)':'var(--t4);'}">${fmtDate(t.startedAt)}</div>
-      </div>
+      <div class="exp-av" style="background:${cor.bg};color:${cor.fg};">${ini(dept.name)}</div>
+      <div><div class="exp-name">${dept.name}</div><div class="exp-sub">${t.isOpen ? '🟢 Aberto' : '⚫ Encerrado'}</div></div>
+      <div class="exp-right"><div class="exp-proto">${t.protocol||'—'}</div><div class="exp-time" style="color:${t.isOpen?'var(--grn)':'var(--t4)'}">${fmtDate(t.startedAt)}</div></div>
     </div>`;
   }).join('') : '<div style="padding:2rem;text-align:center;color:var(--t4);">Nenhum chamado encontrado.</div>';
-
   const lastPage = Math.ceil(expTotal/30);
-  document.getElementById('pag-exp').innerHTML = `
+  const pagEl = document.getElementById('pag-exp');
+  if(pagEl) pagEl.innerHTML = `
     <span>${((expPage-1)*30)+1}–${Math.min(expPage*30,expTotal)} de ${expTotal.toLocaleString('pt-BR')}</span>
     <div class="pag-btns">
       <button class="pag-btn" onclick="carregarExportar(${expPage-1})" ${expPage<=1?'disabled':''}>← Anterior</button>
@@ -1303,18 +1285,13 @@ async function selecionarExportar(id) {
   renderExportar();
   const preview = document.getElementById('exp-preview');
   preview.innerHTML = '<div class="loading"><span class="spin"></span>Carregando conversa…</div>';
-
   try {
-    const r = await fetch(`/api/export?ticketId=${id}`);
+    const r = await fetch('/api/export?ticketId='+id);
     const d = await r.json();
     const dept = DEPTS[d.ticket?.departmentId] || { name: 'Sem setor', cor: CORES[0] };
-    const cor = dept.cor;
     const cliNome = d.contact?.name || 'Sem nome';
     const cliNum  = d.contact?.number || '—';
-    const fmtMin2 = m => m < 60 ? m+'min' : Math.floor(m/60)+'h'+(m%60?' '+m%60+'min':'');
-
     const msgs = (d.messages || []).filter(m => m.text && m.text.trim());
-
     preview.innerHTML = `
       <div class="exp-preview-head">
         <div class="exp-preview-title">📋 ${cliNome}</div>
@@ -1325,20 +1302,16 @@ async function selecionarExportar(id) {
         <div class="exp-info-row"><span class="exp-info-k">Departamento</span><span class="exp-info-v">${dept.name}</span></div>
         <div class="exp-info-row"><span class="exp-info-k">Telefone</span><span class="exp-info-v" style="font-family:monospace;">${cliNum}</span></div>
         <div class="exp-info-row"><span class="exp-info-k">Abertura</span><span class="exp-info-v">${fmtDate(d.ticket?.startedAt)}</span></div>
-        <div class="exp-info-row"><span class="exp-info-k">Encerramento</span><span class="exp-info-v">${d.ticket?.endedAt ? fmtDate(d.ticket.endedAt) : 'Em aberto'}</span></div>
+        <div class="exp-info-row"><span class="exp-info-k">Encerramento</span><span class="exp-info-v">${d.ticket?.endedAt?fmtDate(d.ticket.endedAt):'Em aberto'}</span></div>
         <div class="exp-info-row"><span class="exp-info-k">Mensagens</span><span class="exp-info-v">${msgs.length}</span></div>
       </div>
-      <div class="exp-msgs" id="exp-msgs-${id}">
+      <div class="exp-msgs">
         ${msgs.length ? msgs.slice(-50).map(m => {
           const hora = new Date(m.createdAt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
           const data = new Date(m.createdAt).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-          return `<div class="exp-msg ${m.isFromMe?'from-me':'from-client'}">
-            <div class="exp-bubble">${m.text}</div>
-            <div class="exp-msg-meta">${m.isFromMe?'🏢 Time':'👤 Cliente'} · ${data} ${hora}</div>
-          </div>`;
+          return '<div class="exp-msg '+(m.isFromMe?'from-me':'from-client')+'"><div class="exp-bubble">'+m.text+'</div><div class="exp-msg-meta">'+(m.isFromMe?'🏢 Time':'👤 Cliente')+' · '+data+' '+hora+'</div></div>';
         }).join('') : '<div style="text-align:center;color:var(--t4);padding:2rem;">Sem mensagens de texto neste chamado.</div>'}
       </div>`;
-
   } catch(e) {
     preview.innerHTML = '<div class="err">Erro ao carregar conversa.</div>';
   }
@@ -1346,85 +1319,23 @@ async function selecionarExportar(id) {
 
 async function exportarPDF(ticketId) {
   try {
-    const r = await fetch(`/api/export?ticketId=${ticketId}`);
+    const r = await fetch('/api/export?ticketId='+ticketId);
     const d = await r.json();
     const dept = DEPTS[d.ticket?.departmentId] || { name: 'Sem setor' };
     const cliNome = d.contact?.name || 'Sem nome';
     const cliNum  = d.contact?.number || '—';
     const msgs = (d.messages || []).filter(m => m.text && m.text.trim());
-
     const fmtD = s => s ? new Date(s).toLocaleString('pt-BR') : '—';
-
-    const html = `<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Conversa - ${d.ticket?.protocol}</title>
-<style>
-  body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f5f5f5;color:#1a1a1a;}
-  .header{background:#152c6b;color:#fff;padding:24px 32px;display:flex;align-items:center;justify-content:space-between;}
-  .header-logo{font-size:22px;font-weight:900;letter-spacing:-0.5px;}
-  .header-logo em{color:#FF8E2A;font-style:normal;}
-  .header-sub{font-size:12px;opacity:0.6;margin-top:2px;}
-  .header-proto{font-size:13px;font-family:monospace;background:rgba(255,255,255,0.1);padding:6px 14px;border-radius:6px;}
-  .info{background:#fff;margin:20px 32px;border-radius:10px;padding:20px 24px;border:1px solid #e5e7eb;}
-  .info-title{font-size:14px;font-weight:700;color:#152c6b;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #FF8E2A;}
-  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .info-row{display:flex;flex-direction:column;}
-  .info-k{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:#9ca3af;margin-bottom:2px;}
-  .info-v{font-size:13px;font-weight:600;color:#1a1a1a;}
-  .msgs-wrap{margin:0 32px 32px;background:#fff;border-radius:10px;border:1px solid #e5e7eb;overflow:hidden;}
-  .msgs-title{font-size:14px;font-weight:700;color:#152c6b;padding:16px 20px;border-bottom:1px solid #e5e7eb;background:#f8faff;}
-  .msgs-body{padding:20px;}
-  .msg{margin-bottom:16px;display:flex;flex-direction:column;}
-  .msg.me{align-items:flex-end;}
-  .msg.cli{align-items:flex-start;}
-  .bubble{max-width:75%;padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.6;word-break:break-word;}
-  .msg.me .bubble{background:#e8f0fe;color:#1a1a1a;border-radius:12px 2px 12px 12px;}
-  .msg.cli .bubble{background:#f3f4f6;color:#1a1a1a;border-radius:2px 12px 12px 12px;}
-  .meta{font-size:10px;color:#9ca3af;margin-top:4px;}
-  .footer{text-align:center;padding:16px;font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb;margin:0 32px;}
-  @media print{body{background:#fff;}.info,.msgs-wrap{margin:10px 16px;}}
-</style>
-</head>
-<body>
-<div class="header">
-  <div><div class="header-logo">OUT<em>TAX</em> Gestão Contábil</div><div class="header-sub">Exportação de conversa · ${new Date().toLocaleString('pt-BR')}</div></div>
-  <div class="header-proto">${d.ticket?.protocol||'—'}</div>
-</div>
-<div class="info">
-  <div class="info-title">📋 Informações do chamado</div>
-  <div class="info-grid">
-    <div class="info-row"><span class="info-k">Cliente</span><span class="info-v">${cliNome}</span></div>
-    <div class="info-row"><span class="info-k">Telefone</span><span class="info-v">${cliNum}</span></div>
-    <div class="info-row"><span class="info-k">Departamento</span><span class="info-v">${dept.name}</span></div>
-    <div class="info-row"><span class="info-k">Protocolo</span><span class="info-v">${d.ticket?.protocol||'—'}</span></div>
-    <div class="info-row"><span class="info-k">Abertura</span><span class="info-v">${fmtD(d.ticket?.startedAt)}</span></div>
-    <div class="info-row"><span class="info-k">Encerramento</span><span class="info-v">${d.ticket?.endedAt ? fmtD(d.ticket.endedAt) : 'Em aberto'}</span></div>
-    <div class="info-row"><span class="info-k">Total de mensagens</span><span class="info-v">${msgs.length}</span></div>
-    <div class="info-row"><span class="info-k">Status</span><span class="info-v">${d.ticket?.endedAt ? 'Encerrado' : 'Em aberto'}</span></div>
-  </div>
-</div>
-<div class="msgs-wrap">
-  <div class="msgs-title">💬 Histórico de mensagens (${msgs.length})</div>
-  <div class="msgs-body">
-    ${msgs.map(m => {
+    const msgsHtml = msgs.map(m => {
       const dt = new Date(m.createdAt).toLocaleString('pt-BR');
-      return `<div class="msg ${m.isFromMe?'me':'cli'}">
-        <div class="bubble">${m.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-        <div class="meta">${m.isFromMe?'🏢 Time · OUTTAX':'👤 Cliente · '+cliNome} · ${dt}</div>
-      </div>`;
-    }).join('')}
-  </div>
-</div>
-<div class="footer">Documento gerado pelo Dashboard OUTTAX · ${new Date().toLocaleString('pt-BR')}</div>
-<scr' + 'ipt>window.onload = () => window.print();</scr' + 'ipt>
-</body>
-</html>`;
-
+      const txt = m.text.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return '<div class="msg '+(m.isFromMe?'me':'cli')+'"><div class="bubble">'+txt+'</div><div class="meta">'+(m.isFromMe?'🏢 Time · OUTTAX':'👤 Cliente · '+cliNome)+' · '+dt+'</div></div>';
+    }).join('');
+    const scriptTag = '<scr'+'ipt>window.onload=()=>window.print();</scr'+'ipt>';
+    const html = '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Conversa - '+d.ticket?.protocol+'</title><style>body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f5f5f5;color:#1a1a1a;}.header{background:#152c6b;color:#fff;padding:24px 32px;display:flex;align-items:center;justify-content:space-between;}.header-logo{font-size:22px;font-weight:900;}.header-logo em{color:#FF8E2A;font-style:normal;}.header-sub{font-size:12px;opacity:0.6;margin-top:2px;}.header-proto{font-size:13px;font-family:monospace;background:rgba(255,255,255,0.1);padding:6px 14px;border-radius:6px;}.info{background:#fff;margin:20px 32px;border-radius:10px;padding:20px 24px;border:1px solid #e5e7eb;}.info-title{font-size:14px;font-weight:700;color:#152c6b;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #FF8E2A;}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}.info-row{display:flex;flex-direction:column;}.info-k{font-size:10px;font-weight:600;text-transform:uppercase;color:#9ca3af;margin-bottom:2px;}.info-v{font-size:13px;font-weight:600;}.msgs-wrap{margin:0 32px 32px;background:#fff;border-radius:10px;border:1px solid #e5e7eb;overflow:hidden;}.msgs-title{font-size:14px;font-weight:700;color:#152c6b;padding:16px 20px;border-bottom:1px solid #e5e7eb;background:#f8faff;}.msgs-body{padding:20px;}.msg{margin-bottom:16px;display:flex;flex-direction:column;}.msg.me{align-items:flex-end;}.msg.cli{align-items:flex-start;}.bubble{max-width:75%;padding:10px 14px;border-radius:12px;font-size:12px;line-height:1.6;word-break:break-word;}.msg.me .bubble{background:#e8f0fe;border-radius:12px 2px 12px 12px;}.msg.cli .bubble{background:#f3f4f6;border-radius:2px 12px 12px 12px;}.meta{font-size:10px;color:#9ca3af;margin-top:4px;}.footer{text-align:center;padding:16px;font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb;margin:0 32px;}@media print{body{background:#fff;}}</style></head><body><div class="header"><div><div class="header-logo">OUT<em>TAX</em> Gestão Contábil</div><div class="header-sub">Exportação de conversa · '+new Date().toLocaleString('pt-BR')+'</div></div><div class="header-proto">'+(d.ticket?.protocol||'—')+'</div></div><div class="info"><div class="info-title">📋 Informações do chamado</div><div class="info-grid"><div class="info-row"><span class="info-k">Cliente</span><span class="info-v">'+cliNome+'</span></div><div class="info-row"><span class="info-k">Telefone</span><span class="info-v">'+cliNum+'</span></div><div class="info-row"><span class="info-k">Departamento</span><span class="info-v">'+dept.name+'</span></div><div class="info-row"><span class="info-k">Protocolo</span><span class="info-v">'+(d.ticket?.protocol||'—')+'</span></div><div class="info-row"><span class="info-k">Abertura</span><span class="info-v">'+fmtD(d.ticket?.startedAt)+'</span></div><div class="info-row"><span class="info-k">Encerramento</span><span class="info-v">'+(d.ticket?.endedAt?fmtD(d.ticket.endedAt):'Em aberto')+'</span></div><div class="info-row"><span class="info-k">Mensagens</span><span class="info-v">'+msgs.length+'</span></div><div class="info-row"><span class="info-k">Status</span><span class="info-v">'+(d.ticket?.endedAt?'Encerrado':'Em aberto')+'</span></div></div></div><div class="msgs-wrap"><div class="msgs-title">💬 Histórico de mensagens ('+msgs.length+')</div><div class="msgs-body">'+msgsHtml+'</div></div><div class="footer">Documento gerado pelo Dashboard OUTTAX · '+new Date().toLocaleString('pt-BR')+'</div>'+scriptTag+'</body></html>';
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
-    const win = window.open(url, '_blank');
+    window.open(url, '_blank');
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   } catch(e) {
     alert('Erro ao gerar PDF: ' + e.message);
@@ -1482,67 +1393,6 @@ async function carregarApiStats() {
       <div class="cfg-row"><span class="cfg-k">TMA geral</span><span class="cfg-v">${fmt(d.tmaMedia||0)}</span></div>
       <div class="cfg-row"><span class="cfg-k">Última atualização</span><span class="cfg-v cfg-mono">${new Date().toLocaleTimeString('pt-BR')}</span></div>`;
   } catch(e) {}
-}
-
-// ── DISPARAR ALERTA MANUAL GOOGLE CHAT ──
-async function dispararGCManual(ticketId, btn) {
-  const t = TICKETS.find(x => x.id === ticketId);
-  if(!t) return;
-
-  btn.textContent = '⏳';
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  const dept = DEPTS[t.departmentId] || { name: 'Sem setor' };
-  const contactName = t.contact ? (t.contact.name || t.contact.number || 'Sem nome') : 'Sem nome';
-  const minAberto = tempoMin(t.startedAt);
-
-  // Descobre quem foi o último a falar
-  let tipo = 'time_sem_resposta';
-  try {
-    const mr = await fetch(`/api/messages?ticketId=${t.id}${t.lastMessageId ? '&lastMessageId='+t.lastMessageId : ''}`);
-    const md = await mr.json();
-    const msgs = md.data || [];
-    if(msgs.length > 0) {
-      const ultima = msgs[msgs.length-1];
-      // isFromMe:true = time foi o último a falar → cliente não respondeu
-      // isFromMe:false = cliente foi o último a falar → time não respondeu
-      tipo = ultima.isFromMe === true ? 'cliente_sem_resposta' : 'time_sem_resposta';
-    }
-  } catch(e) {}
-
-  try {
-    const r = await fetch('/api/alerts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        tipo,
-        ticketId: t.id,
-        contactId: t.contactId,
-        contactNumber: t.contact?.number || null,
-        protocol: t.protocol,
-        departmentName: dept.name,
-        contactName,
-        minutesOpen: minAberto,
-        nivel: 1
-      })
-    });
-    const d = await r.json();
-    if(d.ok) {
-      btn.textContent = '✓ Enviado';
-      btn.classList.remove('loading');
-      btn.classList.add('sent');
-      setTimeout(() => {
-        btn.textContent = '📢 GC';
-        btn.classList.remove('sent');
-        btn.disabled = false;
-      }, 3000);
-    }
-  } catch(e) {
-    btn.textContent = '❌';
-    btn.classList.remove('loading');
-    btn.disabled = false;
-  }
 }
 
 // ── ABRIR CONVERSA DIGISAC ──
