@@ -6,14 +6,13 @@ export default async function handler(req, res) {
   if (!ticketId) return res.status(400).json({ error: 'ticketId obrigatório' });
 
   try {
-    // Busca dados do ticket e contato
+    // Busca ticket e contato
     const ticketRes = await fetch(`https://outtax.digisac.me/api/v1/tickets/${ticketId}`, {
       headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
     });
     const ticketData = await ticketRes.json();
     const ticket = ticketData.data || ticketData;
 
-    // Busca contato
     let contact = null;
     if (ticket.contactId) {
       try {
@@ -24,13 +23,12 @@ export default async function handler(req, res) {
       } catch(e) {}
     }
 
-    // Busca todas as mensagens do ticket paginando
-    // A API retorna mensagens misturadas — filtramos pelo ticketId de cada mensagem
+    // Busca mensagens — sem filtrar por ticketId (campo não existe na resposta)
+    // A API já filtra pelo ticketId na query string
     const allMsgs = [];
     let page = 1;
-    let hasMore = true;
 
-    while (hasMore && page <= 20) { // máx 20 páginas = 2000 mensagens
+    while (page <= 20) {
       const r = await fetch(
         `https://outtax.digisac.me/api/v1/messages?ticketId=${ticketId}&limit=100&page=${page}`,
         { headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` } }
@@ -38,25 +36,14 @@ export default async function handler(req, res) {
       const d = await r.json();
       const msgs = d.data || [];
 
-      // Filtra apenas mensagens deste ticket
-      const filtradas = msgs.filter(m =>
-        m.ticketId === ticketId &&
-        m.type === 'chat' &&
-        m.text &&
-        m.text.trim()
-      );
+      // Aceita qualquer mensagem com texto, sem filtrar por ticketId
+      const comTexto = msgs.filter(m => m.text && m.text.trim() && m.type !== 'system');
+      allMsgs.push(...comTexto);
 
-      allMsgs.push(...filtradas);
-
-      // Se retornou menos que o limite, chegou ao fim
-      if (msgs.length < 100) {
-        hasMore = false;
-      } else {
-        page++;
-      }
+      if (msgs.length < 100) break;
+      page++;
     }
 
-    // Ordena por data crescente
     allMsgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
     return res.status(200).json({
@@ -76,9 +63,7 @@ export default async function handler(req, res) {
         id: m.id,
         isFromMe: m.isFromMe,
         text: m.text || '',
-        type: m.type,
         createdAt: m.createdAt,
-        userId: m.userId,
       })),
       total: allMsgs.length,
     });
