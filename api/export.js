@@ -6,13 +6,17 @@ export default async function handler(req, res) {
   if (!ticketId) return res.status(400).json({ error: 'ticketId obrigatório' });
 
   try {
-    // Busca ticket e contato
+    // Busca ticket
     const ticketRes = await fetch(`https://outtax.digisac.me/api/v1/tickets/${ticketId}`, {
       headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
     });
     const ticketData = await ticketRes.json();
     const ticket = ticketData.data || ticketData;
 
+    const startedAt = new Date(ticket.startedAt);
+    const endedAt   = ticket.endedAt ? new Date(ticket.endedAt) : new Date();
+
+    // Busca contato
     let contact = null;
     if (ticket.contactId) {
       try {
@@ -23,8 +27,7 @@ export default async function handler(req, res) {
       } catch(e) {}
     }
 
-    // Busca mensagens — sem filtrar por ticketId (campo não existe na resposta)
-    // A API já filtra pelo ticketId na query string
+    // Busca mensagens filtrando pela data de início/fim do ticket
     const allMsgs = [];
     let page = 1;
 
@@ -36,10 +39,15 @@ export default async function handler(req, res) {
       const d = await r.json();
       const msgs = d.data || [];
 
-      // Aceita qualquer mensagem com texto, sem filtrar por ticketId
-      const comTexto = msgs.filter(m => m.text && m.text.trim() && m.type !== 'system');
-      allMsgs.push(...comTexto);
+      const filtradas = msgs.filter(m => {
+        if (!m.text || !m.text.trim()) return false;
+        if (m.type === 'system') return false;
+        // Filtra apenas mensagens dentro do período do ticket
+        const msgAt = new Date(m.createdAt);
+        return msgAt >= startedAt && msgAt <= endedAt;
+      });
 
+      allMsgs.push(...filtradas);
       if (msgs.length < 100) break;
       page++;
     }
