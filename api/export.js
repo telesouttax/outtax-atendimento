@@ -9,7 +9,6 @@ export default async function handler(req, res) {
     let ticket = null;
     let resolvedContactId = contactId;
 
-    // Se veio ticketId, busca o ticket para pegar o contactId
     if (ticketId) {
       const ticketRes = await fetch(`https://outtax.digisac.me/api/v1/tickets/${ticketId}`, {
         headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
@@ -30,23 +29,34 @@ export default async function handler(req, res) {
       } catch(e) {}
     }
 
-    // Busca TODAS as mensagens do contato (conversa completa)
+    // Descobre total de páginas
+    const firstRes = await fetch(
+      `https://outtax.digisac.me/api/v1/messages?contactId=${resolvedContactId}&limit=100&page=1`,
+      { headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` } }
+    );
+    const firstData = await firstRes.json();
+    const lastPage = firstData.lastPage || 1;
+    const totalMsgs = firstData.total || 0;
+
+    // Busca todas as páginas (do início ao fim)
     const allMsgs = [];
-    let page = 1;
+    const maxPages = Math.min(lastPage, 50); // máx 5000 mensagens
 
-    while (page <= 50) { // até 5000 mensagens
-      const r = await fetch(
-        `https://outtax.digisac.me/api/v1/messages?contactId=${resolvedContactId}&limit=100&page=${page}`,
-        { headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` } }
-      );
-      const d = await r.json();
-      const msgs = d.data || [];
-
-      const comTexto = msgs.filter(m => m.text && m.text.trim() && m.type !== 'system');
-      allMsgs.push(...comTexto);
-
-      if (msgs.length < 100) break;
-      page++;
+    // Busca todas as páginas em paralelo (em lotes de 10)
+    for (let batch = 1; batch <= maxPages; batch += 10) {
+      const batchPages = [];
+      for (let p = batch; p <= Math.min(batch + 9, maxPages); p++) {
+        batchPages.push(p);
+      }
+      const batchResults = await Promise.all(batchPages.map(p =>
+        fetch(`https://outtax.digisac.me/api/v1/messages?contactId=${resolvedContactId}&limit=100&page=${p}`, {
+          headers: { 'Authorization': `Bearer ${process.env.DIGISAC_TOKEN}` }
+        }).then(r => r.json())
+      ));
+      batchResults.forEach(d => {
+        const msgs = (d.data || []).filter(m => m.text && m.text.trim() && m.type !== 'system');
+        allMsgs.push(...msgs);
+      });
     }
 
     allMsgs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
@@ -72,6 +82,8 @@ export default async function handler(req, res) {
         createdAt: m.createdAt,
       })),
       total: allMsgs.length,
+      totalMsgs,
+      pages: lastPage,
     });
 
   } catch (error) {
